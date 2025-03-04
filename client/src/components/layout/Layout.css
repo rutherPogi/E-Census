@@ -1,0 +1,290 @@
+.layout-container {
+  display: grid;
+
+  grid-template-areas:
+  'sidebar topbar'
+  'sidebar main';
+  grid-template-rows: auto 1fr;
+  grid-template-columns: auto 1fr;
+
+  height: 100%;
+}
+
+.main-content {
+  grid-area: main;
+  padding: 2em;
+
+  height: 100%;
+
+  box-sizing: border-box;
+  display: flex; 
+  justify-content: center;
+
+  overflow: hidden;
+
+  background-color: var(--body-color);
+}
+
+.sidebar {
+  grid-area: sidebar;
+
+  box-sizing: border-box;
+  height: 100vh;
+  width: 250px;
+  padding: 0 .5em;
+  background-image: var(--sidebar-color); 
+  color: var(--text-color2);
+ 
+  position: sticky;
+  top: 0;
+  align-self: start;
+  transition: 300ms ease-in-out;
+  overflow: hidden;
+  text-wrap: nowrap;
+}
+
+.profile {
+  height: 90px;
+  padding: 0 1em;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #fff;
+
+  display: flex;
+  align-items: center;
+
+  gap: 1em;
+
+  .profile-photo { 
+    background-color: #fff;
+    height: 40px;
+    width: 10px;
+  }
+
+  .profile-description h1, h2 {
+    margin: 0;
+  }
+
+  .profile-description h1 {
+    font-size: 1.5em;
+  }
+
+  .profile-description h2 {
+    font-size: .8em;
+  }
+
+}
+
+.sidebar ul {
+  margin: 0;
+  padding: 0;
+  list-style: none; 
+}
+
+#toggle-button {
+  padding: 1em;
+  border: none;
+  border-radius: .5em;
+  background: none;
+  cursor: pointer;
+  
+  svg {
+    /* transition: rotate 150ms ease; */
+    fill: var(--text-color2);
+  } 
+}
+
+.active-link {
+  background-color: var(--selected-color);
+}
+
+/* Design */
+.sidebar a, .dropdown-button, .sub-link {
+  display: flex;
+  align-items: center;
+  gap: 1.2em; /* gap between icon and text */
+
+  border-radius: 4px;
+  padding: .85em;
+  text-decoration: none;
+  color: var(--text-color2);
+}
+
+/* HOVER COLOR */
+.sidebar a:hover, .sidebar .dropdown-button:hover {
+  background-color: var(--hover-color);
+}
+
+/* Survey | ID Generator Button Design*/
+.dropdown-button, .sub-link {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* NOTHING */
+.sidebar svg {
+  flex-shrink: 0; /* prevent distortion in size */
+}
+
+.sub-menu {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: 300ms ease-in-out;
+
+  a {
+    padding-left: 3.5em;
+  }
+
+  > div {
+    overflow: hidden;
+  }
+}
+
+.sub-menu.open {
+  grid-template-rows: 1fr;
+}
+
+.sub-menu.closed {
+  display: none; 
+}
+
+/* --------------------------------------------------------------- */
+
+#header {
+  grid-area: topbar;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  position: sticky;
+
+  background-color: #fff;
+  height: 60px;
+
+  padding-right: 1em;
+  
+  svg {
+    fill: var(--text-color1);
+  }
+}
+
+#header-left {
+  display: flex;
+
+  padding-left: .8em;
+  gap: 1em;
+
+  transition: 300ms ease-in-out;
+
+  .logo {
+    justify-content: center;
+    border: 1px solid var(--text-color1);
+    background-color: var(--text-color1);
+    border-radius: 6px;
+    height: 30px;
+    width: 100px;
+
+    font-family: Poppins;
+    font-weight: 500;
+    font-size: 1.3rem;
+    color: #fff;
+  }
+
+  #toggle-button svg {
+    fill: var(--text-color1);
+  }
+}
+
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+}
+
+#header-left.close {
+  padding: 0;
+  gap: 1.5em;
+  transition: 300ms ease-in-out;
+}
+
+#header button {
+  padding: 0;
+}
+
+#header-right {
+  svg {
+    flex-shrink: 0;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+  }
+
+  .dropdown {
+    display: none;
+    position: absolute;
+    right: 10px;
+    border-radius: 8px;
+    padding: 1em;
+    background-color: var(--text-color1);
+
+    .logout {
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+}
+
+#header-right:hover .dropdown{
+  display: block;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+  .sidebar.active {
+    display: block;
+    position: fixed;
+    width: auto;
+    top: 60px;
+    left: 0;
+    z-index: 999;
+  }
+}
+
+@media (max-width: 768px){
+
+  .layout-container {
+    grid-template-areas:
+    'topbar'
+    'main';
+    grid-template-rows: auto 1fr;
+    grid-template-columns: 1fr;
+  
+    height: 100%;
+  }
+
+  #toggle-button {
+    display: block;
+  }
+
+  .main-content {
+    height: 100%;
+  }
+}
+
+@media (max-width: 425px) {
+  .main-content {
+    
+    overflow: auto;
+  }
+}

@@ -1,0 +1,27 @@
+[ TERMINAL ]
+- npm create vite@latest
+project name: client
+- cd client
+- npm install
+
+[ APP ]
+create server folder
+
+[ TERMINAL - SERVER ]
+- npm init -y
+
+[ SERVER - PACKAGE.JSON]
+rename "main": "index.js" -> "main": "server.js" 
+
+[ SERVER ]
+create server.js
+
+[ TERMINAL - SERVER ]
+npm i express
+npm i nodemon -D
+
+[ CORS, BCRYPTJS, JSONWEBTOKEN, MYSQL2 ]
+npm install cors
+npm install bcrpytjs
+npm install jsonwebtoken
+npm install --save mysql2

@@ -27,8 +27,8 @@ const FeatureBox = ({ image, title, description }) => (
       src={image} 
       alt={title}
       sx={{
-        width: 120,
-        height: 120,
+        width: 100,
+        height: 100,
         mb: 2
       }}
     />
@@ -69,7 +69,7 @@ const Features = () => {
     {
       image: hazzardMap,
       title: "Hazzard Map",
-      description: "For awareness."
+      description: "For awareness before, after, and during natural disasters."
     }
   ];
 

@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   return (
-    <Box sx={{ width: '100%', overflow: 'hidden' }}>
+    <Box sx={{ width: '100%', overflow: 'hidden', bgcolor: '#fff'}}>
       {/* Hero Banner Section */}
       <Banner onLogin={handleLogin} />
       

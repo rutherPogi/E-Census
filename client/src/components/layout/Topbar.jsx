@@ -66,14 +66,16 @@ const Topbar = ({ onMenuClick, userName = "Ruther Frith Solloso" }) => {
         
         
         {/* User Menu Button */}
-        <IconButton
+        <Button
           color="inherit"
           aria-label="toggle sidebar"
           edge="start"
           onClick={handleMenuOpen}
+          endIcon={<ExpandMoreIcon sx={{ color: '#DC623C'}}/>}
         >
-          <ExpandMoreIcon sx={{ color: '#DC623C'}}/>
-        </IconButton>
+          <Avatar/>
+
+        </Button>
         
         {/* User Menu */}
         <Menu

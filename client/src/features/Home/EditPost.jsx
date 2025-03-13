@@ -12,7 +12,7 @@ export default function EditPost() {
           padding: 5
         }}
       >
-        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mb: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end', mb: 5 }}>
           <Button variant="outlined" startIcon={<Edit/>}>EDIT POST</Button>
           <Button variant="contained" startIcon={<Add/>}>ADD POST</Button>
         </Box>

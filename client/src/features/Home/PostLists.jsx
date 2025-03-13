@@ -1,11 +1,9 @@
 import { Box, Grid } from "@mui/material";
 import Posts from "./components/Posts";
 
-/**
- * Component that displays a list of news posts
- */
+
 const PostLists = () => {
-  // Sample news data
+
   const newsData = [
     {
       title: "Tech Innovation of 2025",

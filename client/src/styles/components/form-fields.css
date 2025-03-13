@@ -1,0 +1,142 @@
+.input-field {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: .5em;
+
+  svg {
+    fill: black;
+    cursor: pointer;
+  }
+
+  .dropdown {
+    padding: 0 .5em 0 0;
+    justify-content: space-between;
+  }
+
+  .dropdown-container.close {
+    display: none;
+  }
+  
+  .dropdown-container {
+    display: block;
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    top: 70px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 999;
+    background-color: #fff;
+    width: 100%;
+
+    li {
+      list-style: none;
+      padding: .5em;
+    }
+  
+    li:hover {
+      background-color: #ccc;
+    }
+  }
+}
+
+.input-field.serve {
+  margin-top: 1em;
+}
+
+textarea {
+  min-height: 200px;
+  font-family: Roboto;
+  padding: 1em;
+  font-size: 1rem;
+}
+
+.textfield {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0 10px;
+
+  input[type="number"] {
+    width: 100%;
+    font-size: 1rem;
+    border: none;
+    outline: none;
+  }
+}
+
+.textfield.disabled {
+  background-color: #ccc;
+
+  input {
+    background-color: #ccc;
+  }
+}
+
+/* REMOVES THE SPINNER BUTTONS */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.dropdown-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  max-width: 300px;
+}
+
+.dropdown {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  border: 1px solid #ccc;
+  border-radius: 5px;
+
+  input[type='text'] {
+    border: none;
+  }
+}
+
+.radio-field p {
+  color: #313131;
+}
+
+label {
+  font-size: 1rem;
+  color: #313131;
+}
+
+
+input[type="date"],
+input[type="email"],
+input[type="number"] {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+
+@media (max-width: 1024px) {
+
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 425px) {
+
+}
+

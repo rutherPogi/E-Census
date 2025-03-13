@@ -1,0 +1,155 @@
+.form-container {
+  width: 100%;
+}
+
+.responsive-container {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 5px 5px 10px #888888;
+}
+
+.card.survey {
+  display: flex;
+  flex-direction: column;
+
+  padding: 1em;
+  gap: 1em;
+  width: 50%;
+
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 5px 5px 10px #888888;
+
+  .random-box {
+    background-color: #ccc;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+  }
+}
+
+@media (max-width: 425px) {
+
+  .card.survey {
+    width: 100%;
+
+    .random-box {
+      background-color: #ccc;
+      width: 100%;
+      height: 250px;
+      border-radius: 5px;
+    }
+  }
+}
+
+.responsive-header {
+  font-family: Poppins;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+
+  padding: .5em 1em;
+  border-bottom: 2px solid var(--secondary-color);
+
+  position: sticky;
+  top: 0;
+  z-index: 10; 
+  background-color: #fff;
+}
+
+.responsive-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1em;
+  padding: 1em;
+}
+
+.responsive-table {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1em;
+  padding: 1em;
+}
+
+.responsive-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  padding: 1em;
+
+  .person {
+    border-bottom: 1px solid black;
+  }
+
+  .details {
+    display: flex;
+    flex-direction: column;
+  
+    margin-bottom: 12px;
+  }
+
+  .label-details {
+    font-size: 1rem;
+    color: #555;
+    margin: 0;
+  }
+  
+  .value-details {
+    font-size: 1rem;
+    color: #000;
+    margin: 0;
+  }
+}
+
+
+/* --------------- RESPONSIVE ------------------------------ RESPONSIVE ---------------*/
+@media (max-width: 1024px) {
+  .responsive-header {
+    text-align: center;
+  }
+
+  .responsive-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+
+  .responsive-container {
+    max-height: none;
+    height: auto;
+  }
+
+  .responsive-header {
+    text-align: center;
+  }
+}
+
+
+@media (max-width: 425px) {
+
+  .responsive-container {
+    max-height: none;
+    height: auto;
+  }
+
+  .responsive-header {
+    text-align: center;
+    font-size: 1rem;
+  }
+
+  .responsive-form {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+

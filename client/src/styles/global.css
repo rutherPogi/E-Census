@@ -1,0 +1,30 @@
+:root {
+  font-family: 'Roboto', sans-serif;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Colors */
+  --body-color: #D9D9D9;
+  --sidebar-color: linear-gradient(to bottom, #FF6433, #F0995A);;
+  --hover-color: #FF8566;
+  --selected-color: #CC4F2A;
+  --text-color1: #D1452B;
+  --text-color2: #e6e6ef;
+  --secondary-color: #2C83A1;
+  --hover-secondary-color: #1c6780;
+  --gray: #464646;
+  --delete: #f44336;
+  --edit: #007bff;
+  --view: #37b267;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  background-color: #D4D4D4;
+}

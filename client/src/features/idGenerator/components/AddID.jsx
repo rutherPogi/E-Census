@@ -52,7 +52,7 @@ export default function AddID({ idType, onClick, id }) {
             startIcon={<Edit />}
             sx={{ width: '100%' }}
           >
-            MANAGE {idType} IDs
+            MANAGE {idType} ID's
           </Button>
         </Box>
       </Box>

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 
 export const formatCurrency = (value) => {
-  if (!value) return '0';
+  if (!value) return;
   const plainNumber = value.toString().replace(/[^\d.]/g, ''); // Allow decimal points
   return `${parseFloat(plainNumber).toLocaleString()}`;
 };

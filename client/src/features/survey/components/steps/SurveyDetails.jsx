@@ -1,7 +1,7 @@
 import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
 import { useLocation } from 'react-router-dom';
-import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from '../../utils/constants';
+import { BARANGAY_OPTIONS, FAMILY_CLASS_OPTIONS, INCOME_EMPLOYMENT_OPTIONS, MUNICIPALITY_OPTIONS, SD_REQUIRED_FIELDS } from '../../utils/constants';
 import { TextInput, CurrencyInput, DropdownInput } from '../others/FormFields'
 import { formatCurrency } from '../../utils/formatter'
 import { Snackbar, Alert } from '@mui/material';
@@ -23,7 +23,9 @@ export default function SurveyDetails({ handleBack, handleNext}) {
     municipality: '',
     totalMonthlyIncome: '',
     irregularIncome: '',
-    familyIncome: ''
+    familyIncome: '',
+    familyClass: '',
+    employmentStatus: ''
   }); 
 
   const [errors, setErrors] = useState({
@@ -33,7 +35,9 @@ export default function SurveyDetails({ handleBack, handleNext}) {
     municipality: false,
     totalMonthlyIncome: false,
     irregularIncome: false,
-    familyIncome: false
+    familyIncome: false,
+    familyClass: false,
+    employmentStatus: false
   }); 
 
   useEffect(() => {
@@ -51,8 +55,9 @@ export default function SurveyDetails({ handleBack, handleNext}) {
     let isValid = true;
 
     // Validate required fields
-    Object.keys(values).forEach(key => {
-      if (!values[key]) {
+    SD_REQUIRED_FIELDS.forEach(key => {
+      const value = values[key];
+      if (!value) {
         newErrors[key] = 'This field is required';
         isValid = false;
       }
@@ -94,6 +99,11 @@ export default function SurveyDetails({ handleBack, handleNext}) {
       setErrors(prev => ({ ...prev, [field]: 'Amount cannot exceed ₱999,999,999' }));
       return;
     }
+
+    if (Number(plainNumber) <= 1) {
+      setErrors(prev => ({ ...prev, [field]: 'Amount cannot be less than ₱1 ' }));
+      return;
+    }
     
     setErrors(prev => ({ ...prev, [field]: false }));
     setValues(prev => ({
@@ -120,7 +130,7 @@ export default function SurveyDetails({ handleBack, handleNext}) {
 
   return(
     <div className='responsive-container'>
-      <div className='responsive-header'>SURVEY #{surveyNumber}</div>
+      <div className='responsive-header'>SURVEY DETAILS</div>
       <div className='responsive-form'>
         <TextInput
           label='Respondent'
@@ -160,12 +170,32 @@ export default function SurveyDetails({ handleBack, handleNext}) {
           placeholder = 'Enter your municipality'
           required
         />
+        <DropdownInput
+          label = 'Family Class'
+          options = {FAMILY_CLASS_OPTIONS}
+          value = {values.familyClass}
+          onChange = {(e, newValue) => handleChange('familyClass')(e, newValue)}
+          error = {errors.familyClass} 
+          helperText = {errors.familyClass}
+          placeholder = 'Enter family class'
+          required
+        />
         <CurrencyInput
           label = 'Average Monthly Income'
           value =  {values.totalMonthlyIncome}
           onChange =  {handleIncomeChange('totalMonthlyIncome')}
           error =  {errors.totalMonthlyIncome}
           helperText = {errors.totalMonthlyIncome}
+          placeholder= '0.00'
+        />
+        <DropdownInput
+          label = 'Employment Type'
+          options = {INCOME_EMPLOYMENT_OPTIONS}
+          value = {values.familyClass}
+          onChange = {(e, newValue) => handleChange('familyClass')(e, newValue)}
+          error = {errors.familyClass} 
+          helperText = {errors.familyClass}
+          placeholder = 'Enter family class'
           required
         />
         <CurrencyInput
@@ -174,6 +204,7 @@ export default function SurveyDetails({ handleBack, handleNext}) {
           onChange =  {handleIncomeChange('irregularIncome')}
           error =  {errors.irregularIncome}
           helperText = {errors.irregularIncome}
+          placeholder= '0.00'
           required
         />
         <CurrencyInput
@@ -182,6 +213,7 @@ export default function SurveyDetails({ handleBack, handleNext}) {
           onChange =  {handleIncomeChange('familyIncome')}
           error =  {errors.familyIncome}
           helperText = {errors.familyIncome}
+          placeholder= '0.00'
           required
         />
       </div>

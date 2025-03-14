@@ -163,7 +163,6 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           isValid = false;
         }
       }
-      
     });
 
     setErrors(newErrors);
@@ -232,7 +231,6 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           error={errors.middleName}
           helperText = {errors.middleName}
           placeholder = 'Enter Middle Name'
-          required
         />
         <TextInput
           label='Last Name'

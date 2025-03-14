@@ -130,7 +130,7 @@ const Sidebar = ({
         </Tooltip>
 
         {/* Survey */}
-        <Tooltip title={!open ? "Survey" : ""} placement="right">
+        <Tooltip title={!open ? "Census" : ""} placement="right">
           <ListItem 
             onClick={() => handleItemClick('/main/survey')}
             sx={listItemStyles(isActive('/main/survey'))}
@@ -138,7 +138,7 @@ const Sidebar = ({
             <ListItemIcon sx={{ color: isActive('/main/survey') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
               <Assignment />
             </ListItemIcon>
-            {open && <ListItemText primary="Survey" />}
+            {open && <ListItemText primary="Census" />}
           </ListItem>
         </Tooltip>
 

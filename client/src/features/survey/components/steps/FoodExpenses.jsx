@@ -93,10 +93,10 @@ export default function FoodExpenses({ handleBack, handleNext }) {
       };
 
       const newFoodTotal = Object.values(updatedValues).reduce((sum, val) => {
-        // Ensure val is a string before calling replace
-        const valStr = typeof val === 'string' ? val : '0';
+        const valStr = typeof val === 'string' ? val : val?.toString() || '0';
         return sum + (parseFloat(valStr.replace(/,/g, '')) || 0);
       }, 0);
+      
       
       setFoodTotal(newFoodTotal);
       return updatedValues;

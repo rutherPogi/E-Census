@@ -1,20 +1,30 @@
 import { useState } from "react";
-import {
-  Container,
-  Paper,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Avatar,
-  IconButton,
-  InputAdornment
-} from "@mui/material";
+import { Container, Paper, Box, Typography, TextField,
+         Button, Avatar, IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff, PhotoCamera } from "@mui/icons-material";
+
 import { useAuth } from "../../utils/auth/authContext";
 
+
+
+const getInitials = (name) => {
+  if (!name) return '';
+  
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2); // Limit to 2 characters
+};
+
+
+
 export default function Profile() {
+
   const { userData } = useAuth();
+  const userInitials = getInitials(userData.accountName);
+
   const [formData, setFormData] = useState({
     name: userData.accountName,
     username: userData.username,
@@ -51,7 +61,7 @@ export default function Profile() {
   return (
     <Container component={Paper} sx={{ p: 4, maxWidth: 500 }}>
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
-        <Avatar src={formData.photo} sx={{ width: 100, height: 100 }} />
+        <Avatar sx={{ bgcolor: '#DC623C', height: 100, width: 100, fontSize: '36px' }}>{userInitials}</Avatar>
         <IconButton component="label">
           <PhotoCamera />
           <input type="file" hidden accept="image/*" onChange={handlePhotoChange} />

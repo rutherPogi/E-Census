@@ -18,12 +18,23 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import { useAuth } from '../../utils/auth/authContext';
 
+const getInitials = (name) => {
+  if (!name) return '';
+  
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2); // Limit to 2 characters
+};
 
 const Topbar = ({ onMenuClick}) => {
   // State for user menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { logout, userData } = useAuth();
+  const userInitials = getInitials(userData.accountName);
 
   // Handle menu open and close
   const handleMenuOpen = (event) => {
@@ -73,8 +84,9 @@ const Topbar = ({ onMenuClick}) => {
           onClick={handleMenuOpen}
           endIcon={<ExpandMoreIcon sx={{ color: '#DC623C'}}/>}
         >
-          <Avatar/>
-
+          <Avatar sx={{ bgcolor: '#DC623C' }}>
+            {userInitials}
+          </Avatar>
         </Button>
         
         {/* User Menu */}

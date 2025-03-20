@@ -1,61 +1,75 @@
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, Container, Paper } from '@mui/material';
+import { Box, Button, Card, Container, Paper, Typography } from '@mui/material';
 import { Edit, Add } from '@mui/icons-material';
 import '../../../styles/components/style'
 
 
-export default function AddID({ idType, onClick, id }) {
+export default function AddID({ idType, onClick, id, idImage, title }) {
 
   const navigate = useNavigate();
 
 
   return(
-    <Container component={Paper}
+    <Container 
       sx={{
-        height: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        gap: 1,
-        backgroundColor: '#fff',
+        alignItems: 'center', 
         padding: 2
       }}
     >
-      <Box
-        sx={{
-          width: '600px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2
-        }}
-      >
-        <Box
+      <Box 
+        display={'flex'} 
+        flexDirection={'column'} 
+        alignItems={'center'}
+        backgroundColor={'#fff'} 
+        p={3}
+        gap={2} >
+        <Typography variant='h6'>{title} ID</Typography>
+        <Box 
           sx={{
-            height: '300px',
-            width: '100%',
-            backgroundColor: '#ccc',
-            borderRadius: 1
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 5
           }}
-        />
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
-          <Button
-            variant="contained"
-            onClick={onClick}
-            startIcon={<Add />}
-            sx={{ width: '100%' }}
-          >
-            ADD {idType} ID
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => navigate(`/main/manage-${id}ID`)}
-            startIcon={<Edit />}
-            sx={{ width: '100%' }}
-          >
-            MANAGE {idType} ID's
-          </Button>
+        >
+          <Card component="img" elevation={2} src={idImage}
+            sx={{
+              height: '300px',
+              width: '100%',
+              backgroundColor: '#ccc',
+              border: '1px solid #ccc',
+              borderRadius: 3
+            }}
+          />
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 1, 
+            width: '100%', 
+            backgroundColor: '#fff',
+            padding: 1,
+            borderRadius: 2,
+            boxSizing: 'border-box' }}>
+            <Button
+              variant="contained"
+              onClick={onClick}
+              startIcon={<Add />}
+              sx={{ width: '100%' }}
+            >
+              ADD {idType} ID
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate(`/main/manage-${id}ID`)}
+              startIcon={<Edit />}
+              sx={{ width: '100%' }}
+            >
+              MANAGE {idType} ID's
+            </Button>
+          </Box>
         </Box>
-      </Box>
+      </Box>     
     </Container>
   
   )

@@ -35,7 +35,7 @@ const ManagePwdID = () => {
   const fetchSurveyData = async () => {
     setLoading(true);
     try {
-      const response = await get('/surveys/manage-survey');
+      const response = await get('/pwdID/manage-PwdId');
       setSurveyData(response);
       setFilteredData(response);
     } catch (err) {

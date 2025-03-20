@@ -159,27 +159,26 @@ export const OscaSection = ({ data, handleEdit }) => (
 
 export const PhotoSignatureSection = ({ data, handleEdit }) => (
   <Section title="Photo and Signature" handleEdit={handleEdit} pageNumber={11}>
-    <Container>
-      {data.photoSignature && data.photoSignature.photoID ? (
+    {data.scMedia?.photoIDPreview && (
+      <div className="image-container">
+        <p className="info-label">PhotoID:</p>
         <img 
-          src={data.photoSignature.photoID.preview} 
-          alt="Photo ID" 
-          style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '8px', marginLeft: '1em' }} 
+          src={data.scMedia.photoIDPreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
         />
-      ) : (
-        <p>No photo ID uploaded</p>
-      )}
-
-      {data.photoSignature && data.photoSignature.signature ? (
+      </div>
+    )}
+    {data.scMedia?.signaturePreview && (
+      <div className="image-container">
+        <p className="info-label">Signature:</p>
         <img 
-          src={data.photoSignature.signature.preview} 
-          alt="Photo ID" 
-          style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '8px', marginLeft: '1em' }} 
+          src={data.scMedia.signaturePreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
         />
-      ) : (
-        <p>No signature uploaded</p>
-      )}
-    </Container>
+      </div>
+    )}
   </Section>
 );
 

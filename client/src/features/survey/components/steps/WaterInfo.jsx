@@ -1,22 +1,22 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { Snackbar, Alert } from '@mui/material';
-import { 
-  Radio, 
-  RadioGroup, 
-  FormControlLabel, 
-  FormControl, 
-  FormLabel, 
-  FormHelperText
-} from "@mui/material";
+import { Button } from '@mui/material';
+import { Radio, RadioGroup, FormControlLabel, FormControl, 
+         FormLabel, FormHelperText } from "@mui/material";
+
+         
 import { TextInput } from '../others/FormFields'
+import { useFormContext } from "../../pages/FormContext";
+import { Notification } from '../../../../components/common/Notification'
  
+
 
 export default function WaterInfo({ handleBack, handleNext}) {
 
   const { formData, updateFormData } = useFormContext();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
   const [values, setValues] = useState({
     accessWater: formData.accessWater || '',
@@ -29,6 +29,12 @@ export default function WaterInfo({ handleBack, handleNext}) {
     potableWater: false,
     sourceWater: false
   });
+
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
 
   useEffect(() => {
     if (formData.waterInfo) {
@@ -51,50 +57,23 @@ export default function WaterInfo({ handleBack, handleNext}) {
     return !Object.values(newErrors).some(error => error);
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value
-    });
-    
-    // Clear error when field is filled
-    if (value) {
-      setErrors({
-        ...errors,
-        [name]: false
-      });
-    }
+    setValues({ ...values, [name]: value });
+    setErrors({ ...errors, [name]: false });
   };
 
   const handleTextChange = (field) => (e) => {
     const value = e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    
-    if (value) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: false
-      }));
-    }
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors({ ...errors, [name]: false });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSnackbarOpen(true);
+      showNotification('Please fill in all required fields', 'error');
       return;
     }
 
@@ -105,6 +84,8 @@ export default function WaterInfo({ handleBack, handleNext}) {
 
     handleNext();
   };
+
+
 
   return(
     <div className='responsive-container'>
@@ -141,32 +122,23 @@ export default function WaterInfo({ handleBack, handleNext}) {
           value={values.sourceWater}
           onChange={handleTextChange('sourceWater')}
           error={errors.sourceWater}
-          helperText = {errors.sourceWater}
+          helperText = {errors.sourceWater || 'e.g., ---'}
           placeholder = 'Enter sources of water'
           required
         />
       </form>
       <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-          </div>     
+        <div className='form-buttons-right'>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   )
 }

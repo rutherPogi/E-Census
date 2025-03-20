@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FormProvider } from "../components/others/FormContext";
 import { PersonalInfo, DisabilityInfo, ContactInfo, ProfessionalInfo, OrganizationInfo,
-         IDReferenceInfo, FamilyBackground, AccomplishedBy, OtherInfo, ReportingUnit, PhotoID,
-         DisplayPWDInfo } from '../components/steps'
+         IDReferenceInfo, FamilyBackground, AccomplishedBy, OtherInfo, ReportingUnit,
+         DisplayPWDInfo, PwdMedia, PrintID} from '../components/steps'
 
 
 export default function PWDForm() {
@@ -31,7 +31,7 @@ export default function PWDForm() {
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && <PersonalInfo handleNext={handleNext}/>}
+        {currentPage === 0 && <PersonalInfo handleNext={handleNext}/>}
         {currentPage === 2 && <DisabilityInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 3 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 4 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
@@ -41,8 +41,9 @@ export default function PWDForm() {
         {currentPage === 8 && <AccomplishedBy handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 9 && <OtherInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 10 && <ReportingUnit handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 11 && <PhotoID handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 11 && <PwdMedia handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 12 && <DisplayPWDInfo handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
         <div className='form-pagination'>
           {Array.from({ length: 12 }, (_, index) => (
             <div key={index} className={`circle ${currentPage === index + 1 ? "active" : ""}`}></div>

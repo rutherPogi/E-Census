@@ -13,6 +13,7 @@ export { default as Farmlots } from './Farmlots';
 export { default as FoodExpenses } from './FoodExpenses';
 export { default as FruitBearingTree } from './FruitBearingTree';
 export { default as HouseInfo } from './HouseInfo';
+export { default as HouseInfo2 } from './HouseInfo2';
 export { default as Livestock } from './Livestock';
 export { default as MonthlyExpenses } from './MonthlyExpenses';
 export { default as NonIvatan } from './NonIvatan';

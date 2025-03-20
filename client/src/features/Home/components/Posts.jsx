@@ -1,8 +1,21 @@
 import { Box, Card, CardContent, CardMedia, Typography, CardActionArea } from "@mui/material";
 
-/**
- * Component for displaying a single post/news item
- */
+const getImageSource = (imageData) => {
+  if (!imageData) {
+    console.log('No image data received');
+    return null;
+  }
+  
+  // The imageData should already be a complete data URL from the backend
+  if (typeof imageData === 'string') {
+    return imageData;
+  }
+  
+  console.error('Invalid image data format');
+  return null;
+};
+
+
 const Posts = ({ title, description, date, image }) => {
   // Format date for display
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -28,7 +41,7 @@ const Posts = ({ title, description, date, image }) => {
         <CardMedia
           component="img"
           height="160"
-          image={image}
+          image={getImageSource(image)}
           alt={title}
           sx={{
             objectFit: 'cover'

@@ -20,7 +20,6 @@ const Login = () => {
   // Hooks
   const { login } = useAuth();
   const navigate = useNavigate();
-  const isSmallScreen = useMediaQuery('(max-width: 960px)');
 
   // Helper functions
   const handleCloseSnackbar = () => {
@@ -63,9 +62,17 @@ const Login = () => {
         });
         return;
       }
+
       
-      // Store token and update auth context
-      login(res.data.token);
+      // Store token, user data and update auth context
+      const userData = {
+        username: res.data.username,
+        accountName: res.data.accountName,
+        userID: res.data.userID,
+        position: res.data.position
+      };
+
+      login(res.data.token, userData);
       
       // Set authorization header for future requests
       axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;

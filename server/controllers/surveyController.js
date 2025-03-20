@@ -30,78 +30,89 @@ export const submitSurvey = async (req, res) => {
   
   try {
     await connection.beginTransaction();
-    
-    const surveyID = req.body.surveyData.surveyID;
-    console.log("Processing survey ID:", surveyID);
+
+    // Parse the surveyData JSON string
+    const surveyData = JSON.parse(req.body.surveyData);
+    const surveyID = surveyData.surveyData.surveyID;
+
     
     // 1. Insert Survey Data
     console.log("Step 1");
-    await surveyModel.createSurvey(req.body.surveyData, connection);
+    await surveyModel.createSurvey(surveyData.surveyData, connection);
     
     // 2. Insert Family Members
     console.log("Step 2");
-    await surveyModel.addFamilyMembers(surveyID, req.body.familyMembers, connection);
+    await surveyModel.addFamilyMembers(surveyID, surveyData.familyMembers, connection);
     
     // 3. Insert Expenses
     console.log("Step 3");
     await surveyModel.addExpenses(
       surveyID, 
-      req.body.foodExpenses, req.body.educationExpenses,
-      req.body.familyExpenses, req.body.monthlyExpenses,
+      surveyData.foodExpenses, surveyData.educationExpenses,
+      surveyData.familyExpenses, surveyData.monthlyExpenses,
       connection
     );
 
+    const houseImageFile = req.file ? req.file.fieldname || req.file.path : null;
+    const houseImageBuffer = req.file ? req.file.buffer : null;
+    console.log("Image buffer size:", req.file ? req.file.buffer.length : 0);
+
     // 4. Insert House Info
     console.log("Step 4");
-    await surveyModel.addHouseInfo(surveyID, req.body.houseInfo, connection);
+    await surveyModel.addHouseInfo(
+      surveyID, 
+      surveyData.houseInfo, 
+      houseImageBuffer,
+      connection
+    );
     
     // 5. Insert Water Info
     console.log("Step 5");
-    await surveyModel.addWaterInfo(surveyID, req.body.water, connection);
+    await surveyModel.addWaterInfo(surveyID, surveyData.water, connection);
 
     // 6. Insert Livestock
     console.log("Step 6");
-    await surveyModel.addLivestock(surveyID, req.body.livestock, connection);
+    await surveyModel.addLivestock(surveyID, surveyData.livestock, connection);
 
     // 7. Insert FarmLots
     console.log("Step 7");
-    await surveyModel.addFarmlots(surveyID, req.body.farmlots, connection);
+    await surveyModel.addFarmlots(surveyID, surveyData.farmlots, connection);
 
     // 8. Insert Crops Planted
     console.log("Step 8");
-    await surveyModel.addCropsPlanted(surveyID, req.body.cropsPlanted, connection);
+    await surveyModel.addCropsPlanted(surveyID, surveyData.cropsPlanted, connection);
 
     // 9. Insert Fruit Bearing Tree
     console.log("Step 9");
-    await surveyModel.addFruitBearingTree(surveyID, req.body.fruitBearingTree, connection);
+    await surveyModel.addFruitBearingTree(surveyID, surveyData.fruitBearingTree, connection);
 
     // 10. Insert Family Resources
     console.log("Step 10");
-    await surveyModel.addFamilyResources(surveyID, req.body.familyResources, connection);
+    await surveyModel.addFamilyResources(surveyID, surveyData.familyResources, connection);
 
     // 11. Insert Appliances Own
     console.log("Step 11");
-    await surveyModel.addAppliancesOwn(surveyID, req.body.appliancesOwn, connection);
+    await surveyModel.addAppliancesOwn(surveyID, surveyData.appliancesOwn, connection);
 
     // 12. Insert Other Amenities
     console.log("Step 12");
-    await surveyModel.addAmenities(surveyID, req.body.amenitiesOwn, connection);
+    await surveyModel.addAmenities(surveyID, surveyData.amenitiesOwn, connection);
 
     // 13. Insert Community Issues
     console.log("Step 13");
-    await surveyModel.addCommunityIssues(surveyID, req.body.communityIssues, connection);
+    await surveyModel.addCommunityIssues(surveyID, surveyData.communityIssues, connection);
 
     // 14. Insert Assistance/Service Availed
     console.log("Step 14");
-    await surveyModel.addServiceAvailed(surveyID, req.body.serviceAvailed, connection);
+    await surveyModel.addServiceAvailed(surveyID, surveyData.serviceAvailed, connection);
 
     // 15. Insert Government Affiliation
     console.log("Step 15");
-    await surveyModel.addGovernmentAffiliation(surveyID, req.body.affiliation, connection);
+    await surveyModel.addGovernmentAffiliation(surveyID, surveyData.affiliation, connection);
 
     // 16. Insert IPULA / Non-Ivatan
     console.log("Step 16");
-    await surveyModel.addNonIvatan(surveyID, req.body.nonIvatan, connection);
+    await surveyModel.addNonIvatan(surveyID, surveyData.nonIvatan, connection);
 
 
     await connection.commit();

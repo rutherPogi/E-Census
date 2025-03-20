@@ -9,7 +9,8 @@ import { post } from '../../../../../utils/api/apiService';
 
 import { PersonalInfoSection, ContactInfoSection, ProfessionalInfoSection,
          OtherInfoSection, mapFamilyMembers, HouseholdCompositionSection,
-         ProblemNeedsSection, EmergencyContactSection, ApplicationDetailsSection} from "../others/DisplaySection";
+         ProblemNeedsSection, EmergencyContactSection, ApplicationDetailsSection,
+         PhotoIDSection} from "../others/DisplaySection";
 
 
 
@@ -29,27 +30,37 @@ export default function DisplayApplication({ handleBack, handleNext, handleEdit 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      console.log('Submitting form data:', formData);
-      const response = await post('/soloParentID/submit-soloParentID', formData);
+      const formDataToSend = new FormData();
+      const processedFormData = { ...formData };
+
+      formDataToSend.append('photoID', formData.spMedia.photoID);
+      formDataToSend.append('signature', formData.spMedia.signature);
+      
+      delete processedFormData.spMedia.photoIDPreview;
+      delete processedFormData.spMedia.signaturePreview;
+
+      formDataToSend.append('applicationData', JSON.stringify(processedFormData));
+      
+      console.log('Submitting form data:', processedFormData);
+
+      const response = await post('/soloParentID/submit-soloParentID', formDataToSend, true);
       
       if (response.success) {
-        showNotification('Solo Parent ID Application submitted!', 'success');
-
-        setTimeout(() => {
-          clearFormData();
-          navigate('/main/survey');
-        }, 2000);
+        alert('Application submitted successfully!');
+        clearFormData();
+        navigate('/main/survey');
       }
     } catch (error) {
-      console.error('Error submitting application:', error);
+      console.error('Error submitting survey:', error);
+        
       if (error.response) {
-        showNotification(`Server error: ${error.response.data.message || 'Unknown error'}`, 'error');
+        alert(`Server error: ${error.response.data.message || 'Unknown error'}`);
       } else if (error.request) {
-        showNotification('No response from server. Please check your connection.', 'error');
+        alert('No response from server. Please check your connection.');
       } else {
-        showNotification(`Error preparing request: ${error.message}`, 'error');
+        alert(`Error preparing request: ${error.message}`);
       }
     }
   };
@@ -77,6 +88,7 @@ export default function DisplayApplication({ handleBack, handleNext, handleEdit 
         <ProblemNeedsSection data={formData} handleEdit={handleEdit}/>
         <EmergencyContactSection data={formData} handleEdit={handleEdit}/>
         <ApplicationDetailsSection data={formData} handleEdit={handleEdit}/>
+        <PhotoIDSection data={formData} handleEdit={handleEdit}/>
 
       </Box>
       <div className='form-buttons'>

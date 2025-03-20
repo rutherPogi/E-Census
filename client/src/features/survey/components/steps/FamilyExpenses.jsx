@@ -1,15 +1,16 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
+import { Button, } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
 import { CurrencyInput } from "../others/FormFields"
 import { formatCurrency } from '../../utils/formatter'
 import { FAMILY_EXPENSES } from '../../utils/constants';
-import { Snackbar, Alert } from '@mui/material';
+
+
 
 export default function FamilyExpenses({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState(() => {
     const existingData = formData.familyExpenses?.expenses || {};
@@ -49,27 +50,6 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
     }
   }, [formData.familyExpenses]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    const hasValue = Object.values(values).some(val => 
-      parseFloat(val.replace(/,/g, '')) > 0
-    );
-
-    if (!hasValue) { isValid = false; }
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleChange = (field) => (e) => {
     const value = e.target.value;
     const plainNumber = value.replace(/,/g, '');
@@ -87,13 +67,9 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
     setErrors(prev => ({ ...prev, [field]: false }));
     
     setValues(prevValues => {
-      const updatedValues = {
-        ...prevValues,
-        [field]: formatCurrency(plainNumber)
-      };
+      const updatedValues = { ...prevValues, [field]: formatCurrency(plainNumber) };
 
       const newfamilyTotal = Object.values(updatedValues).reduce((sum, val) => {
-        // Ensure val is a string before calling replace
         const valStr = typeof val === 'string' ? val : '0';
         return sum + (parseFloat(valStr.replace(/,/g, '')) || 0);
       }, 0);
@@ -105,12 +81,6 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in at least one!");
-      setSnackbarOpen(true);
-      return;
-    }
 
     const processedValues = { ...values };
     
@@ -127,6 +97,8 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
     handleNext();
   };
   
+
+  
   return (
     <div className='responsive-container'>
       <div className='responsive-header'>FAMILY EXPENSES</div>
@@ -139,6 +111,7 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
             onChange={handleChange(field)}
             error={errors[field]}
             helperText = {errors[field] || `Enter ${field} expenses`}
+            placeholder={'0.00'}
           />
         ))}
           <CurrencyInput
@@ -149,25 +122,10 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
         </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

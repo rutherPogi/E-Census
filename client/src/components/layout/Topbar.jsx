@@ -15,16 +15,16 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MenuIcon from '@mui/icons-material/Menu';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import logo from '../../assets/questionnaire.png'
+
 import { useAuth } from '../../utils/auth/authContext';
 
 
-const Topbar = ({ onMenuClick, userName = "Ruther Frith Solloso" }) => {
+const Topbar = ({ onMenuClick}) => {
   // State for user menu
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const { logout } = useAuth();
-  
+  const { logout, userData } = useAuth();
+
   // Handle menu open and close
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -93,7 +93,7 @@ const Topbar = ({ onMenuClick, userName = "Ruther Frith Solloso" }) => {
 
         >
           <MenuItem onClick={handleProfile}>
-            <AccountCircleIcon sx={{ mr: 1 }} /> {userName}
+            <AccountCircleIcon sx={{ mr: 1 }} /> {userData.accountName}
           </MenuItem>
           <Divider />
           <MenuItem onClick={handleLogout}>

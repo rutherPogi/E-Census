@@ -1,23 +1,30 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { TextInput, CurrencyInput, DropdownInput, DateInput } from '../others/FormFields'
-import { SUFFIX_OPTIONS, CIVIL_STATUS_OPTIONS, EDUCATIONAL_OPTIONS, 
-         EMPLOYMENT_OPTIONS, RELATIONSHIP_OPTIONS, FP_REQUIRED_FIELDS } from '../../utils/constants';
-import { formatCurrency } from '../../utils/formatter'
-import { Snackbar, Alert } from '@mui/material';
+import { Button } from "@mui/material";
 import dayjs from 'dayjs';
- 
 
+import { useFormContext } from "../../pages/FormContext";
+import { TextInput, CurrencyInput, DropdownInput, DateInput } from '../others/FormFields'
+import { FP_REQUIRED_FIELDS } from '../../utils/constants'
+import { formatCurrency } from '../../utils/formatter'
+import { Notification } from '../../../../components/common/Notification'
+import { SUFFIX_OPTIONS, CIVIL_STATUS_OPTIONS, EDUCATIONAL_OPTIONS, 
+         EMPLOYMENT_OPTIONS, RELATIONSHIP_OPTIONS } from '../../utils/options';
+
+
+ 
 export default function FamilyProfile({ handleBack, handleNext }) {
 
   const params = useParams();
   const { formData, addItem, updateItem } = useFormContext();
   const { familyMembers = [] } = formData;
+
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(-1);
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
   const [values, setValues] = useState({
     surveyID: params.id,
@@ -58,6 +65,12 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     remarks: false
   });
 
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
+
   useEffect(() => {
     const storedEditIndex = sessionStorage.getItem('editingMemberIndex');
     
@@ -76,12 +89,6 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     }
   }, [familyMembers]);
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
 
   const handleBirthdateChange = (dateValue) => {
     if (!dateValue) {
@@ -96,11 +103,11 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     }
 
     setErrors(false);
-    const birthdate = dateValue.toDate(); // Convert dayjs to JavaScript Date
+
+    const birthdate = dateValue.toDate();
     const today = new Date();
     let age = today.getFullYear() - birthdate.getFullYear();
     
-    // Adjust if the birthday hasn't occurred this year yet
     const monthDiff = today.getMonth() - birthdate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
       age--;
@@ -108,7 +115,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
   
     setValues({ 
       ...values, 
-      birthdate: dateValue, // Store the dayjs object
+      birthdate: dateValue,
       age: age >= 0 ? age : '' 
     });
   };
@@ -128,22 +135,13 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     }
     
     setErrors(prev => ({ ...prev, [field]: false }));
-    setValues(prev => ({
-      ...prev,
-      [field]: formatCurrency(plainNumber)
-    }));
+    setValues(prev => ({ ...prev, [field]: formatCurrency(plainNumber) }));
   };
 
   const handleChange = (field) => (e, newValue) => {
     const value = newValue?.value || e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: false
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: false }));
   };
 
   const validateForm = () => {
@@ -173,8 +171,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     e.preventDefault();
 
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSnackbarOpen(true);
+      showNotification('Please fill in all required fields', 'error')
       return;
     }
 
@@ -220,8 +217,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value={values.firstName}
           onChange={handleChange('firstName')}
           error={errors.firstName}
-          helperText = {errors.firstName}
-          placeholder = 'Enter First Name'
+          helperText = {errors.firstName || 'e.g., Juan'}
           required
         />
         <TextInput
@@ -229,16 +225,14 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value={values.middleName}
           onChange={handleChange('middleName')}
           error={errors.middleName}
-          helperText = {errors.middleName}
-          placeholder = 'Enter Middle Name'
+          helperText = {errors.middleName || 'e.g, Santos'}
         />
         <TextInput
           label='Last Name'
           value={values.lastName}
           onChange={handleChange('lastName')}
           error={errors.lastName}
-          helperText = {errors.lastName}
-          placeholder = 'Enter Last Name'
+          helperText = {errors.lastName || 'e.g, Dela Cruz'}
           required
         />
         <DropdownInput
@@ -247,8 +241,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value = {values.suffix}
           onChange = {(e, newValue) => handleChange('suffix')(e, newValue)}
           error = {errors.suffix} 
-          helperText = {errors.suffix || ''}
-          placeholder = 'Enter your suffix'
+          helperText = {errors.suffix || 'e.g., Jr - Junior'}
         />
         <DateInput 
           label="Birthdate"
@@ -269,8 +262,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value = {values.civilStatus}
           onChange = {(e, newValue) => handleChange('civilStatus')(e, newValue)}
           error = {errors.civilStatus} 
-          helperText = {errors.civilStatus || ''}
-          placeholder = 'Enter your civilStatus'
+          helperText = {errors.civilStatus || 'e.g., Single'}
           required
         />
         <DropdownInput
@@ -279,8 +271,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value = {values.relationFamilyHead}
           onChange = {(e, newValue) => handleChange('relationFamilyHead')(e, newValue)}
           error = {errors.relationFamilyHead} 
-          helperText = {errors.relationFamilyHead || ''}
-          placeholder = 'Enter your relationFamilyHead'
+          helperText = {errors.relationFamilyHead || 'e.g., Brother'}
           required
         />
         <DropdownInput
@@ -289,8 +280,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value = {values.educationalAttainment}
           onChange = {(e, newValue) => handleChange('educationalAttainment')(e, newValue)}
           error = {errors.educationalAttainment} 
-          helperText = {errors.educationalAttainment || ''}
-          placeholder = 'Enter your educationalAttainment'
+          helperText = {errors.educationalAttainment || 'e.g., College Level'}
           required
         />
         <TextInput
@@ -298,16 +288,14 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value={values.occupation}
           onChange={handleChange('occupation')}
           error={errors.occupation}
-          helperText = {errors.occupation}
-          placeholder = 'Enter Occupation'
+          helperText = {errors.occupation || 'e.g., Teacher'}
         />
         <TextInput
           label='Skills Training Attended'
           value={values.skillsTraining}
           onChange={handleChange('skillsTraining')}
           error={errors.skillsTraining}
-          helperText = {errors.skillsTraining}
-          placeholder = 'Enter skills training attended'
+          helperText = {errors.skillsTraining || 'e.g., ---'}
         />
         <DropdownInput
           label = 'Employment Type'
@@ -315,16 +303,14 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           value = {values.employmentType}
           onChange = {(e, newValue) => handleChange('employmentType')(e, newValue)}
           error = {errors.employmentType} 
-          helperText = {errors.employmentType || ''}
-          placeholder = 'Enter your employmentType'
+          helperText = {errors.employmentType || 'e.g., Permanent'}
         />
         <TextInput
           label='Philhealth Number'
           value={values.philhealthNumber}
           onChange={handleChange('philhealthNumber')}
           error={errors.philhealthNumber}
-          helperText = {errors.philhealthNumber}
-          placeholder = 'Enter philhealth number'
+          helperText = {errors.philhealthNumber || '---'}
         />
         <CurrencyInput
           label = 'Average Monthly Income'
@@ -332,45 +318,35 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           onChange =  {handleIncomeChange('monthlyIncome')}
           error =  {errors.monthlyIncome}
           helperText = {errors.monthlyIncome}
+          placeholder = {'0.00'}
         />
         <TextInput
           label='Health Status'
           value={values.healthStatus}
           onChange={handleChange('healthStatus')}
           error={errors.healthStatus}
-          helperText = {errors.healthStatus}
-          placeholder = 'Enter health status'
+          helperText = {errors.healthStatus || 'e.g., ---'}
         />
         <TextInput
           label='Remarks'
           value={values.remarks}
           onChange={handleChange('remarks')}
           error={errors.remarks}
-          helperText = {errors.remarks}
-          placeholder = 'Enter remarks'
+          helperText = {errors.remarks || 'e.g., Out of town'}
         />
       </div>
       <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-          </div> 
+        <div className='form-buttons-right'>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div> 
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   )
 }

@@ -44,17 +44,14 @@ export const generateSeniorCitizenId = async (connection) => {
   }
 };
 
-export const createSeniorCitizenApplicant = async (seniorCitizenID, photoSignature, connection) => {
-
-  console.log('Photo ID: ', photoSignature?.photoID?.base64);
-  console.log('Signature: ', photoSignature?.signature?.base64);
+export const createSeniorCitizenApplicant = async (seniorCitizenID, photoID, signature, connection) => {
   
   const [result] = await connection.query(
-    `INSERT INTO scApplication (scApplicantID, dateApplied, issuedAt, issuedOn, photoID, photoSignature)
+    `INSERT INTO scApplication (scApplicantID, dateApplied, issuedAt, issuedOn, photoID, signature)
      VALUES (?, CURDATE(), CURDATE(), CURDATE(), ?, ?)`,
     [ seniorCitizenID, 
-      photoSignature?.photoID?.base64,
-      photoSignature?.signature?.base64
+      photoID,
+      signature
     ]
   );
 

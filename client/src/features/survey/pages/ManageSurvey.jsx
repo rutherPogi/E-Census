@@ -1,35 +1,39 @@
 import { useState, useEffect } from 'react';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
-import { get, del } from '../../../utils/api/apiService';
 import { Tooltip, Box, useMediaQuery, useTheme, Snackbar, Alert, 
          TableRow, TableCell } from '@mui/material';
+import dayjs from 'dayjs';
+
 import { SearchBar, ActionButton, DeleteDialog, ManageTable } from '../components/others';
 import { MANAGE_TABLE_HEADERS } from '../utils/constants';
-import dayjs from 'dayjs';
+import { get, del } from '../../../utils/api/apiService';
+import { Notification } from '../../../components/common/Notification'
+
 
 
 const ManageSurvey = () => {
 
   const [surveyData, setSurveyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
+
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(10);
   
-  const [deleteDialog, setDeleteDialog] = useState({
-    open: false,
-    survey: null,
-    isDeleting: false
-  });
+  const [deleteDialog, setDeleteDialog] = useState({ open: false, survey: null, isDeleting: false });
 
-  const [notification, setNotification] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
- 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
 
   const fetchSurveyData = async () => {
     setLoading(true);
@@ -39,11 +43,7 @@ const ManageSurvey = () => {
       setFilteredData(response);
     } catch (err) {
       console.error('Error details:', err.response?.data || err.message);
-      setNotification({
-        open: true,
-        message: err.response?.data?.error || 'Failed to load surveys. Please try again later.',
-        severity: 'error'
-      });
+      showNotification(err.response?.data?.error || 'Failed to load surveys. Please try again later.', 'error' )
       setSurveyData([]);
       setFilteredData([]);
     } finally {
@@ -87,10 +87,6 @@ const ManageSurvey = () => {
     });
   };
 
-  const closeNotification = () => {
-    setNotification(prev => ({ ...prev, open: false }));
-  };
-
   const handlePagination = (event, newPage) => {
     setPage(newPage);
   };
@@ -106,25 +102,15 @@ const ManageSurvey = () => {
       const response = await del(`/surveys/delete-survey/${survey.surveyID}`);
       
       if (response.success) {
-        // Remove the deleted survey from state
         const updatedData = surveyData.filter(s => s.surveyID !== survey.surveyID);
         setSurveyData(updatedData);
         setFilteredData(updatedData);
-        
-        setNotification({
-          open: true,
-          message: 'Survey deleted successfully',
-          severity: 'success'
-        });
+        showNotification('Survey deleted successfully', 'success')
       } else {
         throw new Error('Delete operation failed');
       }
     } catch (err) {
-      setNotification({
-        open: true,
-        message: 'Error deleting survey. Please try again.',
-        severity: 'error'
-      });
+      showNotification('Error deleting survey. Please try again.', 'error')
     } finally {
       closeDeleteDialog();
     }
@@ -150,17 +136,7 @@ const ManageSurvey = () => {
                 icon={<Visibility />}
                 label="View"
                 color="#0d47a1"
-                to={`view/${survey.surveyID}`}
-              />
-            </Box>
-          </Tooltip>
-          <Tooltip title="Edit Survey">
-            <Box>
-              <ActionButton 
-                icon={<Edit />}
-                label="Edit"
-                color="#ff9800"
-                to={`edit/${survey.surveyID}`}
+                to={`/main/view-survey/${survey.surveyID}`}
               />
             </Box>
           </Tooltip>
@@ -208,16 +184,12 @@ const ManageSurvey = () => {
           nameField="respondent"
           messageTemplate="Do you want to delete survey #{id} for {name}? This action cannot be undone."
         />
-        <Snackbar
-          open={notification.open}
-          autoHideDuration={6000}
-          onClose={closeNotification}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        >
-          <Alert onClose={closeNotification} severity={notification.severity} sx={{ width: '100%' }}>
-            {notification.message}
-          </Alert>
-        </Snackbar>
+        <Notification
+          snackbarMessage={snackbarMessage} 
+          snackbarOpen={snackbarOpen} 
+          setSnackbarOpen={setSnackbarOpen} 
+          severity={severity}
+        />
       </div>
     </div>
   );

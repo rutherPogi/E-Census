@@ -42,6 +42,17 @@ export const HouseInfoSection = ({ data, handleEdit }) => (
     <Typography sx={{ marginLeft: '1em'}}>
       House Structure: {data.houseInfo.houseStructure}
     </Typography>
+    {/* House Image Display */}
+    {data.houseInfo?.houseImagePreview && (
+      <div className="image-container">
+        <p className="info-label">House Image:</p>
+        <img 
+          src={data.houseInfo.houseImagePreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
+        />
+      </div>
+    )}
   </Section>
 );
 

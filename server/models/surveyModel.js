@@ -129,17 +129,21 @@ export const addExpenses = async (surveyId, foodExpenses, educationExpenses, fam
   }
 };
 
-export const addHouseInfo = async (surveyId, houseInfo, connection) => {
+export const addHouseInfo = async (surveyId, houseInfo, houseImageBuffer, connection) => {
   if (!houseInfo) return null;
+  console.log("Storing image of size:", houseImageBuffer ? houseImageBuffer.length : 0);
 
   await connection.query(
     `INSERT INTO HouseInformation
-     (surveyID, houseCondition, houseStructure) 
-     VALUES (?, ?, ?)`,
+     (surveyID, houseCondition, houseStructure, houseImage, latitude, longitude) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
     [
       surveyId,
       houseInfo.houseCondition,
-      houseInfo.houseStructure
+      houseInfo.houseStructure,
+      houseImageBuffer,
+      houseInfo.latitude,
+      houseInfo.longitude
     ]
   );
 };
@@ -395,7 +399,9 @@ export const addNonIvatan = async (surveyId, nonIvatan, connection) => {
     ipula.transient,
     ipula.houseOwner,
     ipula.transientRegistered,
-    ipula.transientDateRegistered ? ipula.transientDateRegistered.split('T')[0] : null
+    (!ipula.transientDateRegistered || ipula.transientDateRegistered === 'N/A' || ipula.transientDateRegistered.trim() === '')
+      ? null
+      : ipula.transientDateRegistered.split('T')[0]
   ]);
   
   if (nonIvatanValues.length > 0) {

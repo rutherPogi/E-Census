@@ -10,6 +10,7 @@ import ProblemNeeds from "../components/steps/ProblemNeeds";
 import EmergencyContact from "../components/steps/EmergencyContact";
 import ApplicationDetails from "../components/steps/ApplicationDetails";
 import DisplayApplication from "../components/steps/DisplayForm";
+import SPMedia from "../components/steps/SPMedia";
 
 
 
@@ -40,15 +41,16 @@ export default function SoloParentForm() {
     <FormProvider>
       <div className='form-container'>
         {currentPage === 1 && <PersonalInfo handleNext={handleNext}/>}
-        {currentPage === 2 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 3 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 4 && <OtherInfo handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 0 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 0 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 0 && <OtherInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 5 && <HouseholdComposition handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 6 && <HouseholdComposition2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 7 && <ProblemNeeds handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 8 && <EmergencyContact handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 9 && <ApplicationDetails handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 10 && <DisplayApplication handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 2 && <ApplicationDetails handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 3 && <SPMedia handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 4 && <DisplayApplication handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
       <div className='form-pagination'>
           {Array.from({ length: 10 }, (_, index) => (
             <div key={index} className={`circle ${currentPage === index + 1 ? "active" : ""}`}></div>

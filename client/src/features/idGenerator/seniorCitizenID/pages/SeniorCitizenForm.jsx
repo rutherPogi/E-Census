@@ -2,7 +2,8 @@ import { useState } from "react";
 import { FormProvider } from "../components/others/FormContext";
 
 import { PersonalInfo, ContactInfo, ProfessionalInfo, FamilyComposition, FamilyComposition2,
-         OscaMembership, PhotoSignature, DisplayForm } from '../components/steps'
+         OscaMembership, DisplayForm, SCMedia, PrintID } from '../components/steps'
+
 
 
       
@@ -32,14 +33,15 @@ export default function SeniorCitizenForm() {
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && <PersonalInfo handleNext={handleNext}/>}
+        {currentPage === 0 && <PersonalInfo handleNext={handleNext}/>}
         {currentPage === 2 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 3 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 4 && <FamilyComposition handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 5 && <FamilyComposition2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 6 && <OscaMembership handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 7 && <PhotoSignature handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 7 && <SCMedia handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 8 && <DisplayForm handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
 
       <div className='form-pagination'>
           {Array.from({ length: 8 }, (_, index) => (

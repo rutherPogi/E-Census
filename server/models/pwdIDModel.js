@@ -43,17 +43,20 @@ export const generatePwdId = async (connection) => {
   }
 };
 
-export const createPWDApplicant = async (applicantData, photoID, reportingUnit, connection) => {
-
+export const createPWDApplicant = async (personalInfo, reportingUnit, photoID, signature, connection) => {
+  
   const [result] = await connection.query(
-    `INSERT INTO pwdApplication (pwdApplicantID, dateApplied, photoImage, reportingUnit, controlNumber)
-     VALUES (?, CURDATE(), ?, ?, ?)`,
-    [ applicantData.pwdID, 
-      photoID.image.base64,
-      reportingUnit.office,  
-      reportingUnit.controlNumber ]
+    `INSERT INTO pwdApplication (
+      pwdApplicantID, dateApplied, reportingUnit, controlNumber, photoID, signature
+     ) VALUES (?, CURDATE(), ?, ?, ?, ?)`,
+    [
+      personalInfo.pwdID,
+      reportingUnit.office,
+      reportingUnit.controlNumber,
+      photoID,
+      signature
+    ]
   );
-
   return result;
 };
 

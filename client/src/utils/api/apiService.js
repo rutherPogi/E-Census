@@ -7,26 +7,22 @@ const API_URL = 'http://localhost:3000/api';
 const getAuthToken = () => localStorage.getItem('authToken');
 
 // Create an authenticated API request
-export const authRequest = async (method, endpoint, data = null) => {
+export const authRequest = async (method, endpoint, data = null, isMultipart = false) => {
   const token = getAuthToken();
   
   const config = {
     method,
     url: `${API_URL}${endpoint}`,
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': isMultipart ? 'multipart/form-data' : 'application/json',
     }
   };
   
   // Add authorization header if token exists
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`;
-  }
+  if (token) { config.headers['Authorization'] = `Bearer ${token}`; }
   
   // Add data to request if provided
-  if (data) {
-    config.data = data;
-  }
+  if (data) { config.data = data; }
   
   try {
     const response = await axios(config);
@@ -43,6 +39,6 @@ export const authRequest = async (method, endpoint, data = null) => {
 
 // Convenience methods
 export const get = (endpoint) => authRequest('get', endpoint);
-export const post = (endpoint, data) => authRequest('post', endpoint, data);
-export const put = (endpoint, data) => authRequest('put', endpoint, data);
+export const post = (endpoint, data, isMultipart = false) => authRequest('post', endpoint, data, isMultipart);
+export const put = (endpoint, data, isMultipart = false) => authRequest('put', endpoint, data, isMultipart);
 export const del = (endpoint) => authRequest('delete', endpoint);

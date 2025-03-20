@@ -35,7 +35,7 @@ const ManageSeniorCitizenID = () => {
   const fetchSurveyData = async () => {
     setLoading(true);
     try {
-      const response = await get('/surveys/manage-survey');
+      const response = await get('/seniorCitizenID/manage-seniorCitizenID');
       setSurveyData(response);
       setFilteredData(response);
     } catch (err) {

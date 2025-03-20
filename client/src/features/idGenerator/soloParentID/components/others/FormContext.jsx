@@ -10,7 +10,8 @@ const initialFormData = {
   householdComposition: [],
   problemNeeds: {},
   emergencyContact: {},
-  applicationDetails: {}
+  applicationDetails: {},
+  spMedia: {}
 }; 
 
 export function FormProvider({ children }) {

@@ -13,7 +13,7 @@ const initialFormData = {
   accomplishedBy: {},
   otherInfo: {},
   reportingUnit: {},
-  photoID: {}
+  pwdMedia: {}
 }; 
 
 export function FormProvider({ children }) {

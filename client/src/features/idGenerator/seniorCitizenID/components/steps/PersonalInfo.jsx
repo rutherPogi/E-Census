@@ -45,11 +45,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
 
   useEffect(() => {
     if (formData.personalInfo) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.personalInfo,
-        seniorCitizenID: seniorCitizenID
-      }));
+      setValues(prev => ({ ...prev, ...formData.personalInfo, seniorCitizenID: seniorCitizenID }));
     }
   }, [formData.personalInfo, seniorCitizenID]);
 

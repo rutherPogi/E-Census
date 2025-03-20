@@ -17,6 +17,7 @@ export default function DisplayApplication({ handleBack, handleNext, handleEdit 
 
   const navigate = useNavigate();
   const { formData, clearFormData } = useFormContext();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [severity, setSeverity] = useState('');
@@ -29,27 +30,37 @@ export default function DisplayApplication({ handleBack, handleNext, handleEdit 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      console.log('Submitting form data:', formData);
-      const response = await post('/seniorcitizenID/submit-seniorCitizenID', formData);
+      const formDataToSend = new FormData();
+      const processedFormData = { ...formData };
+
+      formDataToSend.append('photoID', formData.scMedia.photoID);
+      formDataToSend.append('signature', formData.scMedia.signature);
+      
+      delete processedFormData.scMedia.photoIDPreview;
+      delete processedFormData.scMedia.signaturePreview;
+
+      formDataToSend.append('applicationData', JSON.stringify(processedFormData));
+      
+      console.log('Submitting form data:', processedFormData);
+
+      const response = await post('/seniorCitizenID/submit-seniorCitizenID', formDataToSend, true);
       
       if (response.success) {
-        showNotification('Senior Citizen ID Application submitted!', 'success');
-
-        setTimeout(() => {
-          clearFormData();
-          navigate('/main/survey');
-        }, 2000);
+        alert('Application submitted successfully!');
+        clearFormData();
+        navigate('/main/survey');
       }
     } catch (error) {
-      console.error('Error submitting application:', error);
+      console.error('Error submitting survey:', error);
+        
       if (error.response) {
-        showNotification(`Server error: ${error.response.data.message || 'Unknown error'}`, 'error');
+        alert(`Server error: ${error.response.data.message || 'Unknown error'}`);
       } else if (error.request) {
-        showNotification('No response from server. Please check your connection.', 'error');
+        alert('No response from server. Please check your connection.');
       } else {
-        showNotification(`Error preparing request: ${error.message}`, 'error');
+        alert(`Error preparing request: ${error.message}`);
       }
     }
   };

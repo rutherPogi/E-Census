@@ -1,31 +1,43 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
-import { BARANGAY_OPTIONS, FAMILY_CLASS_OPTIONS, INCOME_EMPLOYMENT_OPTIONS, MUNICIPALITY_OPTIONS, SD_REQUIRED_FIELDS } from '../../utils/constants';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+
+
 import { TextInput, CurrencyInput, DropdownInput } from '../others/FormFields'
+import { SD_REQUIRED_FIELDS } from '../../utils/constants';
 import { formatCurrency } from '../../utils/formatter'
-import { Snackbar, Alert } from '@mui/material';
+import { useFormContext } from "../../pages/FormContext";
+import { Notification } from '../../../../components/common/Notification'
+import { BARANGAY_OPTIONS, FAMILY_CLASS_OPTIONS, INCOME_EMPLOYMENT_OPTIONS, 
+         MUNICIPALITY_OPTIONS } from '../../utils/options';
+import { useAuth } from '../../../../utils/auth/authContext'
 
 
-export default function SurveyDetails({ handleBack, handleNext}) {
 
+export default function SurveyDetails({ handleNext}) {
+
+  const navigate = useNavigate();
   const location = useLocation();
   const surveyNumber = location.state?.surveyNumber;
+
+  const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
   const [values, setValues] = useState({
     surveyID: surveyNumber,
     respondent: '',
-    interviewer: '',
+    interviewer: userData.accountName,
     barangay: '',
-    municipality: '',
+    municipality: 'Itbayat',
     totalMonthlyIncome: '',
     irregularIncome: '',
     familyIncome: '',
     familyClass: '',
-    employmentStatus: ''
+    employmentType: ''
   }); 
 
   const [errors, setErrors] = useState({
@@ -37,8 +49,18 @@ export default function SurveyDetails({ handleBack, handleNext}) {
     irregularIncome: false,
     familyIncome: false,
     familyClass: false,
-    employmentStatus: false
+    employmentType: false
   }); 
+
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
+
+  const handleBack = () => {
+    navigate('/main/survey');
+  }
 
   useEffect(() => {
     if (formData.surveyData) {
@@ -49,7 +71,8 @@ export default function SurveyDetails({ handleBack, handleNext}) {
       }));
     }
   }, [formData.surveyData, surveyNumber]);
-  
+
+
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
@@ -67,23 +90,11 @@ export default function SurveyDetails({ handleBack, handleNext}) {
     return isValid;
   };
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
 
   const handleChange = (field) => (e, newValue) => {
     const value = newValue?.value || e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: value ? '' : errors[field]
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: value ? '' : errors[field] }));
   };
 
   const handleIncomeChange = (field) => (e) => {
@@ -99,25 +110,16 @@ export default function SurveyDetails({ handleBack, handleNext}) {
       setErrors(prev => ({ ...prev, [field]: 'Amount cannot exceed ₱999,999,999' }));
       return;
     }
-
-    if (Number(plainNumber) <= 1) {
-      setErrors(prev => ({ ...prev, [field]: 'Amount cannot be less than ₱1 ' }));
-      return;
-    }
     
     setErrors(prev => ({ ...prev, [field]: false }));
-    setValues(prev => ({
-      ...prev,
-      [field]: formatCurrency(plainNumber)
-    }));
+    setValues(prev => ({ ...prev, [field]: formatCurrency(plainNumber) }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSnackbarOpen(true);
+      showNotification('Please fill in all required fields', 'error')
       return;
     }
     
@@ -144,11 +146,7 @@ export default function SurveyDetails({ handleBack, handleNext}) {
         <TextInput
           label='Interviewer'
           value={values.interviewer}
-          onChange={handleChange('interviewer')}
-          error={errors.interviewer}
-          helperText = {errors.interviewer}
-          placeholder = 'Enter respondents name'
-          required
+          disabled
         />
         <DropdownInput
           label = 'Barangay'
@@ -164,10 +162,8 @@ export default function SurveyDetails({ handleBack, handleNext}) {
           label = 'Municipality'
           options = {MUNICIPALITY_OPTIONS}
           value = {values.municipality}
-          onChange = {(e, newValue) => handleChange('municipality')(e, newValue)}
-          error = {errors.municipality} 
-          helperText = {errors.municipality}
           placeholder = 'Enter your municipality'
+          disabled
           required
         />
         <DropdownInput
@@ -191,10 +187,10 @@ export default function SurveyDetails({ handleBack, handleNext}) {
         <DropdownInput
           label = 'Employment Type'
           options = {INCOME_EMPLOYMENT_OPTIONS}
-          value = {values.familyClass}
-          onChange = {(e, newValue) => handleChange('familyClass')(e, newValue)}
-          error = {errors.familyClass} 
-          helperText = {errors.familyClass}
+          value = {values.employmentType}
+          onChange = {(e, newValue) => handleChange('employmentType')(e, newValue)}
+          error = {errors.employmentType} 
+          helperText = {errors.employmentType}
           placeholder = 'Enter family class'
           required
         />
@@ -218,26 +214,17 @@ export default function SurveyDetails({ handleBack, handleNext}) {
         />
       </div>
       <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Cancel</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-          </div> 
+        <div className='form-buttons-right'>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div> 
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   )
 }

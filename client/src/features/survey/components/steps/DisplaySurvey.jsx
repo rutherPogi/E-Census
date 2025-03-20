@@ -1,24 +1,70 @@
-import { useFormContext } from "../../pages/FormContext";
-import { LIVESTOCK_TYPES, AMENITY_TYPES, APPLIANCE_TYPES, NON_IVATAN_TABLE_HEADERS,
-         FAMILY_PROFILE_TABLE_HEADERS, AFFILIATION_TABLE_HEADERS, 
-         SERVICE_AVAILED_TABLE_HEADERS,
-         FOOD_TYPES} from '../../utils/constants'
-import { post } from '../../../../utils/api/apiService';
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate , useParams} from "react-router-dom";
 import { Box } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
+import { get, post } from '../../../../utils/api/apiService';
+import { mapFamilyMembers, mapAffiliation, mapNonIvatan, mapServiceAvailed } from "../others/dataMappers"
 import { SurveyDetailsSection, HouseInfoSection, WaterInfoSection, 
          FarmLotsSection, CommunityIssueSection } from "../others/SurveySections";
 import { ResponsiveTableContainer, StandardTable, ExpenseTable, ItemQuantityTable, 
-         KeyValueTable, LivestockTable, 
-         ResourcesTable} from "../others/TableSection";
-import { mapFamilyMembers, mapAffiliation, mapNonIvatan, mapServiceAvailed } from "../others/dataMappers"
+         KeyValueTable, LivestockTable, ResourcesTable} from "../others/TableSection";
+import { LIVESTOCK_TYPES, AMENITY_TYPES, APPLIANCE_TYPES, NON_IVATAN_TABLE_HEADERS,
+         FAMILY_PROFILE_TABLE_HEADERS, AFFILIATION_TABLE_HEADERS, SERVICE_AVAILED_TABLE_HEADERS } from '../../utils/constants'
 
 
-export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
+
+export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEditing = false }) {
 
   const navigate = useNavigate();
-  const { formData, clearFormData } = useFormContext();
+  const params = useParams();
+  const surveyID = params.id;
 
+  const { formData, clearFormData, setEntireFormData } = useFormContext();
+
+  const [loading, setLoading] = useState(isEditing);
+  const [error, setError] = useState(null);
+  const [fetchedData, setFetchedData] = useState(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      console.log('Fetching...');
+      fetchSurveyData();
+      console.log('Form Data: ', formData);
+    }
+  }, [isEditing]);
+
+  const fetchSurveyData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await get(`/surveys/view-survey/${surveyID}`, {
+        params: { surveyID },
+      });
+
+      if (response) {
+        setFetchedData(response);
+        console.log('Raw API response:', response); // Log the raw response
+        
+        // Use the new function to update the entire form data
+        if (response) {
+          setEntireFormData(response);
+          console.log('Setting entire form data with:', response);
+        } else {
+          console.warn('Response does not contain surveyData property');
+        }
+      } else {
+        throw new Error("Unexpected response format");
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error('Error fetching data', err);
+      setError('Failed to load survey data. Please try again later.');
+      setLoading(false);
+    }
+  };
+  
   const { 
     foodExpenses = { expenses: {}, foodTotal: 0 }, 
     educationExpenses = { expenses: {}, educationTotal: 0 },
@@ -34,7 +80,6 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
 
   const appliancesData = appliancesOwn.appliances || {};
   const amenitiesData = amenitiesOwn.amenities || {};
-  const foodExpensesData = foodExpenses.expenses || {};
 
   const filteredAppliances = APPLIANCE_TYPES.filter(appliance => {
     const quantity = Number(appliancesData[appliance]?.replace(/,/g, '') || 0);
@@ -46,25 +91,53 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
     return quantity >= 1;
   });
 
-  const filteredFoodExpenses = FOOD_TYPES.filter(food => {
-    const quantity = Number(foodExpensesData[food]?.replace(/,/g, '') || 0);
-    return quantity >= 1;
-  });
-
+  const familyMembersData = isEditing && fetchedData ? 
+    fetchedData.familyProfile : 
+    formData.familyMembers;
+    
+  const affiliationData = isEditing && fetchedData ? 
+    fetchedData.governmentAffiliation : 
+    formData.affiliation;
+    
+  const nonIvatanData = isEditing && fetchedData ? 
+    fetchedData.nonIvatan : 
+    formData.nonIvatan;
+    
+  const serviceAvailedData = isEditing && fetchedData ? 
+    fetchedData.serviceAvailed : 
+    formData.serviceAvailed;
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     try {
-      console.log('Submitting form data:', formData);
-      const response = await post('/surveys/submit-survey', formData);
+
+      const formDataToSend = new FormData();
+      const processedFormData = { ...formData };
       
-      if (response.success) {
-        alert('Survey submitted successfully!');
-        clearFormData();
-        navigate('/main/survey');
+      if (formData.houseInfo?.houseImage) {
+        formDataToSend.append('houseImage', formData.houseInfo.houseImage);
+
+        delete processedFormData.houseInfo.houseImage;
+        delete processedFormData.houseInfo.houseImagePreview;
       }
+
+      // If editing, include the surveyID
+      if (isEditing && surveyID) {
+        processedFormData.surveyID = surveyID;
+        formDataToSend.append('surveyData', JSON.stringify(processedFormData));
+        await post('/surveys/update-survey', formDataToSend, true);
+        alert('Survey updated successfully!');
+      } else {
+        formDataToSend.append('surveyData', JSON.stringify(processedFormData));
+        await post('/surveys/submit-survey', formDataToSend, true);
+        alert('Survey submitted successfully!');
+      }
+
+      clearFormData();
+      navigate('/main/survey');
+    
     } catch (error) {
       console.error('Error submitting survey:', error);
       
@@ -78,6 +151,14 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
     }
   };
 
+  if (loading) {
+    return <div>Loading survey data...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div className='responsive-container'>
       <Box
@@ -88,6 +169,7 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
           backgroundColor: '#fff',
           padding: '1em'
       }}>
+
         <SurveyDetailsSection data={formData} handleEdit={handleEdit}/>
         <HouseInfoSection data={formData} handleEdit={handleEdit}/>
         <WaterInfoSection data={formData} handleEdit={handleEdit}/>
@@ -98,7 +180,7 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
           <StandardTable
             title="Family Members Table"
             headers={FAMILY_PROFILE_TABLE_HEADERS}
-            data={mapFamilyMembers(formData.familyMembers)}
+            data={mapFamilyMembers(familyMembersData)}
           />
         </ResponsiveTableContainer>
 
@@ -106,7 +188,7 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
           <StandardTable
             title="Government Affiliation Table"
             headers={AFFILIATION_TABLE_HEADERS}
-            data={mapAffiliation(formData.affiliation)}
+            data={mapAffiliation(affiliationData)}
           />
         </ResponsiveTableContainer>
 
@@ -114,7 +196,7 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
           <StandardTable
             title="Non-Ivatan and Transient Table"
             headers={NON_IVATAN_TABLE_HEADERS}
-            data={mapNonIvatan(formData.nonIvatan)}
+            data={mapNonIvatan(nonIvatanData)}
           />
         </ResponsiveTableContainer>
 
@@ -122,7 +204,7 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
           <StandardTable
             title="Service/Assistance Availed Table"
             headers={SERVICE_AVAILED_TABLE_HEADERS}
-            data={mapServiceAvailed(formData.serviceAvailed)}
+            data={mapServiceAvailed(serviceAvailedData)}
           />
         </ResponsiveTableContainer>
 
@@ -210,7 +292,9 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit }) {
       <div className='form-buttons'>
         <div className='form-buttons-right'>
           <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Submit</button>
+          <button type='button' className="btn submit-btn" onClick={handleSubmit}>
+            {isEditing ? 'Update' : 'Submit'}
+          </button>
         </div>     
       </div>
     </div>

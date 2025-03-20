@@ -58,8 +58,8 @@ const Features = () => {
   const features = [
     {
       image: digitalSurvey,
-      title: "Digital Survey",
-      description: "For faster and efficient survey."
+      title: "Digital Census",
+      description: "For faster and efficient census."
     },
     {
       image: idGenerator,

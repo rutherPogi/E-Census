@@ -1,19 +1,19 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
+import { Button } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
 import { NumberInput } from "../others/FormFields"
-import { Snackbar, Alert } from '@mui/material';
+
 
 
 export default function Farmlots({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState({
-    cultivation: formData.cultivation || '',
-    pastureland: formData.pastureland || '',
-    forestland: formData.forestland || ''
+    cultivation: '',
+    pastureland: '',
+    forestland: ''
   })
 
   const [errors, setErrors] = useState({
@@ -24,10 +24,7 @@ export default function Farmlots({ handleBack, handleNext }) {
 
   useEffect(() => {
     if (formData.farmlots) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.farmlots
-      }));
+      setValues(prev => ({ ...prev, ...formData.farmlots }));
     }
   }, [formData.farmlots]);
 
@@ -52,40 +49,20 @@ export default function Farmlots({ handleBack, handleNext }) {
     });
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    // Validate required fields
-    Object.keys(values).forEach(key => {
-      if (!values[key]) {
-        newErrors[key] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSnackbarOpen(true);
-      return;
-    }
+    const processedValues = { ...values };
+    
+        Object.keys(processedValues).forEach((key) => {
+            const value = processedValues[key];
+            if (value === '' || value === null) {
+              processedValues[key] = '0';
+          }
+        });
 
-    updateFormData('farmlots', values);
-    console.log("Current Form Values:", values);
+    updateFormData('farmlots', processedValues);
+    console.log("Current Form Values:", processedValues);
 
     handleNext();
   };
@@ -101,7 +78,6 @@ export default function Farmlots({ handleBack, handleNext }) {
           error={errors.cultivation}
           helperText={errors.cultivation || 'How many lots for cultivation?'}
           min={0}
-          required
         />
         <NumberInput
           label="Pastureland"
@@ -110,7 +86,6 @@ export default function Farmlots({ handleBack, handleNext }) {
           error={errors.pastureland}
           helperText={errors.pastureland || 'How many lots for pastureland?'}
           min={0}
-          required
         />
         <NumberInput
           label="Forestland"
@@ -119,30 +94,14 @@ export default function Farmlots({ handleBack, handleNext }) {
           error={errors.forestland}
           helperText={errors.forestland || 'How many lots for forestland?'}
           min={0}
-          required
         />
       </div>
       <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-          </div>     
+        <div className='form-buttons-right'>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

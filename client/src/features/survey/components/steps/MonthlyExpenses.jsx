@@ -1,15 +1,14 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
+import { Button, } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
 import { CurrencyInput } from "../others/FormFields"
 import { formatCurrency } from '../../utils/formatter'
 import { MONTHLY_EXPENSES } from '../../utils/constants';
-import { Snackbar, Alert } from '@mui/material';
 
 export default function MonthlyExpenses({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState(() => {
     const existingData = formData.monthlyExpenses?.expenses || {};
@@ -31,44 +30,23 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
   });
 
   useEffect(() => {
-      if (formData.monthlyExpenses && formData.monthlyExpenses.expenses) {
-        setValues(prev => {
-          const newValues = { ...prev };
-          
-          // Ensure we're getting the correct data structure
-          const expenses = formData.monthlyExpenses.expenses;
-          
-          MONTHLY_EXPENSES.forEach(field => {
-            if (typeof expenses[field] === 'string') {
-              newValues[field] = expenses[field];
-            }
-          });
-          
-          return newValues;
+    if (formData.monthlyExpenses && formData.monthlyExpenses.expenses) {
+      setValues(prev => {
+        const newValues = { ...prev };
+        
+        // Ensure we're getting the correct data structure
+        const expenses = formData.monthlyExpenses.expenses;
+        
+        MONTHLY_EXPENSES.forEach(field => {
+          if (typeof expenses[field] === 'string') {
+            newValues[field] = expenses[field];
+          }
         });
-      }
-    }, [formData.monthlyExpenses]);
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    const hasValue = Object.values(values).some(val => 
-      parseFloat(val.replace(/,/g, '')) > 0
-    );
-
-    if (!hasValue) { isValid = false; }
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
+        
+        return newValues;
+      });
     }
-    setSnackbarOpen(false);
-  };
+  }, [formData.monthlyExpenses]);
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
@@ -93,7 +71,6 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
       };
 
       const newMonthlyTotal = Object.values(updatedValues).reduce((sum, val) => {
-        // Ensure val is a string before calling replace
         const valStr = typeof val === 'string' ? val : '0';
         return sum + (parseFloat(valStr.replace(/,/g, '')) || 0);
       }, 0);
@@ -105,12 +82,6 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in at least one!");
-      setSnackbarOpen(true);
-      return;
-    }
 
     const processedValues = { ...values };
     
@@ -139,6 +110,7 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
             onChange={handleChange(field)}
             error={errors[field]}
             helperText = {errors[field] || `Enter ${field} expenses`}
+            placeholder={'0.00'}
           />
         ))}
           <CurrencyInput
@@ -149,25 +121,10 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
         </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

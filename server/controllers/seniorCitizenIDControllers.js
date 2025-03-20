@@ -30,15 +30,19 @@ export const submitSeniorCitizenID = async (req, res) => {
   try {
     await connection.beginTransaction();
 
-    console.log('Request body:', JSON.stringify(req.body));
-    console.log('Files:', req.files);
-    console.log('photoSignature from body:', req.body.photoSignature);
-    
-    const seniorCitizenID = req.body.personalInfo.seniorCitizenID;
-    console.log("Processing Application ID:", seniorCitizenID);
+    const applicationData = JSON.parse(req.body.applicationData);
+    const seniorCitizenID = applicationData.personalInfo.seniorCitizenID;
+
+    const photoIDFile = req.files?.photoID?.[0];
+    const signatureFile = req.files?.signature?.[0];
     
     console.log("Step 1");
-    await seniorCitizenIDModel.createSeniorCitizenApplicant(seniorCitizenID, req.body.photoSignature, connection);
+    await seniorCitizenIDModel.createSeniorCitizenApplicant(
+      seniorCitizenID, 
+      photoIDFile.buffer,
+      signatureFile.buffer,
+      connection
+    );
 
     console.log("Step 2");
     await seniorCitizenIDModel.addPersonalInfo(seniorCitizenID, req.body.personalInfo, connection);
@@ -82,3 +86,18 @@ export const submitSeniorCitizenID = async (req, res) => {
     connection.release();
   }
 };
+
+export const manageSeniorCitizenId = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`SELECT * FROM scApplication ORDER BY dateApplied ASC`);
+    
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching Application data:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching Application data', 
+      error: error.message 
+    });
+  }
+}

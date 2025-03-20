@@ -43,15 +43,17 @@ export const generateSoloParentId = async (connection) => {
   }
 };
 
-export const createSoloParentApplicant = async (soloParentID, applicationDetails, connection) => {
+export const createSoloParentApplicant = async (soloParentID, applicationDetails, photoID, signature, connection) => {
   
   const [result] = await connection.query(
-    `INSERT INTO spApplication (spApplicantID, dateApplied, idCardNumber, category, beneficiaryCode)
-     VALUES (?, CURDATE(), ?, ?, ?)`,
+    `INSERT INTO spApplication (spApplicantID, dateApplied, idCardNumber, category, beneficiaryCode, photoID, signature)
+     VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`,
     [ soloParentID, 
       applicationDetails.cardNumber,
       applicationDetails.category,
-      applicationDetails.beneficiaryCode
+      applicationDetails.beneficiaryCode,
+      photoID,
+      signature
     ]
   );
 

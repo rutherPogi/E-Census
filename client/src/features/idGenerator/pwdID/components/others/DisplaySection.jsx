@@ -245,16 +245,29 @@ export const ReportingUnitSection = ({ data, handleEdit }) => (
   </Section>
 );
 
+
+// PWD Info Section using the reusable component
 export const PhotoIDSection = ({ data, handleEdit }) => (
-  <Section title="Photo ID" handleEdit={handleEdit} pageNumber={11}>
-    {data.photoID && data.photoID.image ? (
-      <img 
-        src={data.photoID.image.preview} 
-        alt="Photo ID" 
-        style={{ maxWidth: '300px', maxHeight: '300px', borderRadius: '8px', marginLeft: '1em' }} 
-      />
-    ) : (
-      <p>No photo ID uploaded</p>
+  <Section title="Photo ID and Signature" handleEdit={handleEdit} pageNumber={11}>
+    {data.pwdMedia?.photoIDPreview && (
+      <div className="image-container">
+        <p className="info-label">PhotoID:</p>
+        <img 
+          src={data.pwdMedia.photoIDPreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
+        />
+      </div>
+    )}
+    {data.pwdMedia?.signaturePreview && (
+      <div className="image-container">
+        <p className="info-label">Signature:</p>
+        <img 
+          src={data.pwdMedia.signaturePreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
+        />
+      </div>
     )}
   </Section>
 );

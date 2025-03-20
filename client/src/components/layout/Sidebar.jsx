@@ -25,9 +25,12 @@ import {
   ExpandMore, 
   Elderly, 
   Accessible, 
-  FamilyRestroom 
+  EscalatorWarning,
+  AccountCircle,
+  Newspaper
 } from '@mui/icons-material';
 import logo from '../../assets/questionnaire.png'
+import { useAuth } from '../../utils/auth/authContext';
 
 const Logo = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
@@ -57,9 +60,17 @@ const Sidebar = ({
   onNavigation,
   isMobile
 }) => {
+
   const [idGeneratorOpen, setIdGeneratorOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { userData } = useAuth();
+
+  const position = userData.position;
+
+  const showAccounts = position === 'Admin';
+  const showIdGenerator = position === 'Admin' || position === 'MSWDO';
+  const showHazardMap = position === 'Admin' || position === 'MSWDO';
   
   // Track the current selected path
   const [selectedPath, setSelectedPath] = useState(location.pathname);
@@ -114,22 +125,52 @@ const Sidebar = ({
           <Avatar sx={{ bgcolor: '#1e88e5' }}>RS</Avatar>
         )}
       </Container>
+
       <Divider sx={{ mb: 2, bgcolor: 'white' }}/>
+
       <List sx={{ width: '100%', p: 0 }}>
         {/* Home */}
         <Tooltip title={!open ? "Home" : ""} placement="right">
           <ListItem 
-            onClick={() => handleItemClick('/main/edit')}
-            sx={listItemStyles(isActive('/main/edit'))}
+            onClick={() => handleItemClick('/main/dashboard')}
+            sx={listItemStyles(isActive('/main/dashboard'))}
           >
-            <ListItemIcon sx={{ color: isActive('/main/edit') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+            <ListItemIcon sx={{ color: isActive('/main/dashboard') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
               <Home />
             </ListItemIcon>
             {open && <ListItemText primary="Home" />}
           </ListItem>
         </Tooltip>
 
-        {/* Survey */}
+        {/* News and Updates */}
+        <Tooltip title={!open ? "News and Updates" : ""} placement="right">
+          <ListItem 
+            onClick={() => handleItemClick('/main/edit')}
+            sx={listItemStyles(isActive('/main/edit'))}
+          >
+            <ListItemIcon sx={{ color: isActive('/main/edit') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+              <Newspaper />
+            </ListItemIcon>
+            {open && <ListItemText primary="News and Updates" />}
+          </ListItem>
+        </Tooltip>
+
+        {/* Accounts - Only visible if not a Barangay Official */}
+        {showAccounts && (
+          <Tooltip title={!open ? "Accounts" : ""} placement="right">
+            <ListItem 
+              onClick={() => handleItemClick('/main/accounts')}
+              sx={listItemStyles(isActive('/main/accounts'))}
+            >
+              <ListItemIcon sx={{ color: isActive('/main/accounts') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <AccountCircle />
+              </ListItemIcon>
+              {open && <ListItemText primary="Accounts" />}
+            </ListItem>
+          </Tooltip>
+        )}
+
+        {/* Census */}
         <Tooltip title={!open ? "Census" : ""} placement="right">
           <ListItem 
             onClick={() => handleItemClick('/main/survey')}
@@ -142,85 +183,91 @@ const Sidebar = ({
           </ListItem>
         </Tooltip>
 
-        {/* ID Generator with submenu */}
-        <Tooltip title={!open ? "ID Generator" : ""} placement="right">
-          <ListItem 
-            onClick={open ? handleIdGeneratorClick : onToggle}
-            sx={listItemStyles(selectedPath.includes('/main/generate-id'))}
-          >
-            <ListItemIcon sx={{ color: selectedPath.includes('/main/generate-id') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Badge />
-            </ListItemIcon>
+        {/* ID Generator with submenu - Only visible if not a Barangay Official */}
+        {showIdGenerator && (
+          <>
+            <Tooltip title={!open ? "ID Generator" : ""} placement="right">
+              <ListItem 
+                onClick={open ? handleIdGeneratorClick : onToggle}
+                sx={listItemStyles(selectedPath.includes('/main/generate-id'))}
+              >
+                <ListItemIcon sx={{ color: selectedPath.includes('/main/generate-id') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                  <Badge />
+                </ListItemIcon>
+                {open && (
+                  <>
+                    <ListItemText primary="ID Generator" />
+                    {idGeneratorOpen ? <ExpandLess /> : <ExpandMore />}
+                  </>
+                )}
+              </ListItem>
+            </Tooltip>
+            
+            {/* ID Generator Submenu - only show when sidebar is open */}
             {open && (
-              <>
-                <ListItemText primary="ID Generator" />
-                {idGeneratorOpen ? <ExpandLess /> : <ExpandMore />}
-              </>
+              <Collapse in={idGeneratorOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {/* Solo Parent ID */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/generate-id/solo-parent'))
+                    }} 
+                    onClick={() => handleItemClick('/main/generate-id/solo-parent')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/generate-id/solo-parent') ? '#FF5733' : 'inherit' }}>
+                      <EscalatorWarning />
+                    </ListItemIcon>
+                    <ListItemText primary="Solo Parent ID" />
+                  </ListItem>
+                  
+                  {/* Senior Citizen ID */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/generate-id/senior-citizen'))
+                    }} 
+                    onClick={() => handleItemClick('/main/generate-id/senior-citizen')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/generate-id/senior-citizen') ? '#FF5733' : 'inherit' }}>
+                      <Elderly />
+                    </ListItemIcon>
+                    <ListItemText primary="Senior Citizen ID" />
+                  </ListItem>
+                  
+                  {/* PWD ID */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/generate-id/pwd'))
+                    }} 
+                    onClick={() => handleItemClick('/main/generate-id/pwd')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/generate-id/pwd') ? '#FF5733' : 'inherit' }}>
+                      <Accessible />
+                    </ListItemIcon>
+                    <ListItemText primary="PWD ID" />
+                  </ListItem>
+                </List>
+              </Collapse>
             )}
-          </ListItem>
-        </Tooltip>
-        
-        {/* ID Generator Submenu - only show when sidebar is open */}
-        {open && (
-          <Collapse in={idGeneratorOpen} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {/* Solo Parent ID */}
-              <ListItem 
-                sx={{ 
-                  pl: 4, 
-                  ...listItemStyles(isActive('/main/generate-id/solo-parent'))
-                }} 
-                onClick={() => handleItemClick('/main/generate-id/solo-parent')}
-              >
-                <ListItemIcon sx={{ color: isActive('/main/generate-id/solo-parent') ? '#FF5733' : 'inherit' }}>
-                  <FamilyRestroom />
-                </ListItemIcon>
-                <ListItemText primary="Solo Parent ID" />
-              </ListItem>
-              
-              {/* Senior Citizen ID */}
-              <ListItem 
-                sx={{ 
-                  pl: 4, 
-                  ...listItemStyles(isActive('/main/generate-id/senior-citizen'))
-                }} 
-                onClick={() => handleItemClick('/main/generate-id/senior-citizen')}
-              >
-                <ListItemIcon sx={{ color: isActive('/main/generate-id/senior-citizen') ? '#FF5733' : 'inherit' }}>
-                  <Elderly />
-                </ListItemIcon>
-                <ListItemText primary="Senior Citizen ID" />
-              </ListItem>
-              
-              {/* PWD ID */}
-              <ListItem 
-                sx={{ 
-                  pl: 4, 
-                  ...listItemStyles(isActive('/main/generate-id/pwd'))
-                }} 
-                onClick={() => handleItemClick('/main/generate-id/pwd')}
-              >
-                <ListItemIcon sx={{ color: isActive('/main/generate-id/pwd') ? '#FF5733' : 'inherit' }}>
-                  <Accessible />
-                </ListItemIcon>
-                <ListItemText primary="PWD ID" />
-              </ListItem>
-            </List>
-          </Collapse>
+          </>
         )}
 
-        {/* Hazard Map */}
-        <Tooltip title={!open ? "Hazard Map" : ""} placement="right">
-          <ListItem 
-            onClick={() => handleItemClick('/main/hazard-map')}
-            sx={listItemStyles(isActive('/main/hazard-map'))}
-          >
-            <ListItemIcon sx={{ color: isActive('/main/hazard-map') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Map />
-            </ListItemIcon>
-            {open && <ListItemText primary="Hazard Map" />}
-          </ListItem>
-        </Tooltip>
+        {/* Hazard Map - Only visible if not a Barangay Official */}
+        {showHazardMap && (
+          <Tooltip title={!open ? "Hazard Map" : ""} placement="right">
+            <ListItem 
+              onClick={() => handleItemClick('/main/hazard-map')}
+              sx={listItemStyles(isActive('/main/hazard-map'))}
+            >
+              <ListItemIcon sx={{ color: isActive('/main/hazard-map') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <Map />
+              </ListItemIcon>
+              {open && <ListItemText primary="Hazard Map" />}
+            </ListItem>
+          </Tooltip>
+        )}
 
         {/* Profile */}
         <Tooltip title={!open ? "Profile" : ""} placement="right">

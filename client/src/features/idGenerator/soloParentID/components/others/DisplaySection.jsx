@@ -234,6 +234,31 @@ export const ApplicationDetailsSection = ({ data, handleEdit }) => (
   </Section>
 );
 
+export const PhotoIDSection = ({ data, handleEdit }) => (
+  <Section title="Photo ID and Signature" handleEdit={handleEdit} pageNumber={11}>
+    {data.spMedia?.photoIDPreview && (
+      <div className="image-container">
+        <p className="info-label">PhotoID:</p>
+        <img 
+          src={data.spMedia.photoIDPreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
+        />
+      </div>
+    )}
+    {data.spMedia?.signaturePreview && (
+      <div className="image-container">
+        <p className="info-label">Signature:</p>
+        <img 
+          src={data.spMedia.signaturePreview} 
+          alt="House" 
+          style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '4px' }} 
+        />
+      </div>
+    )}
+  </Section>
+);
+
 
 
 

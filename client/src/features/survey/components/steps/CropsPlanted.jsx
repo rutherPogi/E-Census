@@ -1,15 +1,15 @@
+import { useState, useEffect } from "react";
+import { Button } from '@mui/material';
+
+import { SizeInput } from "../others/FormFields";
 import { useFormContext } from "../../pages/FormContext";
 import { CROP_TYPES } from "../../utils/constants";
-import { useState, useEffect } from "react";
-import { Snackbar, Alert } from '@mui/material';
-import { SizeInput } from "../others/FormFields";
+
 
 
 export default function CropsPlanted({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState(() => {
     const existingData = formData.cropsPlanted?.crops || {};
@@ -25,33 +25,10 @@ export default function CropsPlanted({ handleBack, handleNext }) {
 
   useEffect(() => {
     if (formData.cropsPlanted) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.cropsPlanted
-      }));
+      setValues(prev => ({ ...prev, ...formData.cropsPlanted }));
     }
   }, [formData.cropsPlanted]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    const hasValue = Object.values(values).some(val => 
-      parseFloat(val.replace(/,/g, '')) > 0
-    );
-
-    if (!hasValue) { isValid = false; }
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
@@ -77,12 +54,6 @@ export default function CropsPlanted({ handleBack, handleNext }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in at least one!");
-      setSnackbarOpen(true);
-      return;
-    }
-
     const processedValues = { ...values };
     
     Object.keys(processedValues).forEach((key) => {
@@ -93,14 +64,14 @@ export default function CropsPlanted({ handleBack, handleNext }) {
     });
 
     updateFormData('cropsPlanted', { crops: processedValues });
-    console.log("Current Form Values:", values);
+    console.log("Current Form Values:", processedValues);
 
     handleNext();
   };
   
   return (
     <div className='responsive-container'>
-      <div className='responsive-header'>Crops Planted</div>
+      <div className='responsive-header'>CROPS PLANTED</div>
       <div className='responsive-form'>
         {CROP_TYPES.map((field) => (
           <SizeInput
@@ -116,25 +87,10 @@ export default function CropsPlanted({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-        </div>     
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div>      
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

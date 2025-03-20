@@ -30,12 +30,22 @@ export const submitPwdId = async (req, res) => {
   try {
     await connection.beginTransaction();
     
-    const pwdID = req.body.personalInfo.pwdID;
-    console.log("Processing Application ID:", pwdID);
-    
+    const applicationData = JSON.parse(req.body.applicationData);
+    const pwdID = applicationData.personalInfo.pwdID;
+    console.log(pwdID);
+
+    const photoIDFile = req.files?.photoID?.[0];
+    const signatureFile = req.files?.signature?.[0];
+
     // 1. Insert PWD Application Data
     console.log("Step 1");
-    await pwdIDModel.createPWDApplicant(req.body.personalInfo, req.body.photoID, req.body.reportingUnit, connection);
+    await pwdIDModel.createPWDApplicant(
+      applicationData.personalInfo,
+      applicationData.reportingUnit,
+      photoIDFile.buffer,
+      signatureFile.buffer,
+      connection
+    );
 
     console.log("Step 2");
     await pwdIDModel.addPersonalInfo(pwdID, req.body.personalInfo, connection);
@@ -90,4 +100,19 @@ export const submitPwdId = async (req, res) => {
   } finally {
     connection.release();
   }
-};
+}; 
+
+export const managePwdId = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`SELECT * FROM pwdApplication ORDER BY dateApplied ASC`);
+    
+    res.status(200).json(rows);
+  } catch (error) {
+    console.error('Error fetching Application data:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error fetching Application data', 
+      error: error.message 
+    });
+  }
+}

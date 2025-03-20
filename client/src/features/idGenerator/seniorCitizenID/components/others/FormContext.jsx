@@ -8,7 +8,7 @@ const initialFormData = {
   professionalInfo: {},
   familyComposition: [],
   oscaMembership: {},
-  photoSignature: {}
+  scMedia: {}
 }; 
 
 export function FormProvider({ children }) {

@@ -1,28 +1,5 @@
 import dayjs from 'dayjs';
 
-export const formatCurrency = (value) => {
-  if (!value) return;
-  const plainNumber = value.toString().replace(/[^\d.]/g, ''); // Allow decimal points
-  return `${parseFloat(plainNumber).toLocaleString()}`;
-};
-
-export const formatDate = (value) => {
-  if (!value) return 'N/A';
-  return dayjs(value).format('MM/DD/YYYY');
-};
-
-export const formatNumber = (value) => {
-  if (!value) return '0';
-  const plainNumber = value.toString().replace(/[^\d.]/g, ''); // Allow decimal points
-  return parseFloat(plainNumber).toLocaleString();
-};
-
-export const formatters = {
-  currency: formatCurrency,
-  date: formatDate,
-  number: formatNumber,
-};
-
 export const formatPhoneNumber = (value, type) => {
   if (!value) return '';
 
@@ -43,3 +20,38 @@ export const formatPhoneNumber = (value, type) => {
   return plainNumber;
 };
 
+export const formatEmail = (value) => {
+  if (!value) return '';
+  return value.trim().toLowerCase(); // Remove spaces & convert to lowercase
+};
+
+export const formatDate = (value, format = 'YYYY-MM-DD') => {
+  if (!value) return '';
+  return dayjs(value).format(format);
+};
+
+export const formatCurrency = (value) => {
+  if (!value) return;
+  const plainNumber = value.toString().replace(/[^\d.]/g, ''); // Allow decimal points
+  return `${parseFloat(plainNumber).toLocaleString()}`;
+};
+
+export const formatAge = (value) => {
+  if (!value) return '';
+
+  // Remove non-numeric characters
+  let age = value.replace(/\D/g, '');
+
+  // Convert to number and cap at 99
+  age = Math.min(parseInt(age, 10) || 0, 99);
+
+  return age.toString();
+};
+
+export const formatters = {
+  phone: formatPhoneNumber,
+  email: formatEmail,
+  date: formatDate,
+  currency: formatCurrency,
+  age: formatAge,
+};

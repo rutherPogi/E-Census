@@ -35,7 +35,7 @@ const ManageSoloParentID = () => {
   const fetchSurveyData = async () => {
     setLoading(true);
     try {
-      const response = await get('/surveys/manage-survey');
+      const response = await get('/soloParentID/manage-soloParentID');
       setSurveyData(response);
       setFilteredData(response);
     } catch (err) {

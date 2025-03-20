@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../../../utils/api/apiService';
+
 import AddID from '../../components/AddID';
+import soloParentID from '../../../../assets/soloParentID.png'
 import '../../../../styles/components/style';
 
 
@@ -35,6 +37,8 @@ export default function AddSoloParentID() {
       idType = 'SOLO PARENT'
       onClick = {generateNewSoloParentId}
       id = 'soloParent'
+      idImage = {soloParentID}
+      title = {`Solo Parent`}
     />
   )
 }

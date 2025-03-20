@@ -15,6 +15,7 @@ export const TextInput = ({
   multiline,
   autofocus,
   required,
+  disabled = false,
   ...props 
 }) => {
 
@@ -22,6 +23,7 @@ export const TextInput = ({
 
   return (
     <TextField
+      disabled = {disabled}
       label = {label}
       variant = 'outlined'
       value = {value || ''}
@@ -193,6 +195,7 @@ export const DropdownInput = ({
   placeholder, 
   required,
   freeSolo,
+  disabled = false,
   ...props 
 }) => {
 
@@ -200,6 +203,7 @@ export const DropdownInput = ({
   
   return (
     <Autocomplete
+      disabled = {disabled}
       freeSolo = {freeSolo}
       options = {options}
       value = {options.find(option => option.value === value) || null}
@@ -280,6 +284,7 @@ export const NumberInput = ({
       placeholder={placeholder}
       size={isMobile ? 'small' : 'medium'}
       type="text" // Using text type with regex validation for better control
+      fullWidth
       inputProps={{ 
         inputMode: 'numeric',
         pattern: '[0-9]*',

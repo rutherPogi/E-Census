@@ -1,26 +1,16 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { TextField } from "@mui/material";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Paper 
-} from '@mui/material';
-import { Snackbar, Alert } from '@mui/material';
+import { TextField, Table, TableBody, TableCell, TableContainer, TableHead, 
+         TableRow, Paper, Button } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
 import { LIVESTOCK_TYPES } from "../../utils/constants";
+
 
 
 export default function Livestock({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  // Initialize values with '0' instead of empty strings
   const [values, setValues] = useState(() => {
     const existingData = formData.livestock || {};
     return Object.fromEntries(
@@ -46,38 +36,14 @@ export default function Livestock({ handleBack, handleNext }) {
 
   useEffect(() => {
     if (formData.livestock) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.livestock
-      }));
+      setValues(prev => ({ ...prev, ...formData.livestock }));
     }
   }, [formData.livestock]);
 
-  const validateForm = () => {
-    let hasValue = false;
-  
-    LIVESTOCK_TYPES.forEach(type => {
-      ['number', 'own', 'dispersal'].forEach(field => {
-        if (values[type][field] !== '') {
-          hasValue = true; 
-        }
-      });
-    });
-  
-    return hasValue; // Only return true if at least one field has a value
-  };
-  
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
 
   const handleChange = (livestockType, field) => (e) => {
     let value = e.target.value;
     
-    // Validate input is numeric
     if (!/^\d*$/.test(value)) {
       setErrors(prev => ({
         ...prev,
@@ -89,7 +55,6 @@ export default function Livestock({ handleBack, handleNext }) {
       return;
     }
     
-    // Validate maximum value
     if (Number(value) > 999) {
       setErrors(prev => ({
         ...prev,
@@ -101,33 +66,19 @@ export default function Livestock({ handleBack, handleNext }) {
       return;
     }
 
-    // Clear errors
-    setErrors(prev => ({
+    setErrors(prev => ({ 
       ...prev,
-      [livestockType]: {
-        ...prev[livestockType],
-        [field]: false
-      }
+      [livestockType]: { ...prev[livestockType], [field]: false }
     }));
     
-    // Update values
     setValues(prev => ({
       ...prev,
-      [livestockType]: {
-        ...prev[livestockType],
-        [field]: value
-      }
+      [livestockType]: { ...prev[livestockType], [field]: value}
     }));
   }; 
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in at least one field!");
-      setSnackbarOpen(true);
-      return;
-    }
 
     const processedValues = { ...values };
 
@@ -163,7 +114,7 @@ export default function Livestock({ handleBack, handleNext }) {
     <div className='responsive-container'>
       <div className='responsive-header'>LIVESTOCK/ANIMALS</div>
       <div className='responsive-table'>
-        <TableContainer component={Paper} className="mt-4">
+        <TableContainer component={Paper}>
           <Table>
             <TableHead>
               <TableRow>
@@ -208,25 +159,10 @@ export default function Livestock({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
-        </div>     
-      </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>   
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
+        </div>    
+      </div>  
     </div>
   );
 }

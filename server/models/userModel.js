@@ -6,10 +6,10 @@ export const findUserByUsername = async (username) => {
   return rows[0];
 };
 
-export const createUser = async (username, hashedPassword) => {
+export const createUser = async (userID, accountName, username, hashedPassword, position) => {
   const [result] = await pool.query(
-    "INSERT INTO users (username, password) VALUES (?, ?)",
-    [username, hashedPassword]
+    "INSERT INTO users (userID, accountName, username, password, position) VALUES (?, ?, ?, ?, ?)",
+    [userID, accountName, username, hashedPassword, position]
   );
   return result;
 };

@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../../../utils/api/apiService';
+
 import AddID from '../../components/AddID';
+import pwdID from '../../../../assets/pwdID-image.svg'
 import '../../../../styles/components/style';
+
 
 
 export default function AddPwdID() {
@@ -35,6 +38,8 @@ export default function AddPwdID() {
       idType = 'PWD'
       onClick = {generateNewSurveyId}
       id = 'pwd'
+      idImage = {pwdID}
+      title = {`Person with Disability`}
     />
   )
 }

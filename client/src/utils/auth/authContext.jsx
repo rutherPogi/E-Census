@@ -8,6 +8,12 @@ export const AuthProvider = ({ children }) => {
         return localStorage.getItem('authToken') ? true : false;
     });
 
+    // Add state for user data
+    const [userData, setUserData] = useState(() => {
+        const savedUserData = localStorage.getItem('userData');
+        return savedUserData ? JSON.parse(savedUserData) : null;
+    });
+
     // Run on component mount to set auth based on token
     useEffect(() => {
         const token = localStorage.getItem('authToken');
@@ -16,14 +22,22 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const login = (token) => {
+    const login = (token, user) => {
         if (token) { localStorage.setItem('authToken', token); }
+
+        if (user) {
+            localStorage.setItem('userData', JSON.stringify(user));
+            setUserData(user);
+        }
+
         setIsAuthenticated(true);
     };
 
     const logout = () => {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
         setIsAuthenticated(false);
+        setUserData(null);
     };
 
     // Get current token
@@ -31,8 +45,13 @@ export const AuthProvider = ({ children }) => {
         return localStorage.getItem('authToken');
     };
 
+    // Get user data
+    const getUserData = () => {
+        return userData;
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, getToken }}>
+        <AuthContext.Provider value={{ isAuthenticated, userData, login, logout, getToken, getUserData }}>
             {children}
         </AuthContext.Provider>
     );

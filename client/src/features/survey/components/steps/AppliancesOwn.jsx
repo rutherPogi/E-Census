@@ -9,6 +9,7 @@ import { formatCurrency } from "../../utils/formatter";
 export default function AppliancesOwn({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
+  
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 

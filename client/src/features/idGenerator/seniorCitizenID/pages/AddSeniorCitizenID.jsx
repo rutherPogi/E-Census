@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get } from '../../../../utils/api/apiService';
+
 import AddID from '../../components/AddID';
+import seniorCitizenID from '../../../../assets/seniorCitizenID.png'
 import '../../../../styles/components/style';
 
- 
+
+
 export default function AddSeniorCitizenID() {
 
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +38,8 @@ export default function AddSeniorCitizenID() {
       idType = 'SENIOR CITIZEN'
       onClick = {generateNewSeniorCitizenId}
       id = 'seniorCitizen'
+      idImage = {seniorCitizenID}
+      title = {'Senior Citizen'}
     />
   )
 }

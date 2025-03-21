@@ -42,22 +42,22 @@ export default function Form({ isEditing = false }) {
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 0 && <SurveyDetails handleNext={handleNext}/>}
-        {currentPage === 0 && <FamilyProfile handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 0 && <FamilyProfile2 handleNext={handleNext} handleBack={() => setCurrentPage(2)}/>}
-        {currentPage === 0 && <FoodExpenses handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 0 && <EducationExpenses handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 1 && <SurveyDetails handleNext={handleNext}/>}
+        {currentPage === 2 && <FamilyProfile handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 3 && <FamilyProfile2 handleNext={handleNext} handleBack={() => setCurrentPage(2)}/>}
+        {currentPage === 4 && <FoodExpenses handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 5 && <EducationExpenses handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 6 && <FamilyExpenses handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 7 && <MonthlyExpenses handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 8 && <HouseInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 9 && <HouseInfo2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 10 && <WaterInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 11 && <Livestock handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 1 && <Farmlots handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 2 && <CropsPlanted handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 3 && <FruitBearingTree handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 4 && <FamilyResources handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 5 && <AppliancesOwn handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 12 && <Farmlots handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 13 && <CropsPlanted handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 14 && <FruitBearingTree handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 15 && <FamilyResources handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 16 && <AppliancesOwn handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 17 && <Amenities handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 18 && <CommunityIssue handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 19 && <ServiceAvailed handleNext={handleNext} handleBack={handleBack}/>}

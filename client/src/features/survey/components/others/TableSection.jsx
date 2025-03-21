@@ -152,9 +152,9 @@ export const LivestockTable = ({ livestock, livestockTypes, title = "livestock"}
               <TableCell component="th" scope="row" sx={{ textTransform: 'capitalize' }}>
                 {type}
               </TableCell>
-              <TableCell align="center">{formatters.number(livestock[type]?.number)}</TableCell>
-              <TableCell align="center">{formatters.number(livestock[type]?.own)}</TableCell>
-              <TableCell align="center">{formatters.number(livestock[type]?.dispersal)}</TableCell>
+              <TableCell align="center">{livestock[type]?.number}</TableCell>
+              <TableCell align="center">{livestock[type]?.own}</TableCell>
+              <TableCell align="center">{livestock[type]?.dispersal}</TableCell>
             </TableRow>
           ))}
         </TableBody>

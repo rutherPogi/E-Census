@@ -1,10 +1,15 @@
 import { Card, Box, Typography, Divider } from "@mui/material";
 
+import { useFormContext } from "./FormContext";
 import pwdLogo from '../../../../../assets/pwdLogo.png'
 import itbayatLogo from '../../../../../assets/itbayatLogo.png'
 import phFlag from '../../../../../assets/phFlag.png'
 
-const IDFront = ({ formData }) => {
+const IDFront = () => {
+
+  const { formData } = useFormContext();
+
+
   return (
       <Card sx={{ border: "1px solid #ccc", width: 520, height: 350 }}>
         <Box 
@@ -71,22 +76,28 @@ const IDFront = ({ formData }) => {
 
           <Box sx={{width: '100%'}}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography variant="body1" fontWeight="bold">{formData?.name || "Juan Dela Cruz"}</Typography>
+              <Typography variant="body1" fontWeight="bold">
+                { formData.personalInfo.firstName + 
+                 (formData.personalInfo.middleName === 'N/A' ? ' ' : ' ' + formData.personalInfo.middleName + ' ') + 
+                  formData.personalInfo.lastName }
+              </Typography>
               <Typography 
                 variant="body2" textAlign={'center'}
                 sx={{ width: '100%', borderTop: '1px solid black' }}
               >
-                  Name
+                Name
               </Typography>
             </Box>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography variant="body1" fontWeight="bold">{formData?.name || "Physical Disability"}</Typography>
+              <Typography variant="body1" fontWeight="bold">
+                {formData.disabilityInfo.disabilityType}
+              </Typography>
               <Typography 
                 variant="body2" textAlign={'center'}
                 sx={{ width: '100%', borderTop: '1px solid black' }}
               >
-                  Type of Disability
+                Type of Disability
               </Typography>
             </Box>
 
@@ -113,8 +124,12 @@ const IDFront = ({ formData }) => {
                 justifyContent: "center"
               }}
             >
-              {formData?.photo ? (
-                <img src={formData.photo} alt="ID Photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              {formData?.pwdMedia?.photoIDPreview ? (
+                <img 
+                  src={formData.pwdMedia.photoIDPreview} 
+                  alt="ID Photo" 
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                />
               ) : (
                 "Photo ID"
               )}

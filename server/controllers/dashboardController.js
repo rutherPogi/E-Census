@@ -13,7 +13,6 @@ export const getTotal = async (req, res) => {
         (SELECT COUNT(*) FROM scApplication) AS TotalSCApplication
       `);
 
-    console.log('Rows:', rows[0]);
     res.json(rows[0]);
   } catch (error) {
     console.error('Error getting posts:', error);

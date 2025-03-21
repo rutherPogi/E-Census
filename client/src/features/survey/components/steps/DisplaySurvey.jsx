@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate , useParams} from "react-router-dom";
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 import { useFormContext } from "../../pages/FormContext";
 import { get, post } from '../../../../utils/api/apiService';
+import { Notification } from '../../../../components/common/Notification'
 import { mapFamilyMembers, mapAffiliation, mapNonIvatan, mapServiceAvailed } from "../others/dataMappers"
 import { SurveyDetailsSection, HouseInfoSection, WaterInfoSection, 
          FarmLotsSection, CommunityIssueSection } from "../others/SurveySections";
@@ -25,6 +26,16 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEd
   const [loading, setLoading] = useState(isEditing);
   const [error, setError] = useState(null);
   const [fetchedData, setFetchedData] = useState(null);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
+
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
 
   useEffect(() => {
     if (isEditing) {
@@ -128,15 +139,15 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEd
         processedFormData.surveyID = surveyID;
         formDataToSend.append('surveyData', JSON.stringify(processedFormData));
         await post('/surveys/update-survey', formDataToSend, true);
-        alert('Survey updated successfully!');
+        showNotification('Survey updated successfully!', 'success');
       } else {
         formDataToSend.append('surveyData', JSON.stringify(processedFormData));
         await post('/surveys/submit-survey', formDataToSend, true);
-        alert('Survey submitted successfully!');
+        showNotification('Survey submitted successfully!', 'success');
       }
 
       clearFormData();
-      navigate('/main/survey');
+      setTimeout(() => navigate('/main/survey'), 1000);
     
     } catch (error) {
       console.error('Error submitting survey:', error);
@@ -291,11 +302,17 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEd
       </Box>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>
+          <Button variant='outlined' sx={{ width: '100%' }} onClick={handleBack}>Back</Button>
+          <Button variant='contained'sx={{ width: '100%' }} onClick={handleSubmit}>
             {isEditing ? 'Update' : 'Submit'}
-          </button>
-        </div>     
+          </Button>
+        </div>  
+        <Notification
+          snackbarMessage={snackbarMessage} 
+          snackbarOpen={snackbarOpen} 
+          setSnackbarOpen={setSnackbarOpen} 
+          severity={severity}
+        />   
       </div>
     </div>
     

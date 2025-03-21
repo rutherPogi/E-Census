@@ -1,13 +1,20 @@
 import { Card, Box, Typography } from "@mui/material";
+import { useFormContext } from "./FormContext";
 
 
+const IDBack = () => {
 
-const IDBack = ({ formData }) => {
+  const { formData } = useFormContext();
+  console.log('Form Data: ', formData);
+
+
   return (
     <Card sx={{ border: "1px solid #ccc", width: 520, height: 350, p: 2, boxSizing: 'border-box' }}>
       <Box sx={{ display: 'flex', gap: 1 }}>
         <Typography fontSize={'14px'}>ADDRESS: </Typography>
-        <Typography  sx={{ borderBottom: '1px solid black', flex: 1, fontSize: '14px' }}>Hello</Typography>
+        <Typography  sx={{ borderBottom: '1px solid black', flex: 1, fontSize: '14px' }}>
+          {formData.personalInfo.firstName}
+        </Typography>
       </Box>
     
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

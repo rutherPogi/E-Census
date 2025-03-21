@@ -246,6 +246,19 @@ export const viewSurvey = async (req, res) => {
       SELECT * FROM NonIvatan WHERE surveyID = ?
     `, [surveyID]);
 
+    console.log('Survey Data: ', surveyData);
+    console.log('Family Profile: ', familyProfile);
+    console.log('Expenses: ', expenses);
+    console.log('Livestock: ', livestock);
+    console.log('Crops Planted: ', cropsPlanted);
+    console.log('Fruit Bearing Tree: ', fruitBearingTree);
+    console.log('Family Resources: ', familyResources);
+    console.log('Appliances Own: ', appliancesOwn);
+    console.log('Amenities: ', amenities);
+    console.log('Service Availed: ', serviceAvailed);
+    console.log('Government Affiliation: ', governmentAffiliation);
+    console.log('Non Ivatan: ', nonIvatan);
+
     res.status(200).json({
       surveyData, 
       familyProfile,

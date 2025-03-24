@@ -11,6 +11,7 @@ import EmergencyContact from "../components/steps/EmergencyContact";
 import ApplicationDetails from "../components/steps/ApplicationDetails";
 import DisplayApplication from "../components/steps/DisplayForm";
 import SPMedia from "../components/steps/SPMedia";
+import PrintID from "../components/steps/PrintID";
 
 
 
@@ -40,7 +41,7 @@ export default function SoloParentForm() {
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && <PersonalInfo handleNext={handleNext}/>}
+        {currentPage === 0 && <PersonalInfo handleNext={handleNext}/>}
         {currentPage === 2 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 3 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 4 && <OtherInfo handleNext={handleNext} handleBack={handleBack}/>}
@@ -50,8 +51,8 @@ export default function SoloParentForm() {
         {currentPage === 8 && <EmergencyContact handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 9 && <ApplicationDetails handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 10 && <SPMedia handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 11 && <DisplayApplication handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
-        
+        {currentPage === 11 && <DisplayApplication handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>} 
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack} />} 
 
       <div className='form-pagination'>
           {Array.from({ length: 10 }, (_, index) => (

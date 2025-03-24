@@ -53,7 +53,6 @@ export const submitSurvey = async (req, res) => {
       connection
     );
 
-    const houseImageFile = req.file ? req.file.fieldname || req.file.path : null;
     const houseImageBuffer = req.file ? req.file.buffer : null;
     console.log("Image buffer size:", req.file ? req.file.buffer.length : 0);
 
@@ -172,23 +171,40 @@ export const viewSurvey = async (req, res) => {
   const surveyID = req.params.surveyID || req.query.surveyID;
 
   try {
-    // 1. Get main survey data with joins to related tables
-    const [surveyData] = await connection.query(`
-      SELECT 
-        sr.surveyID, sr.respondent, sr.interviewer, sr.surveyDate, 
-        sr.barangay, sr.municipality, 
-        sr.monthlyIncome, sr.irregularIncome, 
-        sr.familyIncome,
-        hi.houseCondition, hi.houseStructure,
-        wi.waterAccess, wi.potableWater, wi.waterSources,
-        f.cultivation, f.pastureland, f.forestland,
-        ci.issues
-      FROM SurveyResponses sr
-      LEFT JOIN HouseInformation hi ON sr.surveyID = hi.surveyID
-      LEFT JOIN WaterInformation wi ON sr.surveyID = wi.surveyID
-      LEFT JOIN Farmlots f ON sr.surveyID = f.surveyID
-      LEFT JOIN CommunityIssues ci ON sr.surveyID = ci.surveyID
-      WHERE sr.surveyID = ?
+
+    // 1. Get Survey Responses
+    const [surveyResponses] = await connection.query(`
+      SELECT * FROM SurveyResponses WHERE surveyID = ?
+    `, [surveyID]);
+
+    // 2. Get House Information
+    const [rows] = await connection.query(`
+      SELECT * FROM HouseInformation WHERE surveyID = ?
+    `, [surveyID]);
+
+    const houseInformation = rows.map(row => {
+      let processedRow = {...row};
+
+      if (row.houseImage) {
+        processedRow.houseImage = `data:image/jpeg;base64,${Buffer.from(row.houseImage).toString('base64')}`;
+      }
+      
+      return processedRow;
+    });
+
+    // 3. Get Water Information
+    const [waterInformation] = await connection.query(`
+      SELECT * FROM WaterInformation WHERE surveyID = ?
+    `, [surveyID]);
+
+    // 4. Get Farmlots
+    const [farmlots] = await connection.query(`
+      SELECT * FROM Farmlots WHERE surveyID = ?
+    `, [surveyID]);
+
+    // 5. Get Community Issues
+    const [communityIssues] = await connection.query(`
+      SELECT * FROM CommunityIssues WHERE surveyID = ?
     `, [surveyID]);
 
     // 2. Get family profile data
@@ -246,21 +262,14 @@ export const viewSurvey = async (req, res) => {
       SELECT * FROM NonIvatan WHERE surveyID = ?
     `, [surveyID]);
 
-    console.log('Survey Data: ', surveyData);
-    console.log('Family Profile: ', familyProfile);
-    console.log('Expenses: ', expenses);
-    console.log('Livestock: ', livestock);
-    console.log('Crops Planted: ', cropsPlanted);
-    console.log('Fruit Bearing Tree: ', fruitBearingTree);
-    console.log('Family Resources: ', familyResources);
-    console.log('Appliances Own: ', appliancesOwn);
-    console.log('Amenities: ', amenities);
-    console.log('Service Availed: ', serviceAvailed);
-    console.log('Government Affiliation: ', governmentAffiliation);
-    console.log('Non Ivatan: ', nonIvatan);
+
 
     res.status(200).json({
-      surveyData, 
+      surveyResponses,
+      houseInformation,
+      waterInformation,
+      farmlots,
+      communityIssues, 
       familyProfile,
       expenses,
       livestock,

@@ -1,20 +1,21 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { TextInput, DateInput, GenderInput } from '../others/FormFields'
-import { Snackbar, Alert } from '@mui/material';
+import { Button } from '@mui/material';
 import dayjs from 'dayjs';
+
+import { TextInput, DateInput, GenderInput } from '../others/FormFields'
+import { useFormContext } from "../../pages/FormContext";
+
+
 
 
 export default function ServiceAvailed({ handleBack, handleNext }) {
 
   const { formData, addItem, updateItem } = useFormContext();
   const { serviceAvailed = [] } = formData;
+
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(-1);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
-  const [total, setTotal] = useState(0)
   const [values, setValues] = useState({
     date: null,
     ngo: '',
@@ -54,59 +55,11 @@ export default function ServiceAvailed({ handleBack, handleNext }) {
     }
   }, [serviceAvailed]);
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-  
-    if (!values.date || !values.date.isValid()) {
-      newErrors.date = "Date is required.";
-      isValid = false;
-    }
-  
-    if (!values.ngo.trim()) {
-      newErrors.ngo = "NGO name is required.";
-      isValid = false;
-    }
-  
-    if (!values.assistance.trim()) {
-      newErrors.assistance = "Service/Assistance field is required.";
-      isValid = false;
-    }
-  
-    if (values.male === '' || isNaN(values.male)) {
-      newErrors.male = "Please enter a valid number.";
-      isValid = false;
-    }
-  
-    if (values.female === '' || isNaN(values.female)) {
-      newErrors.female = "Please enter a valid number.";
-      isValid = false;
-    }
-  
-    if (!values.howServiceHelp.trim()) {
-      newErrors.howServiceHelp = "This field is required.";
-      isValid = false;
-    }
-  
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleNumberChange = (field) => (e) => {
     const value = e.target.value;
   
     if (value === '') {
-      setValues(prev => ({
-        ...prev,
-        [field]: ''
-      }));
+      setValues(prev => ({ ...prev, [field]: '' }));
       updateTotal({ ...values, [field]: '' });
       return;
     }
@@ -122,10 +75,7 @@ export default function ServiceAvailed({ handleBack, handleNext }) {
     }
   
     setErrors(prev => ({ ...prev, [field]: false }));
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
     
     updateTotal({ ...values, [field]: value });
   };
@@ -133,54 +83,31 @@ export default function ServiceAvailed({ handleBack, handleNext }) {
   const updateTotal = (currentValues) => {
     const maleValue = parseInt(currentValues.male) || 0;
     const femaleValue = parseInt(currentValues.female) || 0;
-    setValues(prev => ({
-      ...prev,
-      total: maleValue + femaleValue
-    }));
+    setValues(prev => ({ ...prev, total: maleValue + femaleValue }));
   };
 
   const handleDateChange = (newValue) => {
-    // Check if newValue is null
     if (!newValue || !newValue.isValid()) {
-      setValues(prev => ({
-        ...prev,
-        date: dayjs() // Set to current date if invalid
-      }));
+      setValues(prev => ({ ...prev, date: dayjs() }));
       return;
     }
-
-    setValues(prev => ({
-      ...prev,
-      date: newValue
-    }));
+    setValues(prev => ({ ...prev, date: newValue }));
   };
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: false
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: false }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields.");
-      setSnackbarOpen(true);
-      return;
-    }
-
     const processedValues = {
       ...values,
       date: values.date && values.date.isValid() 
         ? values.date.format('YYYY-MM-DD')
-        : dayjs().format('YYYY-MM-DD'),
+        : null,
       male: parseInt(values.male) || 0,
       female: parseInt(values.female) || 0,
       total: parseInt(values.total) || 0
@@ -262,25 +189,10 @@ export default function ServiceAvailed({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
           <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+            <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+            <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
           </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

@@ -34,30 +34,21 @@ export function FormProvider({ children }) {
 
   // Update any form section with new data
   const updateFormData = (section, data) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: data
-    }));
+    setFormData(prev => ({ ...prev, [section]: data }));
   };
 
   // Generic function to add an item to any array in formData
   // addItem('familyMembers', memberData);
   // addItem('serviceAvailed', serviceData);
   const addItem = (section, item) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: [...prev[section], item]
-    }));
+    setFormData(prev => ({ ...prev, [section]: [...prev[section], item] }));
   };
 
   const updateItem = (section, index, updatedItem) => {
     setFormData(prevData => {
       const updatedSection = [...prevData[section]];
       updatedSection[index] = updatedItem;
-      return {
-        ...prevData,
-        [section]: updatedSection
-      };
+      return { ...prevData, [section]: updatedSection };
     });
   };
  

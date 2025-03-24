@@ -23,6 +23,7 @@ import AddAccount from './features/accounts/pages/AddAccount.jsx';
 import HazzardMap from './features/hazzardMap/map.jsx';
 import Profile from './features/profile/Profile.jsx';
 import Dashboard from './features/dashboard/dashboard.jsx';
+import ManagePopulation from './features/population/ManagePopulation.jsx';
 
 
 
@@ -41,6 +42,8 @@ export default function App() {
               <Route path='survey' element={<AddSurvey/>}/>
               <Route path='survey/:id' element={<SurveyForm/>}/>
               <Route path='view-survey/:id' element={<SurveyForm isEditing={true}/>}/>
+
+              <Route path='population' element={<ManagePopulation/>}/>
 
               <Route path="manage-pwdID" element={<ManagePwdID />} />
               <Route path="manage-soloParentID" element={<ManageSoloParentID />} />

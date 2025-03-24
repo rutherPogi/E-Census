@@ -11,49 +11,52 @@ const IDFront = () => {
 
 
   return (
-      <Card sx={{ border: "1px solid #ccc", width: 520, height: 350 }}>
+      <Card sx={{ border: "1px solid #ccc", width: 324, height: 204 }}>
+        {/* HEADER */}
         <Box 
           sx={{ 
             position: 'relative', 
-            padding: '.5em 1em', 
+            padding: '.3em .6em', 
             display: "flex", 
             justifyContent: 'center',
-            mb: 2
+            mb: 1
           }}
         >
-
-          <Box sx={{ position: 'absolute', left: '3.5em', top: '1em' }}>
+          {/* PH FLAG */}
+          <Box sx={{ position: 'absolute', left: '1.5em', top: '.5em' }}>
             <img 
               src={phFlag} 
               alt="Itbayat Logo" 
               style={{ 
-                height: "45px", 
+                height: "25px", 
                 objectFit: "cover" 
               }} 
             />
           </Box>
           
+          {/* TEXT HEADER */}
           <Box sx={{ textAlign: "center" }}>
-            <Typography variant="body2">Republic of the Philippines</Typography>
-            <Typography variant="body2">Province of Batanes</Typography>
-            <Typography variant="body2">Municipality of Itbayat</Typography>
+            <Typography variant="body2" sx={{ fontSize: '10px' }}>Republic of the Philippines</Typography>
+            <Typography variant="body2" sx={{ fontSize: '10px' }}>Province of Batanes</Typography>
+            <Typography variant="body2" sx={{ fontSize: '10px' }}>Municipality of Itbayat</Typography>
           </Box>
 
+          {/* ITBAYAT/PWD LOGO */}
           <Box 
             sx={{
               position: 'absolute',
-              right: '2em',
+              right: '1em',
               display: 'flex',
               alignItems: 'center',
-              gap: 2
+              gap: 1
             }}
           >
             <img 
               src={itbayatLogo} 
               alt="Itbayat Logo" 
               style={{ 
-                width: "60px", 
-                height: "60px", 
+                width: "35px", 
+                height: "35px", 
                 objectFit: "cover" 
               }} 
             />
@@ -61,51 +64,45 @@ const IDFront = () => {
               src={pwdLogo} 
               alt="Itbayat Logo" 
               style={{ 
-                width: "45px", 
-                height: "45px", 
+                width: "25px", 
+                height: "25px", 
                 objectFit: "cover", 
-                borderRadius: '25px'
+                borderRadius: '15px'
               }} 
             />
           </Box>
-          
         </Box>
 
-
-        <Box sx={{ display: "flex", padding: 1, width: '100%', boxSizing: 'border-box'}}>
-
+        {/* CONTENT */}
+        <Box sx={{ display: "flex", padding: '0 .5em', width: '100%', gap: 1, boxSizing: 'border-box'}}>
+          {/* NAME */}
           <Box sx={{width: '100%'}}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography variant="body1" fontWeight="bold">
-                { formData.personalInfo.firstName + 
-                 (formData.personalInfo.middleName === 'N/A' ? ' ' : ' ' + formData.personalInfo.middleName + ' ') + 
-                  formData.personalInfo.lastName }
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: "bold" }}>
+                { (formData.personalInfo.firstName || '...') + 
+                  (formData.personalInfo.middleName === 'N/A' ? ' ' : ' ' + (formData.personalInfo.middleName || '') + ' ') + 
+                  (formData.personalInfo.lastName || '') }
               </Typography>
               <Typography 
-                variant="body2" textAlign={'center'}
-                sx={{ width: '100%', borderTop: '1px solid black' }}
+                sx={{ width: '100%', borderTop: '1px solid black', fontSize: '8px', textAlign: 'center' }}
               >
                 Name
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography variant="body1" fontWeight="bold">
-                {formData.disabilityInfo.disabilityType}
+            {/* TYPE OF DISABILITY */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: "bold" }}>
+                {formData.disabilityInfo.disabilityType || '...'}
               </Typography>
-              <Typography 
-                variant="body2" textAlign={'center'}
-                sx={{ width: '100%', borderTop: '1px solid black' }}
-              >
+              <Typography sx={{ width: '100%', borderTop: '1px solid black', fontSize: '8px', textAlign: 'center' }}>
                 Type of Disability
               </Typography>
             </Box>
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography 
-                variant="body2" textAlign={'center'}
-                sx={{ width: '80%', borderTop: '1px solid black', mt: 3 }}
-              >
+            {/* SIGNATURE */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
+              <Typography sx={{ width: '80%', borderTop: '1px solid black', mt: 1.5, fontSize: '8px', textAlign: 'center' }}>
                   Signature
               </Typography>
             </Box>
@@ -116,12 +113,13 @@ const IDFront = () => {
             {/* PHOTO ID */}
             <Box
               sx={{
-                width: '170px',
-                height: '130px',
+                width: '100px',
+                height: '80px',
                 border: "1px solid #ddd",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                fontSize: '10px'
               }}
             >
               {formData?.pwdMedia?.photoIDPreview ? (
@@ -136,30 +134,19 @@ const IDFront = () => {
             </Box>
 
             {/* ID NUMBER */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: 1 }}>
-              <Typography fontWeight="bold"
-                sx={{
-                  fontSize: '14px'
-                }}
-              >
-                {formData?.name || "02-0902-000-0000041"}
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
+              <Typography sx={{ fontSize: '9px', fontWeight: "bold" }}>
+                {formData.personalInfo.pwdID || '...'}
               </Typography>
-              <Typography 
-                variant="body2" textAlign={'center'}
-                sx={{ width: '100%', borderTop: '1px solid black' }}
-              >
+              <Typography sx={{ width: '100%', borderTop: '1px solid black', fontSize: '8px', textAlign: 'center' }}>
                   ID No.
               </Typography>
             </Box>
           </Box>
-
-         
-
-          
         </Box>
 
-        <Box sx={{ display: 'flex', padding: '0 1em', justifyContent: 'center'}}>
-          <Typography sx={{ fontSize: '12px', fontStyle: "italic", mt: 3}}>
+        <Box sx={{ display: 'flex', padding: '0 .5em', justifyContent: 'center'}}>
+          <Typography sx={{ fontSize: '8px', fontStyle: "italic", mt: 1.5}}>
             VALID ANYWHERE IN THE PHILIPPINES
           </Typography>
         </Box>

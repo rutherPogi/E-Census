@@ -7,6 +7,7 @@ import { useFormContext } from "../others/FormContext";
 import { CIVIL_STATUS_OPTIONS, SUFFIX_OPTIONS, SEX_OPTIONS, PI_REQUIRED_FIELDS } from '../../utils/constants';
 import { Notification } from "../../../components/Notification";
 import { TextInput, DropdownInput, DateInput } from "../../../../../components/common/FormFields";
+import { PI_ERROR_STATE, PI_INITIAL_STATE } from "../../utils/initialStates";
 
 
 export default function PersonalInfo({ handleBack, handleNext}) {
@@ -19,29 +20,14 @@ export default function PersonalInfo({ handleBack, handleNext}) {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [severity, setSeverity] = useState('');
 
-  const [values, setValues] = useState({
-    pwdID: pwdID,
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    suffix: '',
-    birthdate: null,
-    sex: '',
-    civilStatus: '',
-    pwdNumber: ''
-  }); 
+  const [values, setValues] = useState(PI_INITIAL_STATE(pwdID)); 
+  const [errors, setErrors] = useState(PI_ERROR_STATE); 
 
-  const [errors, setErrors] = useState({
-    firstName: false,
-    middleName: false,
-    lastName: false,
-    suffix: false,
-    birthdate: false,
-    sex: false,
-    civilStatus: false,
-    pwdNumber: false,
-    dateApplied: false
-  }); 
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
 
   useEffect(() => {
     if (formData.personalInfo) {
@@ -100,10 +86,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
-      
+      showNotification("Please fill in all required fields", 'error');
       return;
     }
 
@@ -133,7 +116,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value={values.firstName}
           onChange={handleChange('firstName')}
           error={errors.firstName}
-          helperText = {errors.firstName}
+          helperText = {errors.firstName || 'e.g., Juan'}
           placeholder = 'Enter First Name'
           required
         />
@@ -142,7 +125,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value={values.middleName}
           onChange={handleChange('middleName')}
           error={errors.middleName}
-          helperText = {errors.middleName}
+          helperText = {errors.middleName || 'e.g., Santos'}
           placeholder = 'Enter Middle Name'
         />
         <TextInput
@@ -150,7 +133,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value={values.lastName}
           onChange={handleChange('lastName')}
           error={errors.lastName}
-          helperText = {errors.lastName}
+          helperText = {errors.lastName || 'e.g, Dela Cruz'}
           placeholder = 'Enter Last Name'
           required
         />
@@ -160,7 +143,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value = {values.suffix}
           onChange = {(e, newValue) => handleChange('suffix')(e, newValue)}
           error = {errors.suffix} 
-          helperText = {errors.suffix || ''}
+          helperText = {errors.suffix || 'e.g., Jr - Junior'}
           placeholder = 'Enter your suffix'
         />
         <DateInput
@@ -177,7 +160,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value = {values.sex}
           onChange = {(e, newValue) => handleChange('sex')(e, newValue)}
           error = {errors.sex} 
-          helperText = {errors.sex || ''}
+          helperText = {errors.sex || 'e.g., Male'}
           placeholder = 'Enter your sex'
           required
         />
@@ -187,7 +170,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
           value = {values.civilStatus}
           onChange = {(e, newValue) => handleChange('civilStatus')(e, newValue)}
           error = {errors.civilStatus} 
-          helperText = {errors.civilStatus || ''}
+          helperText = {errors.civilStatus || 'e.g, Single'}
           placeholder = 'ex. Single'
           required
         />

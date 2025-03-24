@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Container, Paper, Box, Typography, TextField,
-         Button, Avatar, IconButton, InputAdornment } from "@mui/material";
-import { Visibility, VisibilityOff, PhotoCamera } from "@mui/icons-material";
+import { Container, Paper, Box, Typography, TextField, Button, Avatar, Snackbar, Alert } from "@mui/material";
+import ChangePasswordDialog from "./ChangePasswordDialog";
 
 import { useAuth } from "../../utils/auth/authContext";
-
-
+import { updateUserProfile } from './userService';
 
 const getInitials = (name) => {
   if (!name) return '';
@@ -18,78 +16,123 @@ const getInitials = (name) => {
     .substring(0, 2); // Limit to 2 characters
 };
 
-
-
 export default function Profile() {
-
-  const { userData } = useAuth();
-  const userInitials = getInitials(userData.accountName);
+  
+  const { userData, updateUserData } = useAuth();
 
   const [formData, setFormData] = useState({
-    name: userData.accountName,
-    username: userData.username,
-    password: "",
-    showPassword: false,
-    photo: userData.photo || "https://via.placeholder.com/150" // Placeholder image
+    accountName: userData.accountName,
+    username: userData.username
+  });
+  const [openDialog, setOpenDialog] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
   });
 
+  const userInitials = getInitials(formData.accountName);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
   };
 
-  const handleTogglePassword = () => {
-    setFormData({ ...formData, showPassword: !formData.showPassword });
-  };
-
-  const handlePhotoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({ ...formData, photo: reader.result });
-      };
-      reader.readAsDataURL(file);
+  const handleSaveChanges = async () => {
+    try {
+      await updateUserProfile(userData.userID, formData);
+      updateUserData(formData);
+      setSnackbar({
+        open: true,
+        message: "Profile updated successfully",
+        severity: "success"
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to update profile",
+        severity: "error"
+      });
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Updated Data:", formData);
-    // Implement update logic (e.g., API call to update user info)
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false
+    });
   };
 
   return (
     <Container component={Paper} sx={{ p: 4, maxWidth: 500 }}>
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
         <Avatar sx={{ bgcolor: '#DC623C', height: 100, width: 100, fontSize: '36px' }}>{userInitials}</Avatar>
-        <IconButton component="label">
-          <PhotoCamera />
-          <input type="file" hidden accept="image/*" onChange={handlePhotoChange} />
-        </IconButton>
-        <Typography variant="h6">Edit Profile</Typography>
-        <TextField label="Name" name="name" fullWidth value={formData.name} onChange={handleChange} />
-        <TextField label="Username" name="username" fullWidth value={formData.username} onChange={handleChange} />
-        <TextField
-          label="Password"
-          name="password"
-          type={formData.showPassword ? "text" : "password"}
-          fullWidth
-          value={formData.password}
+        <Typography variant="h6">{`@${formData.username}`}</Typography>
+        <TextField 
+          label="Name" 
+          name="accountName" 
+          fullWidth 
+          value={formData.accountName} 
           onChange={handleChange}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleTogglePassword} edge="end">
-                  {formData.showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            )
-          }}
         />
-        <Button variant="contained" color="primary" onClick={handleSubmit} fullWidth>
+        <TextField 
+          label="Username" 
+          name="username" 
+          fullWidth 
+          value={formData.username} 
+          onChange={handleChange}
+        />
+        <Button 
+          variant="contained" 
+          color="primary" 
+          fullWidth
+          onClick={handleSaveChanges}
+          sx={{ mb: 1 }}
+        >
           Save Changes
         </Button>
+        <Button 
+          variant="outlined" 
+          color="primary" 
+          fullWidth
+          onClick={handleOpenDialog}
+        >
+          Change Password
+        </Button>
       </Box>
+
+      <ChangePasswordDialog 
+        open={openDialog} 
+        onClose={handleCloseDialog} 
+        userID={userData.userID}
+        onSuccess={() => {
+          setSnackbar({
+            open: true,
+            message: "Password updated successfully",
+            severity: "success"
+          });
+        }}
+      />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

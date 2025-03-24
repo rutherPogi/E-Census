@@ -1,23 +1,29 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-         Paper, IconButton, Snackbar, Alert } from '@mui/material';
+         Paper, IconButton, Button } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import dayjs from 'dayjs';
+
+import { useFormContext } from "../../pages/FormContext";
+import { Notification } from '../../../../components/common/Notification'
+
   
 
 export default function NonIvatan2({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
   const { nonIvatan } = formData;
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setSnackbarOpen(false);
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
   };
-  
+
   const handleAdd = () => {
     sessionStorage.removeItem('editingMemberIndex');
     handleBack();
@@ -34,7 +40,7 @@ export default function NonIvatan2({ handleBack, handleNext }) {
     
     updateFormData('nonIvatan', updatedIpula);
 
-    setSnackbarMessage("Deleted Successfully!");
+    showNotification("Deleted Successfully!", 'info');
     setSnackbarOpen(true);
   };
     
@@ -60,13 +66,13 @@ export default function NonIvatan2({ handleBack, handleNext }) {
             <TableBody>
               {nonIvatan.map((person, index) => (
                 <TableRow key={index}>
-                  <TableCell>{person.name}</TableCell>
-                  <TableCell>{person.settlement}</TableCell>
-                  <TableCell>{person.ethnicity}</TableCell>
-                  <TableCell>{person.origin}</TableCell>
-                  <TableCell>{person.transient}</TableCell>
-                  <TableCell>{person.houseOwner}</TableCell>
-                  <TableCell>{person.transientRegistered}</TableCell>
+                  <TableCell>{person.name || 'N/A'}</TableCell>
+                  <TableCell>{person.settlement || 'N/A'}</TableCell>
+                  <TableCell>{person.ethnicity || 'N/A'}</TableCell>
+                  <TableCell>{person.origin || 'N/A'}</TableCell>
+                  <TableCell>{person.transient || 'N/A'}</TableCell>
+                  <TableCell>{person.houseOwner || 'N/A'}</TableCell>
+                  <TableCell>{person.transientRegistered || 'N/A'}</TableCell>
                   <TableCell>
                     {person.transientDateRegistered && dayjs(person.transientDateRegistered).isValid() 
                       ? dayjs(person.transientDateRegistered).format('MM/DD/YYYY') 
@@ -96,20 +102,16 @@ export default function NonIvatan2({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
           <div className='form-buttons-right'>
-            <button type='button' className="btn" onClick={handleAdd}>Add Person</button>
-            <button type='button' className="btn submit-btn" onClick={handleNext}>Next</button>
+            <Button variant='outlined' onClick={handleAdd} sx={{ width: '100%' }}>Cancel</Button>
+            <Button variant='contained' onClick={handleNext} sx={{ width: '100%' }}>Next</Button>
           </div>     
       </div>
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={3000} 
-        onClose={handleSnackbarClose} 
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity="success" variant="filled">
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   );
 }

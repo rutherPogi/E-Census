@@ -13,22 +13,35 @@ export default function DisabilityInfo({ handleBack, handleNext}) {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [severity, setSeverity] = useState('');
   
-  const [values, setValues] = useState({ disabilityType: '', disabilityCause: '' }); 
-  const [errors, setErrors] = useState({ disabilityType: false, disabilityCause: false }); 
+  const [values, setValues] = useState({ 
+    disabilityType: '', 
+    disabilityCause: '',
+    disabilitySpecific: '' 
+  }); 
+  
+  const [errors, setErrors] = useState({ 
+    disabilityType: false, 
+    disabilityCause: false,
+    disabilitySpecific: false
+  }); 
+
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
 
   useEffect(() => {
     if (formData.disabilityInfo) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.disabilityInfo
-      }));
+      setValues(prev => ({ ...prev, ...formData.disabilityInfo }));
     }
   }, [formData.disabilityInfo]);
 
   const validateForm = () => {
     const newErrors = {
       disabilityType: !values.disabilityType,
-      disabilityCause: !values.disabilityCause
+      disabilityCause: !values.disabilityCause,
+      disabilitySpecific: values.disabilityCause && !values.disabilitySpecific
     };
     
     setErrors(newErrors);
@@ -37,16 +50,20 @@ export default function DisabilityInfo({ handleBack, handleNext}) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setValues({
-      ...values,
-      [name]: value
-    });
+    
+    // Clear specific disability selection when cause changes
+    if (name === 'disabilityCause') {
+      setValues({ 
+        ...values, 
+        [name]: value,
+        disabilitySpecific: '' 
+      });
+    } else {
+      setValues({ ...values, [name]: value });
+    }
     
     if (value) {
-      setErrors({
-        ...errors,
-        [name]: false
-      });
+      setErrors({ ...errors, [name]: false });
     }
   };
 
@@ -54,14 +71,12 @@ export default function DisabilityInfo({ handleBack, handleNext}) {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
+      showNotification('Please fill in all required fields', 'error');
       return;
     }
     
     updateFormData('disabilityInfo', values);
-    console.log("Disabilty Information:", values);
+    console.log("Disability Information:", values);
     
     handleNext();
   };
@@ -110,13 +125,60 @@ export default function DisabilityInfo({ handleBack, handleNext}) {
             value={values.disabilityCause}
             onChange={handleChange}
           >
-            <FormControlLabel value="Congenial / Inborn" control={<Radio />} label="Congenial / Inborn"/>
-            <FormControlLabel value="Acquired" control={<Radio />} label="Intellectual Disability"/>
+            <FormControlLabel value="Congenital / Inborn" control={<Radio />} label="Congenital / Inborn"/>
+            <FormControlLabel value="Acquired" control={<Radio />} label="Acquired"/>
           </RadioGroup>
           {errors.disabilityCause && (
             <FormHelperText>Please select a cause of disability</FormHelperText>
           )}
         </FormControl>
+
+        {values.disabilityCause === "Congenital / Inborn" && (
+          <FormControl 
+            component="fieldset" 
+            error={errors.disabilitySpecific} 
+            fullWidth 
+            margin="normal"
+          >
+            <FormLabel component="legend">Specific Congenital Condition</FormLabel>
+            <RadioGroup
+              name="disabilitySpecific"
+              value={values.disabilitySpecific}
+              onChange={handleChange}
+            >
+              <FormControlLabel value="Autism" control={<Radio />} label="Autism"/>
+              <FormControlLabel value="ADHD" control={<Radio />} label="ADHD"/>
+              <FormControlLabel value="Cerebral Palsy" control={<Radio />} label="Cerebral Palsy"/>
+              <FormControlLabel value="Down Syndrome" control={<Radio />} label="Down Syndrome"/>
+            </RadioGroup>
+            {errors.disabilitySpecific && (
+              <FormHelperText>Please select a specific condition</FormHelperText>
+            )}
+          </FormControl>
+        )}
+
+        {values.disabilityCause === "Acquired" && (
+          <FormControl 
+            component="fieldset" 
+            error={errors.disabilitySpecific} 
+            fullWidth 
+            margin="normal"
+          >
+            <FormLabel component="legend">Specific Acquired Condition</FormLabel>
+            <RadioGroup
+              name="disabilitySpecific"
+              value={values.disabilitySpecific}
+              onChange={handleChange}
+            >
+              <FormControlLabel value="Chronic Illness" control={<Radio />} label="Chronic Illness"/>
+              <FormControlLabel value="Cerebral Palsy" control={<Radio />} label="Cerebral Palsy"/>
+              <FormControlLabel value="Injury" control={<Radio />} label="Injury"/>
+            </RadioGroup>
+            {errors.disabilitySpecific && (
+              <FormHelperText>Please select a specific condition</FormHelperText>
+            )}
+          </FormControl>
+        )}
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>

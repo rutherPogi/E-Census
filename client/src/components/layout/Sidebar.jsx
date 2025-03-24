@@ -1,36 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Drawer, 
-  Toolbar, 
-  List, 
-  ListItem, 
-  ListItemIcon, 
-  ListItemText,
-  Collapse, 
-  Divider, 
-  Box, 
-  Tooltip,
-  Container,
-  Avatar,
-  Typography
-} from '@mui/material';
-import { 
-  Home, 
-  Assignment, 
-  Badge, 
-  Map, 
-  Person, 
-  ExpandLess,
-  ExpandMore, 
-  Elderly, 
-  Accessible, 
-  EscalatorWarning,
-  AccountCircle,
-  Newspaper
-} from '@mui/icons-material';
-import logo from '../../assets/questionnaire.png'
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse, 
+         Divider, Box, Tooltip, Container, Avatar, Typography } from '@mui/material';
+import { Home, Assignment, Badge, Map, Person, ExpandLess, ExpandMore, 
+         Elderly, Accessible, EscalatorWarning, AccountCircle, Newspaper,
+         Groups } from '@mui/icons-material';
+
 import { useAuth } from '../../utils/auth/authContext';
+import logo from '../../assets/questionnaire.png'
+
+
 
 const Logo = () => (
   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
@@ -180,6 +159,19 @@ const Sidebar = ({
               <Assignment />
             </ListItemIcon>
             {open && <ListItemText primary="Census" />}
+          </ListItem>
+        </Tooltip>
+
+        {/* Population */}
+        <Tooltip title={!open ? "Population" : ""} placement="right">
+          <ListItem 
+            onClick={() => handleItemClick('/main/population')}
+            sx={listItemStyles(isActive('/main/population'))}
+          >
+            <ListItemIcon sx={{ color: isActive('/main/population') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+              <Groups />
+            </ListItemIcon>
+            {open && <ListItemText primary="Population" />}
           </ListItem>
         </Tooltip>
 

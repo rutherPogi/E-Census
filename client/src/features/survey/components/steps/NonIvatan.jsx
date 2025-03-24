@@ -1,29 +1,30 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { TextInput, DateInput, GenderInput } from '../others/FormFields'
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, 
-         FormHelperText, Snackbar, Alert } from "@mui/material";
+         FormHelperText, Button } from "@mui/material";
 import dayjs from 'dayjs';
+
+import { useFormContext } from "../../pages/FormContext";
+import { TextInput, DateInput } from '../others/FormFields'
+
 
 
 export default function NonIvatan({ handleBack, handleNext }) {
 
   const { formData, addItem, updateItem } = useFormContext();
   const { nonIvatan = [] } = formData;
+
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(-1);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState({
-    name: formData.name || '',
-    settlement: formData.settlement || '',
-    ethnicity: formData.ethnicity || '',
-    origin: formData.origin || '',
-    transient: formData.transient || '',
-    houseOwner: formData.houseOwner || '',
-    transientRegistered: formData.transientRegistered || '',
-    transientDateRegistered: formData.transientDateRegistered || null
+    name: '',
+    settlement: '',
+    ethnicity: '',
+    origin: '',
+    transient: '',
+    houseOwner: '',
+    transientRegistered: '',
+    transientDateRegistered: null
   })
 
   const [errors, setErrors] = useState({
@@ -58,85 +59,22 @@ export default function NonIvatan({ handleBack, handleNext }) {
     }
   }, [nonIvatan]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    const requiredFields = ['name', 'settlement', 'ethnicity', 'origin', 'transient'];
-    const transientFields = ['houseOwner', 'transientRegistered'];
-    const registeredFields = ['transientDateRegistered'];
-
-    requiredFields.forEach(key => {
-      if (!values[key]) {
-        newErrors[key] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    if (values.transient === 'Yes') {
-      transientFields.forEach(key => {
-        if (!values[key]) {
-          newErrors[key] = 'This field is required';
-          isValid = false;
-        }
-      });
-      
-      if (values.transientRegistered === 'Yes') {
-        registeredFields.forEach(key => {
-          if (!values[key]) {
-            newErrors[key] = 'This field is required';
-            isValid = false;
-          }
-        });
-      }
-    }
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleDateChange = (newValue) => {
     if (!newValue || !newValue.isValid()) {
-      setValues(prev => ({
-        ...prev,
-        transientDateRegistered: dayjs()
-      }));
+      setValues(prev => ({ ...prev, transientDateRegistered: dayjs() }));
       return;
     }
-
-    setValues(prev => ({
-      ...prev,
-      transientDateRegistered: newValue
-    }));
+    setValues(prev => ({ ...prev, transientDateRegistered: newValue }));
   };
 
   const handleChange = (field) => (e, newValue) => {
     const value = newValue?.value || e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: false
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: false }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSnackbarOpen(true);
-      return;
-    }
 
     const processedValues = { ...values };
   
@@ -267,25 +205,10 @@ export default function NonIvatan({ handleBack, handleNext }) {
       )}
       <div className='form-buttons'>
           <div className='form-buttons-right'>
-            <button type='submit' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='submit' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+            <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+            <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
           </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

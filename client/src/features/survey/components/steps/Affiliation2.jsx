@@ -1,20 +1,28 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-         Paper, IconButton, Snackbar, Alert } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
+         Paper, IconButton, Button } from '@mui/material';
 import dayjs from 'dayjs';
+
+import { useFormContext } from "../../pages/FormContext";
+import { Notification } from '../../../../components/common/Notification'
+
+
+
 
 export default function Affiliation2({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
   const { affiliation } = formData;
+
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') return;
-    setSnackbarOpen(false);
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
   };
 
   const handleAdd = () => {
@@ -33,8 +41,7 @@ export default function Affiliation2({ handleBack, handleNext }) {
     
     updateFormData('affiliation', updatedAffiliation);
 
-    setSnackbarMessage("Deleted Successfully!");
-    setSnackbarOpen(true);
+    showNotification("Deleted Successfully!", 'info');
   };
     
   return (
@@ -55,14 +62,14 @@ export default function Affiliation2({ handleBack, handleNext }) {
             <TableBody>
               {affiliation.map((aff, index) => (
                 <TableRow key={index}>
-                  <TableCell>{aff.nameAffiliated}</TableCell>
+                  <TableCell>{aff.nameAffiliated || 'N/A'}</TableCell>
                   <TableCell>
                     {aff.asOfficer && dayjs(aff.asOfficer).isValid() 
                       ? dayjs(aff.asOfficer).format('MM/DD/YYYY') 
                       : 'N/A'}
                   </TableCell>
                   <TableCell>{aff.asMember ? dayjs(aff.asMember).format('MM/DD/YYYY') : 'N/A'}</TableCell>
-                  <TableCell>{aff.organizationAffiliated}</TableCell>
+                  <TableCell>{aff.organizationAffiliated || 'N/A'}</TableCell>
                   <TableCell>
                     <IconButton 
                       color="primary" 
@@ -87,22 +94,16 @@ export default function Affiliation2({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
           <div className='form-buttons-right'>
-          <button type='button' className="btn" onClick={handleAdd}>Add Person</button>
-            <button type='button' className="btn submit-btn" onClick={handleNext}>
-              Next
-            </button> 
+            <Button variant='outlined' onClick={handleAdd} sx={{ width: '100%' }}>Cancel</Button>
+            <Button variant='contained' onClick={handleNext} sx={{ width: '100%' }}>Next</Button>
           </div>     
       </div>
-      <Snackbar 
-        open={snackbarOpen} 
-        autoHideDuration={3000} 
-        onClose={handleSnackbarClose} 
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={handleSnackbarClose} severity="success" variant="filled">
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   );
 }

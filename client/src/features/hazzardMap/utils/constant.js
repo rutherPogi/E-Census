@@ -163,3 +163,11 @@ export const ITBAYAT_BARANGAYS = {
     }
   ]
 };
+
+export const HAZARD_TYPES = [
+  { id: 'landslide', label: 'Landslide Prone', color: '#e74c3c' },
+  { id: 'flood', label: 'Flood Prone', color: '#3498db' },
+  { id: 'earthquake', label: 'Earthquake Damage', color: '#f39c12' },
+  { id: 'tsunami', label: 'Tsunami Risk', color: '#9b59b6' },
+  { id: 'storm', label: 'Storm Surge', color: '#2ecc71' }
+];

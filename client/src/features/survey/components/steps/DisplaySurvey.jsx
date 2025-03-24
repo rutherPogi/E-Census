@@ -15,7 +15,7 @@ import { LIVESTOCK_TYPES, AMENITY_TYPES, APPLIANCE_TYPES, NON_IVATAN_TABLE_HEADE
 
 
 
-export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEditing = false }) {
+export default function DisplaySurvey({ handleBack, handleEdit, isEditing = false }) {
 
   const navigate = useNavigate();
   const params = useParams();
@@ -47,33 +47,95 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEd
 
   const fetchSurveyData = async () => {
     setLoading(true);
-
+  
     try {
       const response = await get(`/surveys/view-survey/${surveyID}`, {
         params: { surveyID },
       });
-
+  
       if (response) {
         setFetchedData(response);
-        console.log('Raw API response:', response); // Log the raw response
+        console.log('Raw API response:', response);
+
+        const houseInfo = response.houseInformation[0] || {};
         
-        // Use the new function to update the entire form data
-        if (response) {
-          setEntireFormData(response);
-          console.log('Setting entire form data with:', response);
-        } else {
-          console.warn('Response does not contain surveyData property');
-        }
+        // Transform the API response to match formData structure
+        const transformedData = {
+          surveyData: response.surveyResponses[0] || {},
+          houseInfo: {
+            ...houseInfo,
+            // Use the image that's already converted to data URL by the server
+            houseImagePreview: houseInfo.houseImage || null
+          },
+          waterInfo: response.waterInformation[0] || {},
+          farmlots: response.farmlots[0] || {},
+          communityIssues: response.communityIssues[0] || {},
+          familyMembers: response.familyProfile || [],
+          // Transform expenses data
+          foodExpenses: transformExpenses(response.expenses, 'food'),
+          educationExpenses: transformExpenses(response.expenses, 'education'),
+          familyExpenses: transformExpenses(response.expenses, 'family'),
+          monthlyExpenses: transformExpenses(response.expenses, 'monthly'),
+          // Other transformations
+          livestock: transformLivestock(response.livestock),
+          cropsPlanted: { crops: transformKeyValue(response.cropsPlanted, 'cropName', 'fieldSize') },
+          fruitBearingTree: { tree: transformKeyValue(response.fruitBearingTree, 'treeName', 'treeCount') },
+          familyResources: { resources: transformKeyValue(response.familyResources, 'resourceName', 'amount') },
+          appliancesOwn: { appliances: transformKeyValue(response.appliancesOwn, 'applianceName', 'quantity') },
+          amenitiesOwn: { amenities: transformKeyValue(response.amenities, 'amenityName', 'quantity') },
+          serviceAvailed: response.serviceAvailed || [],
+          affiliation: response.governmentAffiliation || [],
+          nonIvatan: response.nonIvatan || []
+        };
+        
+        setEntireFormData(transformedData);
+        console.log('Setting entire form data with:', transformedData);
       } else {
         throw new Error("Unexpected response format");
       }
-
+  
       setLoading(false);
     } catch (err) {
       console.error('Error fetching data', err);
       setError('Failed to load survey data. Please try again later.');
       setLoading(false);
     }
+  };
+
+  const transformExpenses = (expenses, category) => {
+    const categoryExpenses = expenses.filter(exp => exp.category === category);
+    const expensesObj = {};
+    let total = 0;
+    
+    categoryExpenses.forEach(exp => {
+      expensesObj[exp.expenseName] = exp.amount;
+      total += Number(exp.amount);
+    });
+    
+    return {
+      expenses: expensesObj,
+      [`${category}Total`]: total
+    };
+  };
+  
+  const transformLivestock = (livestock) => {
+    const result = {};
+    livestock.forEach(item => {
+      result[item.livestockType] = {
+        number: item.number,
+        own: item.own,
+        dispersal: item.dispersal
+      };
+    });
+    return result;
+  };
+  
+  const transformKeyValue = (items, keyField, valueField) => {
+    const result = {};
+    items.forEach(item => {
+      result[item[keyField]] = item[valueField];
+    });
+    return result;
   };
   
   const { 
@@ -102,21 +164,10 @@ export default function DisplaySurvey({ handleBack, handleNext, handleEdit, isEd
     return quantity >= 1;
   });
 
-  const familyMembersData = isEditing && fetchedData ? 
-    fetchedData.familyProfile : 
-    formData.familyMembers;
-    
-  const affiliationData = isEditing && fetchedData ? 
-    fetchedData.governmentAffiliation : 
-    formData.affiliation;
-    
-  const nonIvatanData = isEditing && fetchedData ? 
-    fetchedData.nonIvatan : 
-    formData.nonIvatan;
-    
-  const serviceAvailedData = isEditing && fetchedData ? 
-    fetchedData.serviceAvailed : 
-    formData.serviceAvailed;
+  const familyMembersData = formData.familyMembers;
+  const affiliationData = formData.affiliation;
+  const nonIvatanData = formData.nonIvatan;
+  const serviceAvailedData = formData.serviceAvailed;
 
 
   const handleSubmit = async (e) => {

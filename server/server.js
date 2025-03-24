@@ -9,6 +9,7 @@ import seniorCitizenIDRoutes from './routes/seniorCitizenIDRoutes.js';
 import postRoutes from './routes/postRoutes.js';
 import hazzardMapRoutes from './routes/hazzardMapRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import populationRoutes from './routes/populationRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use('/api/seniorCitizenID', seniorCitizenIDRoutes);
 app.use('/api/posts', postRoutes );
 app.use('/api/hazzardMap', hazzardMapRoutes );
 app.use('/api/dashboard', dashboardRoutes );
+app.use('/api/population', populationRoutes );
 
 // Start server
 app.listen(PORT, () => {

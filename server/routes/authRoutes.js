@@ -12,6 +12,9 @@ router.get('/manage-accounts', authenticateToken, authController.manageAccounts)
 router.delete('/delete-account/:userID', authenticateToken, authController.deleteAccount);
 router.get('/last-sequence', authController.getLastSequence);
 
+router.put('/users/:userID', authenticateToken, authController.updateUserProfile);
+router.put('/users/:userID/password', authenticateToken, authController.changePassword);
+
 
 
 export default router;

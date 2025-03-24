@@ -1,8 +1,11 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
-import { TextInput, DateInput, GenderInput } from '../others/FormFields'
-import { Snackbar, Alert } from '@mui/material';
+import { Button } from '@mui/material';
 import dayjs from 'dayjs';
+
+import { TextInput, DateInput } from '../others/FormFields'
+import { useFormContext } from "../../pages/FormContext";
+
+
 
 
 export default function Affiliation({ handleBack, handleNext }) {
@@ -11,8 +14,6 @@ export default function Affiliation({ handleBack, handleNext }) {
   const { affiliation = [] } = formData;
   const [isEditing, setIsEditing] = useState(false);
   const [editIndex, setEditIndex] = useState(-1);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const [values, setValues] = useState({
     nameAffiliated: '',
@@ -48,84 +49,25 @@ export default function Affiliation({ handleBack, handleNext }) {
     }
   }, [affiliation]);
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {};
-  
-    if (!values.nameAffiliated.trim()) {
-      newErrors.nameAffiliated = "This field is required.";
-      isValid = false;
-    }
-
-    if (!values.asMember || !values.asMember.isValid()) {
-      newErrors.asMember = "This field is required.";
-      isValid = false;
-    }
-
-    if (values.asMember.isAfter(dayjs())) {
-      newErrors.asMember;
-      isValid = false;
-    }
-  
-    if (!values.organizationAffiliated.trim()) {
-      newErrors.organizationAffiliated = "This field is required.";
-      isValid = false;
-    }
-  
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
-  };
-
   const handleDateChange = (field) => (newValue) => {
     if (!newValue || !newValue.isValid()) {
-      setValues(prev => ({
-        ...prev,
-        [field]: field === 'asOfficer' ? 'N/A' : dayjs() // 'N/A' for asOfficer, default to today for asMember
-      }));
-      setErrors(prev => ({
-        ...prev,
-        [field]: field === 'asMember' ? "Invalid date" : false // Show error only for required field
-      }));
+      setValues(prev => ({ ...prev, [field]: field === 'asOfficer' ? 'N/A' : dayjs() }));
+      setErrors(prev => ({ ...prev, [field]: field === 'asMember' ? "Invalid date" : false }));
       return;
     }
   
-    setValues(prev => ({
-      ...prev,
-      [field]: newValue
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: false
-    }));
+    setValues(prev => ({ ...prev, [field]: newValue }));
+    setErrors(prev => ({ ...prev, [field]: false }));
   };
 
   const handleChange = (field) => (e) => {
     const value = e.target.value;
-    setValues(prev => ({
-      ...prev,
-      [field]: value
-    }));
-    setErrors(prev => ({
-      ...prev,
-      [field]: false
-    }));
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: false }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields.");
-      setSnackbarOpen(true);
-      return;
-    }
 
     const processedValues = {
       ...values,
@@ -135,7 +77,7 @@ export default function Affiliation({ handleBack, handleNext }) {
           : 'N/A',
       asMember: values.asMember && values.asMember.isValid() 
         ? values.asMember.format('YYYY-MM-DD') 
-        : dayjs().format('YYYY-MM-DD')
+        : null
     };
     
 
@@ -191,25 +133,10 @@ export default function Affiliation({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
           <div className='form-buttons-right'>
-            <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-            <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+            <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Back</Button>
+            <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
           </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   )
 }

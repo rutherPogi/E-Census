@@ -1,10 +1,11 @@
-import { useFormContext } from "../../pages/FormContext";
 import { useState, useEffect } from "react";
+import { Button, Snackbar, Alert } from '@mui/material';
+
+import { useFormContext } from "../../pages/FormContext";
 import { NumberInput } from "../others/FormFields"
 import { APPLIANCE_TYPES } from "../../utils/constants";
-import { Snackbar, Alert } from '@mui/material';
 import { formatCurrency } from "../../utils/formatter";
-
+import { Notification } from '../../../../components/common/Notification'
  
 export default function AppliancesOwn({ handleBack, handleNext }) {
 
@@ -12,6 +13,7 @@ export default function AppliancesOwn({ handleBack, handleNext }) {
   
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [severity, setSeverity] = useState('');
 
   const [values, setValues] = useState(() => {
     const existingData = formData.appliancesOwn?.appliances || {};
@@ -25,12 +27,15 @@ export default function AppliancesOwn({ handleBack, handleNext }) {
     Object.fromEntries(APPLIANCE_TYPES.map(type => [type, false]))
   );
 
+  const showNotification = (message, type) => {
+    setSnackbarMessage(message);
+    setSeverity(type);
+    setSnackbarOpen(true);
+  };
+
   useEffect(() => {
     if (formData.appliancesOwn) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.appliancesOwn
-      }));
+      setValues(prev => ({ ...prev, ...formData.appliancesOwn }));
     }
   }, [formData.appliancesOwn]);
 
@@ -38,21 +43,16 @@ export default function AppliancesOwn({ handleBack, handleNext }) {
     const newErrors = {};
     let isValid = true;
 
-    const hasValue = Object.values(values).some(val => 
-      parseFloat(val.replace(/,/g, '')) > 0
-    );
+    const hasValue = Object.values(values).some(val => {
+      if (!val || val === '') return false;
+      const numValue = parseFloat(String(val).replace(/,/g, ''));
+      return numValue > 0;
+    });
 
     if (!hasValue) { isValid = false; }
 
     setErrors(prev => ({ ...prev, ...newErrors }));
     return isValid;
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setSnackbarOpen(false);
   };
 
   const handleChange = (field) => (e) => {
@@ -85,8 +85,7 @@ export default function AppliancesOwn({ handleBack, handleNext }) {
     e.preventDefault();
 
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in at least one!");
-      setSnackbarOpen(true);
+      showNotification("Please fill in at least one!", 'error');
       return;
     }
 
@@ -123,25 +122,16 @@ export default function AppliancesOwn({ handleBack, handleNext }) {
       </div>
       <div className='form-buttons'>
         <div className='form-buttons-right'>
-          <button type='button' className="btn cancel-btn" onClick={handleBack}>Back</button>
-          <button type='button' className="btn submit-btn" onClick={handleSubmit}>Next</button>
+          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
+          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
         </div>     
       </div>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert 
-          onClose={handleSnackbarClose} 
-          severity="error" 
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </div>
   );
 }

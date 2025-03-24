@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Box, Button, Typography } from '@mui/material';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 
 import { useFormContext } from "../../pages/FormContext";
 import { Notification } from '../../../../components/common/Notification'
@@ -12,7 +13,6 @@ const customIcon = new Icon({
   iconSize: [25, 41],
   iconAnchor: [12, 41]
 });
-
 
 const ITBAYAT_COORDINATES = [20.7758, 121.8491];
 const DEFAULT_ZOOM = 14;
@@ -28,11 +28,24 @@ function MapWithPin({ position, setPosition }) {
   return position ? <Marker position={position} icon={customIcon} /> : null;
 }
 
-export default function HouseLocation({ handleBack, handleNext }) {
+// New component to control map center
+function MapController({ position }) {
+  const map = useMap();
+  
+  useEffect(() => {
+    if (position) {
+      map.flyTo(position, DEFAULT_ZOOM);
+    }
+  }, [position, map]);
+  
+  return null;
+}
 
+export default function HouseLocation({ handleBack, handleNext }) {
   const { formData, updateFormData } = useFormContext();
   
   const [position, setPosition] = useState(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -44,11 +57,52 @@ export default function HouseLocation({ handleBack, handleNext }) {
     }
   }, [formData.houseInfo]);
 
-
   const showNotification = (message, type) => {
     setSnackbarMessage(message);
     setSeverity(type);
     setSnackbarOpen(true);
+  };
+
+  const handleGetCurrentLocation = () => {
+    setIsGettingLocation(true);
+    
+    if (!navigator.geolocation) {
+      showNotification("Geolocation is not supported by your browser", "error");
+      setIsGettingLocation(false);
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setPosition([latitude, longitude]);
+        setIsGettingLocation(false);
+        showNotification("Current location detected successfully", "success");
+      },
+      (error) => {
+        let errorMessage = "Unable to retrieve your location";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "You denied the request for Geolocation";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "The request to get your location timed out";
+            break;
+        }
+        
+        showNotification(errorMessage, "error");
+        setIsGettingLocation(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+      }
+    );
   };
 
   const handleSubmit = (e) => {
@@ -79,7 +133,7 @@ export default function HouseLocation({ handleBack, handleNext }) {
           Please mark your house location in Itbayat Municipality by clicking on the map.
         </Typography>
         
-        <Box sx={{ height: 400, width: '100%', mb: 3 }}>
+        <Box sx={{ position: 'relative', height: 400, width: '100%', mb: 3 }}>
           <MapContainer 
             center={position || ITBAYAT_COORDINATES} 
             zoom={DEFAULT_ZOOM} 
@@ -90,7 +144,30 @@ export default function HouseLocation({ handleBack, handleNext }) {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapWithPin position={position} setPosition={setPosition} />
+            <MapController position={position} />
           </MapContainer>
+          
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<MyLocationIcon />}
+            onClick={handleGetCurrentLocation}
+            disabled={isGettingLocation}
+            sx={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              zIndex: 1000,
+              backgroundColor: 'white',
+              color: 'primary.main',
+              '&:hover': {
+                backgroundColor: '#f5f5f5',
+              },
+              boxShadow: 2
+            }}
+          >
+            {isGettingLocation ? 'Locating...' : 'Use My Location'}
+          </Button>
         </Box>
         
         {position && (

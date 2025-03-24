@@ -1,23 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, GeoJSON } from 'react-leaflet';
-import { Box, Card, TextField, Button, Typography, Dialog, DialogTitle, DialogContent, 
-         DialogActions, IconButton, Grid, FormControl, InputLabel, Select, MenuItem, Paper
-       } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer } from 'react-leaflet';
+import { Box, Typography } from '@mui/material';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+import { get, post, put, del } from '../../utils/api/apiService'
+import { ITBAYAT_CENTER, DEFAULT_ZOOM, HAZARD_TYPES } from './utils/constant';
 
-import { get } from '../../utils/api/apiService'
-import { BARANGAYS, HOUSE_PIN_COLOR, ITBAYAT_CENTER, DEFAULT_ZOOM, ITBAYAT_BARANGAYS } from './utils/constant';
-import { 
-  MapViewController, 
-  MapLegend, 
-  createColoredIcon, 
-  getImageSource 
-} from './components/MapComponents';
+import HazardAreaEditor from './components/hazard/HazardAreaEditor'
 
-// Fix for default marker icons in Leaflet with React
+
+////////////////////////////////////////////////////////
+
+import MapView from './components/map/MapView';
+import MapLegend from './components/map/MapLegend';
+import MapControls from './components/map/MapControls';
+
+import BarangayLayer from './components/map/MapLayers/BarangayLayer'
+import HousePinsLayer from './components/map/MapLayers/HousePinsLayer'
+import HazardAreasLayer from './components/map/MapLayers/HazardAreasLayer'
+
+import HouseDetailsDialog from './components/dialogs/HouseDetailsDialog';
+import HazardEditorDialog from './components/dialogs/HazardEditorDialog';
+
+import { useHouseData } from './hooks/useHouseData';
+import { useHazardAreas } from './hooks/useHazardAreas';
+
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
@@ -26,56 +34,89 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-function App() {
 
+function App() {
+  // Fetch house data with custom hook
+  const { 
+    houseData, 
+    selectedHouse, 
+    setSelectedHouse,
+    isLoading: isHouseDataLoading, 
+    error: houseDataError 
+  } = useHouseData();
+
+  // Fetch and manage hazard areas with custom hook
+  const {
+    hazardAreas,
+    selectedHazard,
+    editingHazardIndex,
+    addHazardArea,
+    updateHazardArea,
+    deleteHazardArea,
+    selectHazardForEditing,
+    setSelectedHazard,
+    clearSelectedHazard
+  } = useHazardAreas();
+
+  // UI State
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedBarangay, setSelectedBarangay] = useState(null);
-  const [selectedHouse, setSelectedHouse] = useState(null);
-  const [houseData, setHouseData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [isHazardModeActive, setIsHazardModeActive] = useState(false);
+  const [hazardDialogOpen, setHazardDialogOpen] = useState(false);
+  const [showHousePins, setShowHousePins] = useState(true);
+  const [showBarangayBoundaries, setShowBarangayBoundaries] = useState(true);
+  const [showHazardAreas, setShowHazardAreas] = useState(true);
+  const [selectedHazardType, setSelectedHazardType] = useState(HAZARD_TYPES[0].id);
+  const [filteredHazardTypes, setFilteredHazardTypes] = useState(HAZARD_TYPES.map(type => type.id));
 
-  // Fetch house data from database
-  useEffect(() => {
-    const fetchHouseData = async () => {
-      try {
-        setIsLoading(true);
-        
-        const response = await get('/hazzardMap/coordinates')
-
-        setHouseData(response);
-        setIsLoading(false);
-      } catch (err) {
-        setError('Failed to fetch house data');
-        setIsLoading(false);
-        console.error('Error fetching house data:', err);
-      }
-    };
-
-    fetchHouseData();
-  }, []);
-
-  const handleBarangayChange = (event) => {
-    const barangayName = event.target.value;
-    if (barangayName === "") {
-      setSelectedBarangay(null);
-    } else {
-      const barangay = BARANGAYS.find(b => b.name === barangayName);
-      setSelectedBarangay(barangay);
+  // Event handlers
+  const handleHouseClick = (house) => {
+    if (!isHazardModeActive) {
+      setSelectedHouse(house);
+      setDialogOpen(true);
     }
   };
 
-  const handleHouseClick = (house) => {
-    setSelectedHouse(house);
-    setDialogOpen(true);
+  const toggleHazardMode = () => {
+    setIsHazardModeActive(!isHazardModeActive);
   };
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+  const handleHazardTypeChange = (event) => {
+    setSelectedHazardType(event.target.value);
   };
 
-  // Render a loading message while data is being fetched
-  if (isLoading) {
+  const handleEditHazard = (index) => {
+    selectHazardForEditing(index);
+    setHazardDialogOpen(true);
+  };
+
+  const handleAddHazard = async (hazardCircle) => {
+    await addHazardArea(hazardCircle, selectedHazardType);
+  };
+
+  const handleHazardUpdate = async () => {
+    const success = await updateHazardArea(selectedHazard);
+    if (success) {
+      setHazardDialogOpen(false);
+      clearSelectedHazard();
+    } else {
+      alert('Failed to update hazard area. Please try again.');
+    }
+  };
+
+  const handleDeleteHazard = async () => {
+    if (selectedHazard && selectedHazard.id) {
+      const success = await deleteHazardArea(selectedHazard.id);
+      if (success) {
+        setHazardDialogOpen(false);
+        clearSelectedHazard();
+      } else {
+        alert('Failed to delete hazard area. Please try again.');
+      }
+    }
+  };
+
+  if (isHouseDataLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Typography variant="h4">Loading house data...</Typography>
@@ -83,8 +124,7 @@ function App() {
     );
   }
 
-  // Render an error message if there was an error fetching data
-  if (error) {
+  if (houseDataError) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <Typography variant="h4" color="error">{error}</Typography>
@@ -104,28 +144,19 @@ function App() {
         boxSizing: 'border-box'
       }}
     >   
-      {/* Select Barangay */}   
-      <Box sx={{ p: 2, bgcolor: 'background.paper' }}>
-        <FormControl fullWidth variant="outlined" size="small">
-          <InputLabel id="barangay-select-label">Select Barangay</InputLabel>
-          <Select
-            labelId="barangay-select-label"
-            id="barangay-select"
-            value={selectedBarangay ? selectedBarangay.name : ""}
-            onChange={handleBarangayChange}
-            label="Select Barangay"
-          >
-            <MenuItem value="">
-              <em>Municipality Overview</em>
-            </MenuItem>
-            {BARANGAYS.map((barangay) => (
-              <MenuItem key={barangay.name} value={barangay.name}>
-                {barangay.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
+      {/* Map Controls */}   
+      <MapControls
+        isHazardModeActive = {isHazardModeActive}
+        toggleHazardMode = {toggleHazardMode}
+        selectedHazardType = {selectedHazardType}
+        handleHazardTypeChange = {handleHazardTypeChange}
+        showBarangayBoundaries = {showBarangayBoundaries}
+        setShowBarangayBoundaries = {setShowBarangayBoundaries}
+        showHazardAreas = {showHazardAreas}
+        setShowHazardAreas = {setShowHazardAreas}
+        showHousePins = {showHousePins}
+        setShowHousePins = {setShowHousePins}
+      />
 
       {/* Map */}
       <Box sx={{ flexGrow: 1, position: 'relative' }}>
@@ -139,118 +170,60 @@ function App() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <MapViewController selectedBarangay={selectedBarangay} />
-          
-         {/* Real Barangay Boundaries */}
-         {ITBAYAT_BARANGAYS.features.map((feature) => (
-            <GeoJSON 
-              key={feature.properties.id}
-              data={feature}
-              style={() => ({
-                color: 'blue',
-                weight: 2,
-                opacity: selectedBarangay && 
-                  (selectedBarangay.name === feature.properties.name || 
-                   selectedBarangay.name === feature.properties.alternative_name) ? 1 : 0.5,
-                fillColor: selectedBarangay && 
-                  (selectedBarangay.name === feature.properties.name || 
-                   selectedBarangay.name === feature.properties.alternative_name) ? 
-                    'rgba(0, 0, 255, 0.1)' : 'transparent'
-              })}
-            >
-              <Popup>
-                <Typography variant="subtitle1">{feature.properties.name}</Typography>
-                {feature.properties.alternative_name && (
-                  <Typography variant="body2">({feature.properties.alternative_name})</Typography>
-                )}
-                <Typography variant="body2">Barangay of Itbayat Municipality</Typography>
-              </Popup>
-            </GeoJSON>
-          ))}
-          
-          {/* House Information Markers */}
-          {houseData.map((house) => (
-            <Marker 
-              key={house.houseInfoID} 
-              position={[parseFloat(house.latitude), parseFloat(house.longitude)]}
-              icon={createColoredIcon(HOUSE_PIN_COLOR)}
-              eventHandlers={{
-                click: () => handleHouseClick(house)
-              }}
-            />
-          ))}
+          <MapView selectedBarangay={selectedBarangay} />
 
-          {/* Map Legend */}
-          <MapLegend />
+          {/* Map Layers */}
+          
+         {/* Real Barangay Boundaries - Now with visibility toggle */}
+          {showBarangayBoundaries && (
+            <BarangayLayer selectedBarangay={selectedBarangay} />
+          )}
+          
+          {/* House Information Markers - Now with visibility toggle */}
+          {showHousePins && (
+            <HousePinsLayer 
+              houseData={houseData} 
+              onHouseClick={handleHouseClick}
+              isHazardModeActive={isHazardModeActive}
+            />
+          )}
+          
+          {/* Hazard Area Circles - Now with visibility toggle */}
+          {showHazardAreas && (
+            <HazardAreasLayer 
+              hazardAreas={hazardAreas}
+              filteredHazardTypes={filteredHazardTypes}
+              isHazardModeActive={isHazardModeActive}
+              onEditHazard={handleEditHazard}
+            />
+          )}
+          
+          {/* Hazard Editor Component */}
+          <HazardAreaEditor 
+            isActive={isHazardModeActive}
+            onAddHazard={handleAddHazard}
+          />
+
+          {/* Map Legend - use extended version that includes hazard types */}
+          <MapLegend setFilteredHazardTypes={setFilteredHazardTypes}/>
         </MapContainer>
       </Box>
 
-      {/* Dialog for House Details */}
-      <Dialog
+      {/* Dialogs */}
+      <HouseDetailsDialog 
         open={dialogOpen}
-        onClose={handleCloseDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>
-          House Information
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseDialog}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent dividers>
-          {selectedHouse && (
-            <Grid container spacing={2}>
-              {selectedHouse.houseImage && (
-                <Grid item xs={12}>
-                 <Box 
-                    component="img" 
-                    src={getImageSource(selectedHouse.houseImage)}
-                    alt="House Image"
-                    sx={{ width: '100%', maxHeight: 300, objectFit: 'cover' }}
-                    onError={(e) => {
-                      console.error('Image failed to load');
-                      e.target.onerror = null; 
-                      e.target.src = 'path/to/fallback/image.jpg'; // Optional fallback
-                    }}
-                  />
-                </Grid>
-              )}
-              <Grid item xs={12}>
-                <Typography variant="h6" component="h2">
-                  Survey ID: {selectedHouse.surveyID}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body1">
-                  <strong>House Condition:</strong> {selectedHouse.houseCondition}
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body1">
-                  <strong>House Structure:</strong> {selectedHouse.houseStructure}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body2" color="text.secondary">
-                  Location: {selectedHouse.latitude}, {selectedHouse.longitude}
-                </Typography>
-              </Grid>
-            </Grid>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
+        onClose={() => setDialogOpen(false)}
+        selectedHouse={selectedHouse}
+      />
+
+      <HazardEditorDialog
+        open={hazardDialogOpen}
+        onClose={() => setHazardDialogOpen(false)}
+        selectedHazard={selectedHazard}
+        setSelectedHazard={setSelectedHazard}
+        onUpdate={handleHazardUpdate}
+        onDelete={handleDeleteHazard}
+      />
     </Box>
   );
 }

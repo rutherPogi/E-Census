@@ -73,7 +73,7 @@ const Banner = ({ onLogin }) => {
                 fontSize: { xs: '1rem', sm: '1.25rem' }
               }}
             >
-              <span style={{ color: '#FF5733' }}>e</span>Census
+              <span style={{ color: '#FF5733' }}>e</span>-tbayat MSWDO
             </Typography>
           </Box>
           
@@ -124,29 +124,30 @@ const Banner = ({ onLogin }) => {
           }}
         >
           {/* Municipality Logo */}
+          
+          
+          {/* Municipality Name */}
+          <Box>
           <Box
             component="img"
             src={itbayatLogo}
             alt="Itbayat Logo"
             sx={{
-              height: { xs: '70px', sm: '80px', md: '100px' },
+              height: { xs: '70px', sm: '80px', md: '150px' },
               marginRight: { xs: 0, md: 2 },
               marginBottom: { xs: 1, md: 0 },
             }}
           />
-          
-          {/* Municipality Name */}
-          <Box>
             <Typography
               variant={isMobile ? "h4" : isTablet ? "h3" : "h2"}
               sx={{
                 color: '#FF5733',
                 fontWeight: 'bold',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3.5rem' }
+                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
               }}
             >
-              Itbayat
+              Municipal Social Welfare and Development Office
             </Typography>
             <Typography
               variant={isMobile ? "h6" : isTablet ? "h5" : "h4"}
@@ -156,7 +157,7 @@ const Banner = ({ onLogin }) => {
                 fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
               }}
             >
-              Municipality
+              Local Government of Itbayat
             </Typography>
           </Box>
         </Box>

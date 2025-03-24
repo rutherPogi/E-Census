@@ -42,7 +42,7 @@ export default function Form({ isEditing = false }) {
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && <SurveyDetails handleNext={handleNext}/>}
+        {currentPage === 0 && <SurveyDetails handleNext={handleNext}/>}
         {currentPage === 2 && <FamilyProfile handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 3 && <FamilyProfile2 handleNext={handleNext} handleBack={() => setCurrentPage(2)}/>}
         {currentPage === 4 && <FoodExpenses handleNext={handleNext} handleBack={handleBack}/>}
@@ -66,7 +66,7 @@ export default function Form({ isEditing = false }) {
         {currentPage === 22 && <Affiliation2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 23 && <NonIvatan handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 24 && <NonIvatan2 handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 25 && <DisplaySurvey handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit} isEditing={editing}/>}
+        {currentPage === 1 && <DisplaySurvey handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit} isEditing={editing}/>}
 
 
         <div className='form-pagination'>

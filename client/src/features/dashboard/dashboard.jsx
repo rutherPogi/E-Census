@@ -45,7 +45,6 @@ export default function Dashboard() {
           });
         } catch (err) {
           console.error('Error fetching posts:', err);
-          setError(err.message);
         }
       };
   

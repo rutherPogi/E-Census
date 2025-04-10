@@ -1,109 +1,54 @@
 import { useState, useEffect } from "react";
-import { Box, Button, Typography } from '@mui/material';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import { Icon } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import MyLocationIcon from '@mui/icons-material/MyLocation';
+import { Typography } from '@mui/material';
 
 import { useFormContext } from "../../pages/FormContext";
-import { Notification } from '../../../../components/common/Notification'
+import { Notification, FormButtons } from '../../../../components/common';
 
-const customIcon = new Icon({
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41]
-});
+import { HI2_INITIAL_VALUES } from "../../utils/initialValues";
+import { HI2_REQUIRED_FIELDS } from "../../utils/requiredFields";
 
-const ITBAYAT_COORDINATES = [20.7758, 121.8491];
-const DEFAULT_ZOOM = 14;
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useNotification } from '../../hooks/useNotification';
 
-// Map component with pin functionality
-function MapWithPin({ position, setPosition }) {
-  useMapEvents({
-    click: (e) => {
-      setPosition([e.latlng.lat, e.latlng.lng]);
-    }
-  });
+import LocationMap from "../others/HouseInfoSections/HouseMap/LocationMap";
+import CoordinatesDisplay from "../others/HouseInfoSections/HouseMap/CoordinatesDisplay";
+import HouseAddress from "../others/HouseInfoSections/HouseAddress";
 
-  return position ? <Marker position={position} icon={customIcon} /> : null;
-}
 
-// New component to control map center
-function MapController({ position }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (position) {
-      map.flyTo(position, DEFAULT_ZOOM);
-    }
-  }, [position, map]);
-  
-  return null;
-}
+
 
 export default function HouseLocation({ handleBack, handleNext }) {
-  const { formData, updateFormData } = useFormContext();
-  
-  const [position, setPosition] = useState(null);
-  const [isGettingLocation, setIsGettingLocation] = useState(false);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('error');
+  const [position, setPosition] = useState(null);
+
+  const { formData, updateFormData } = useFormContext();
+
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange
+  } = useFormValidation(
+    HI2_INITIAL_VALUES,
+    true, 
+    HI2_REQUIRED_FIELDS
+  );
+  
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   useEffect(() => {
-    if (formData.houseInfo && formData.houseInfo.latitude && formData.houseInfo.longitude) {
-      setPosition([formData.houseInfo.latitude, formData.houseInfo.longitude]);
+    if (formData.houseLocation && formData.houseLocation.latitude && formData.houseLocation.longitude) {
+      setValues(prev => ({ ...prev, ...formData.houseLocation }));
+      setPosition([formData.houseLocation.latitude, formData.houseLocation.longitude]);
     }
-  }, [formData.houseInfo]);
-
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
-
-  const handleGetCurrentLocation = () => {
-    setIsGettingLocation(true);
-    
-    if (!navigator.geolocation) {
-      showNotification("Geolocation is not supported by your browser", "error");
-      setIsGettingLocation(false);
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setPosition([latitude, longitude]);
-        setIsGettingLocation(false);
-        showNotification("Current location detected successfully", "success");
-      },
-      (error) => {
-        let errorMessage = "Unable to retrieve your location";
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "You denied the request for Geolocation";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information is unavailable";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "The request to get your location timed out";
-            break;
-        }
-        
-        showNotification(errorMessage, "error");
-        setIsGettingLocation(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 0
-      }
-    );
-  };
+  }, [formData.houseLocation]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -113,75 +58,54 @@ export default function HouseLocation({ handleBack, handleNext }) {
       return;
     }
 
-    const latitude = position[0];
-    const longitude = position[1];
+    if (!validateForm()) {
+      showNotification("Please fill in all required fields", "error");
+      return;
+    }
 
-    updateFormData('houseInfo', { 
-      ...formData.houseInfo, 
-      latitude: latitude, 
-      longitude: longitude 
+    updateFormData('houseLocation', { ...values,
+      latitude: position[0], 
+      longitude: position[1],
+      houseStreet: values.houseStreet,
+      barangay: values.barangay,
+      municipality: values.municipality
     });
 
+    console.log('HOUSE INFO 2', formData.houseLocation)
     handleNext();
   };
 
   return (
     <div className='responsive-container'>
       <div className='responsive-header'>HOUSE LOCATION</div>
-      <form id="survey-form" className="responsive-details" onSubmit={handleSubmit}>
+      <form id="survey-form" className="responsive-form details" onSubmit={handleSubmit}>
+        
+        <HouseAddress
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
+        />
+
         <Typography variant="body1" sx={{ mb: 2 }}>
           Please mark your house location in Itbayat Municipality by clicking on the map.
         </Typography>
         
-        <Box sx={{ position: 'relative', height: 400, width: '100%', mb: 3 }}>
-          <MapContainer 
-            center={position || ITBAYAT_COORDINATES} 
-            zoom={DEFAULT_ZOOM} 
-            style={{ height: '100%', width: '100%' }}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <MapWithPin position={position} setPosition={setPosition} />
-            <MapController position={position} />
-          </MapContainer>
-          
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<MyLocationIcon />}
-            onClick={handleGetCurrentLocation}
-            disabled={isGettingLocation}
-            sx={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              zIndex: 1000,
-              backgroundColor: 'white',
-              color: 'primary.main',
-              '&:hover': {
-                backgroundColor: '#f5f5f5',
-              },
-              boxShadow: 2
-            }}
-          >
-            {isGettingLocation ? 'Locating...' : 'Use My Location'}
-          </Button>
-        </Box>
+        <LocationMap 
+          position={position} 
+          setPosition={setPosition}
+          showNotification={showNotification}
+        />
         
-        {position && (
-          <Typography variant="body2" sx={{ mb: 2 }}>
-            Selected coordinates: {position[0].toFixed(6)}, {position[1].toFixed(6)}
-          </Typography>
-        )}
+        <CoordinatesDisplay position={position} />
       </form>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div>     
-      </div>
+
+      <FormButtons 
+        onBack={handleBack}
+        onNext={handleSubmit}
+        backLabel="Back"
+        nextLabel="Next"
+      />
+      
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

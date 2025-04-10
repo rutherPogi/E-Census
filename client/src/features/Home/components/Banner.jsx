@@ -5,14 +5,18 @@ import PersonIcon from "@mui/icons-material/Person";
 import bannerImage from "../../../assets/image3.jpg";
 import itbayatLogo from "../../../assets/itbayatLogo.png";
 import Logo from '../../../assets/questionnaire.png';
+import mswdoLogo from '../../../assets/MSWDO-Logo.png';
 
-/**
- * Banner component for the homepage hero section
- */
+
+
+
 const Banner = ({ onLogin }) => {
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
+
 
   return (
     <Box 
@@ -58,7 +62,7 @@ const Banner = ({ onLogin }) => {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box
               component="img"
-              src={Logo}
+              src={mswdoLogo}
               alt="eCensus Logo"
               sx={{
                 height: { xs: '20px', sm: '30px' },

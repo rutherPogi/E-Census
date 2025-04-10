@@ -3,9 +3,8 @@ import digitalSurvey from '../../../assets/digitalSurvey.png';
 import idGenerator from '../../../assets/idGenerator.png';
 import hazzardMap from '../../../assets/hazzardMap.png';
 
-/**
- * Feature Box component to avoid repeating code
- */
+
+
 const FeatureBox = ({ image, title, description }) => (
   <Box 
     sx={{
@@ -68,7 +67,7 @@ const Features = () => {
     },
     {
       image: hazzardMap,
-      title: "Hazzard Map",
+      title: "Hazard Map",
       description: "For awareness before, after, and during natural disasters."
     }
   ];

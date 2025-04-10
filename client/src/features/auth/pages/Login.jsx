@@ -3,30 +3,30 @@ import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, Typography, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import axios from "axios";
 
-import logo from "../../../assets/questionnaire.png";
+import logo from "../../../assets/MSWDO-Logo.png";
 import { useAuth } from '../../../utils/auth/authContext';
 import { UsernameInput, PasswordInput } from "../../../components/common/FormFields";
 
 
 
 const Login = () => {
-  // State variables
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ username: false, password: false });
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
-  // Hooks
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Helper functions
+
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  // Form submission handler
+
   const handleLogin = async (e) => {
     e.preventDefault();
     
@@ -127,7 +127,7 @@ const Login = () => {
           color="#fff"
           sx={{ fontSize: { xs: '28px', sm: '36px' } }}
         > 
-          <span style={{ color: '#FF5733' }}>e</span>Census
+          <span style={{ color: '#FF5733' }}>e</span>Tbayat
         </Typography>
         
         <Typography 

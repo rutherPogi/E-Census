@@ -11,7 +11,7 @@ export const generateSurveyId = async (connection) => {
   try {
     // Get the current sequence for today
     const [rows] = await connection.query(
-      `SELECT MAX(surveyID) as maxId FROM SurveyResponses 
+      `SELECT MAX(surveyID) as maxId FROM Surveys 
        WHERE surveyID LIKE ?`,
       [`${datePrefix}%`]
     );
@@ -29,7 +29,7 @@ export const generateSurveyId = async (connection) => {
     
     // Verify this ID doesn't already exist (double-check)
     const [existingCheck] = await connection.query(
-      `SELECT COUNT(*) as count FROM SurveyResponses WHERE surveyID = ?`,
+      `SELECT COUNT(*) as count FROM Surveys WHERE surveyID = ?`,
       [surveyId]
     );
     
@@ -44,56 +44,67 @@ export const generateSurveyId = async (connection) => {
   }
 };
 
+
+
 export const createSurvey = async (surveyData, connection) => {
 
   const [result] = await connection.query(
-    `INSERT INTO SurveyResponses 
-     (surveyID, respondent, interviewer, surveyDate, barangay, municipality, 
-      monthlyIncome, irregularIncome, familyIncome)
-     VALUES (?, ?, ?, CURDATE(), ?, ?, ?, ?, ?)`,
+    `INSERT INTO Surveys 
+     (surveyID, respondent, interviewer, barangay, municipality)
+     VALUES (?, ?, ?, ?, ?)`,
     [
       surveyData.surveyID,
       surveyData.respondent,
       surveyData.interviewer,
       surveyData.barangay,
-      surveyData.municipality,
-      parseFloat(surveyData.totalMonthlyIncome) || 0,
-      parseFloat(surveyData.irregularIncome) || 0,
-      parseFloat(surveyData.familyIncome) || 0
+      surveyData.municipality
     ]
   );
   return result;
 };
 
-export const addFamilyMembers = async (surveyId, familyMembers, connection) => {
+export const addHousehold = async (surveyData, connection) => {
+
+  const [result] = await connection.query(
+    `INSERT INTO Households 
+     (householdID, surveyID, familyClass, monthlyIncome, irregularIncome, familyIncome)
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      'H' + surveyData.surveyID,
+      surveyData.surveyID,
+      surveyData.familyClass,
+      parseFloat(surveyData.monthlyIncome.replace(/,/g, '').trim()) || 0,
+      parseFloat(surveyData.irregularIncome.replace(/,/g, '').trim()) || 0,
+      parseFloat(surveyData.familyIncome.replace(/,/g, '').trim()) || 0
+    ]
+  );
+  return result;
+};
+
+
+// POPULATION
+export const addPopulation = async (populationID, surveyId, familyMembers, connection) => {
+
   if (!familyMembers || familyMembers.length === 0) return null;
   
-  const familyMemberValues = familyMembers.map(member => [
+  const familyMemberValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
     surveyId,
-    member.firstName || '',
-    member.middleName || '',
-    member.lastName || '',
-    member.suffix || '',
-    member.birthdate ? member.birthdate.split('T')[0] : null, // Convert to 'YYYY-MM-DD'
-    member.age,
-    member.civilStatus,
-    member.relationFamilyHead || '',
-    member.educationalAttainment || '',
-    member.occupation || '',
-    member.skillsTraining || '',
-    member.employmentType || '',
-    member.philhealthNumber || '',
-    parseFloat(member.monthlyIncome) || 0,
-    member.healthStatus || '',
-    member.remarks || ''
+    member.philhealthNumber || 'N/A',
+    member.healthStatus || 'N/A',
+    member.remarks || 'N/A',
+    member.isOSY,
+    member.inSchool,
+    member.outOfTown,
+    member.isOFW,
+    member.isPWD,
+    member.isSoloParent
   ]);
   
   const [result] = await connection.query(
-    `INSERT INTO FamilyProfile
-     (surveyID, firstName, middleName, lastName, suffix, birthdate,
-     age, civilStatus, relationToFamilyHead, educationalAttainment,
-     occupation, skillsTraining, employmentType, philhealthNumber,
-     monthlyIncome, healthStatus, remarks) 
+    `INSERT INTO Population
+     (populationID, surveyID, philhealthNumber, healthStatus, remarks,
+      isOSY, inSchool, outOfTown, isOFW, isPWD, isSoloParent) 
      VALUES ?`,
     [familyMemberValues]
   );
@@ -101,54 +112,336 @@ export const addFamilyMembers = async (surveyId, familyMembers, connection) => {
   return result;
 };
 
-export const addExpenses = async (surveyId, foodExpenses, educationExpenses, familyExpenses, monthlyExpenses, connection) => {
+export const addPersonalInfo = async (populationID, familyMembers, connection) => {
+
+  if (!familyMembers || familyMembers.length === 0) return null;
   
-  const expenseCategories = {
-    food: foodExpenses,
-    education: educationExpenses,
-    family: familyExpenses,
-    monthly: monthlyExpenses
-  };
-
-  for (const [category, expenses] of Object.entries(expenseCategories)) {
-    if (expenses?.expenses) {
-      const expenseValues = Object.entries(expenses.expenses).map(([item, amount]) => [
-        surveyId,
-        item,
-        category,
-        parseFloat(amount) || 0
-    ]);
-
-      await connection.query(
-        `INSERT INTO expenses 
-         (surveyID, expenses, expensesType, amount) 
-         VALUES ?`,
-        [expenseValues]
-      );
-    }
-  }
+  const familyMemberValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.firstName,
+    member.middleName || 'N/A',
+    member.lastName,
+    member.suffix || 'N/A',
+    member.birthdate ? member.birthdate.split('T')[0] : null,
+    member.age,
+    member.sex,
+    member.birthplace || 'N/A',
+    member.religion || 'N/A',
+    member.civilStatus,
+    member.relationToFamilyHead
+  ]);
+  
+  const [result] = await connection.query(
+    `INSERT INTO PersonalInformation
+     ( populationID, 
+       firstName, middleName, lastName, suffix,
+       birthdate, age, sex, birthplace,
+       religion, civilStatus, relationToFamilyHead ) 
+     VALUES ?`,
+    [familyMemberValues]
+  );
+  
+  return result;
 };
 
-export const addHouseInfo = async (surveyId, houseInfo, houseImageBuffer, connection) => {
+export const addProfessionalInfo = async (populationID, familyMembers, connection) => {
+
+  if (!familyMembers || familyMembers.length === 0) return null;
+  
+  const familyMemberValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.educationalAttainment,
+    member.skills,
+    member.occupation,
+    member.employmentType,
+    parseFloat(member.monthlyIncome.replace(/,/g, '').trim()) || 0,
+  ]);
+  
+  const [result] = await connection.query(
+    `INSERT INTO ProfessionalInformation
+     (  populationID, 
+        educationalAttainment,
+        skills,
+        occupation,
+        employmentType,
+        monthlyIncome ) 
+     VALUES ?`,
+    [familyMemberValues]
+  );
+  
+  return result;
+};
+
+export const addContactInfo = async (populationID, familyMembers, connection) => {
+  
+  if (!familyMembers || familyMembers.length === 0) return null;
+  
+  const familyMemberValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.contactNumber
+  ]);
+  
+  const [result] = await connection.query(
+    `INSERT INTO ContactInformation
+     ( populationID, 
+       mobileNumber ) 
+     VALUES ?`,
+    [familyMemberValues]
+  );
+  
+  return result;
+};
+
+export const addGovernmentAffiliation = async (populationID, familyMembers, connection) => {
+
+  if (!familyMembers || familyMembers.length === 0) return null;
+  
+  const affiliationValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.isAffiliated,
+    (!member.asOfficer || 
+      member.asOfficer === 'N/A' || 
+      member.asOfficer.trim() === ''
+    )
+      ? null
+      : member.asOfficer.split('T')[0],
+    (!member.asMember || 
+      member.asMember === 'N/A' || 
+      member.asMember.trim() === ''
+    )
+      ? null
+      : member.asMember.split('T')[0],
+    member.organizationAffiliated || 'N/A'
+  ]);
+  
+  if(affiliationValues.length > 0) {
+    const [result] = await connection.query(
+      `INSERT INTO GovernmentAffiliation
+       (populationID, isAffiliated, asOfficer, asMember, organizationAffiliated) 
+       VALUES ?`,
+      [affiliationValues]
+    );
+
+    return result;
+  }
+
+  return null;
+};
+
+export const addNonIvatan = async (populationID, familyMembers, connection) => {
+
+  if (!familyMembers || familyMembers.length === 0) return null;
+  
+  const nonIvatanValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.isIpula,
+    member.settlementDetails || 'N/A',
+    member.ethnicity || 'N/A',
+    member.placeOfOrigin || 'N/A',
+    member.isTransient ,
+    member.houseOwner || 'N/A',
+    member.transientRegistered,
+    (!member.transientDateRegistered || 
+      member.transientDateRegistered === 'N/A' || 
+      member.transientDateRegistered.trim() === ''
+    )
+      ? null
+      : member.transientDateRegistered.split('T')[0]
+  ]);
+  
+  if (nonIvatanValues.length > 0) {
+    const [result] = await connection.query(
+      `INSERT INTO NonIvatan
+       (populationID, isIpula, settlementDetails, ethnicity, placeOfOrigin,
+        isTransient, houseOwner, isRegistered, dateRegistered) 
+       VALUES ?`,
+      [nonIvatanValues]
+    );
+
+    return result;
+  } 
+  
+  return null;
+};
+
+
+// EXPENSES
+export const addFoodExpenses = async (surveyId, foodExpenses, connection) => {
+
+  if (!surveyId || !foodExpenses.expenses) return null;
+
+  const expenses = foodExpenses.expenses;
+  
+  // Convert string values to numbers and handle commas
+  const rice = parseFloat(expenses.Rice?.replace(/,/g, '').trim()) || 0;
+  const viand = parseFloat(expenses.Viand?.replace(/,/g, '').trim()) || 0;
+  const sugar = parseFloat(expenses.Sugar?.replace(/,/g, '').trim()) || 0;
+  const milk = parseFloat(expenses.Milk?.replace(/,/g, '').trim()) || 0;
+  const oil = parseFloat(expenses.Oil?.replace(/,/g, '').trim()) || 0;
+  const snacks = parseFloat(expenses.Snacks?.replace(/,/g, '').trim()) || 0;
+  const otherFood = parseFloat(expenses["Other Food"]?.replace(/,/g, '').trim()) || 0;
+
+  await connection.query(
+    `INSERT INTO FoodExpenses
+     (surveyID, rice, viand, sugar, milk, oil, snacks, otherFood) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      surveyId,
+      rice,
+      viand,
+      sugar,
+      milk,
+      oil,
+      snacks,
+      otherFood
+    ]
+  );
+  
+  return true;
+};
+
+export const addEducationExpenses = async (surveyId, educationExpenses, connection) => {
+
+  if (!surveyId || !educationExpenses.expenses) return null;
+
+  const expenses = educationExpenses.expenses;
+
+  const tuitionFees = parseFloat(expenses['Tuition Fees']?.replace(/,/g, '').trim()) || 0;
+  const miscellaneousFees = parseFloat(expenses['Miscellaneous Fees']?.replace(/,/g, '').trim()) || 0;
+  const schoolSupplies = parseFloat(expenses['School Supplies']?.replace(/,/g, '').trim()) || 0;
+  const transportation = parseFloat(expenses.Transportation?.replace(/,/g, '').trim()) || 0;
+  const rentDormitory = parseFloat(expenses['Rent/Dormitory']?.replace(/,/g, '').trim()) || 0;
+  const otherEducation = parseFloat(expenses['Other Education']?.replace(/,/g, '').trim()) || 0;
+
+  await connection.query(
+    `INSERT INTO EducationExpenses
+     (surveyID, tuitionFees, miscellaneousFees, schoolSupplies, transportation, rentDormitory, otherEducation) 
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [
+      surveyId,
+      tuitionFees,
+      miscellaneousFees,
+      schoolSupplies,
+      transportation,
+      rentDormitory,
+      otherEducation
+    ]
+  );
+
+  return true;
+};
+
+export const addFamilyExpenses = async (surveyId, familyExpenses, connection) => {
+
+  if (!surveyId || !familyExpenses.expenses) return null;
+
+  const expenses = familyExpenses.expenses;
+
+  const firewood = parseFloat(expenses.Firewood?.replace(/,/g, '').trim()) || 0;
+  const gasTank = parseFloat(expenses['Gas Tank']?.replace(/,/g, '').trim()) || 0;
+  const caregivers = parseFloat(expenses.Caregivers?.replace(/,/g, '').trim()) || 0;
+  const laundry = parseFloat(expenses.Laundry?.replace(/,/g, '').trim()) || 0;
+  const hygiene = parseFloat(expenses.Hygiene?.replace(/,/g, '').trim()) || 0;
+  const clothings = parseFloat(expenses.Clothings?.replace(/,/g, '').trim()) || 0;
+  const others = parseFloat(expenses.Others?.replace(/,/g, '').trim()) || 0;
+
+  await connection.query(
+    `INSERT INTO FamilyExpenses
+     (surveyID, firewood, gasTank, caregivers, laundry, hygiene, clothings, others) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
+      surveyId,
+      firewood,
+      gasTank,
+      caregivers,
+      laundry,
+      hygiene,
+      clothings,
+      others
+    ]
+  );
+
+  return true;
+};
+
+export const addMonthlyExpenses = async (surveyId, monthlyExpenses, connection) => {
+
+  if (!surveyId || !monthlyExpenses.expenses) return null;
+
+  const expenses = monthlyExpenses.expenses;
+
+  const electricBill = parseFloat(expenses['Electric Bill']?.replace(/,/g, '').trim()) || 0;
+  const waterBill = parseFloat(expenses['Water Bill']?.replace(/,/g, '').trim()) || 0;
+  const subscription = parseFloat(expenses.Subscription?.replace(/,/g, '').trim()) || 0;
+  const mobileLoad = parseFloat(expenses['Mobile Load']?.replace(/,/g, '').trim()) || 0;
+  const others = parseFloat(expenses.Others?.replace(/,/g, '').trim()) || 0;
+
+  await connection.query(
+    `INSERT INTO MonthlyExpenses  
+     (surveyID, electricBill, waterBill, subscription, mobileLoad, others) 
+     VALUES (?, ?, ?, ?, ?, ?)`,
+    [
+      surveyId,
+      electricBill,
+      waterBill,
+      subscription,
+      mobileLoad,
+      others
+    ]
+  );
+
+  return true;
+};
+
+
+export const addHouseInfo = async (surveyId, houseInfo, houseLocation, connection) => {
+
   if (!houseInfo) return null;
-  console.log("Storing image of size:", houseImageBuffer ? houseImageBuffer.length : 0);
 
   await connection.query(
     `INSERT INTO HouseInformation
-     (surveyID, houseCondition, houseStructure, houseImage, latitude, longitude) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
+     (surveyID, houseCondition, houseStructure, latitude, longitude, houseStreet, barangay, municipality) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       surveyId,
       houseInfo.houseCondition,
       houseInfo.houseStructure,
-      houseImageBuffer,
-      houseInfo.latitude,
-      houseInfo.longitude
+      houseLocation.latitude,
+      houseLocation.longitude,
+      houseLocation.houseStreet,
+      houseLocation.barangay,
+      houseLocation.municipality
     ]
   );
 };
 
+export const addHouseImage = async (surveyId, houseTitle, houseImageBuffer, connection) => {
+
+  if (!houseImageBuffer) {
+    console.log("No image buffer provided for image:", houseTitle);
+    return null;
+  }
+
+  try {
+    await connection.query(
+      `INSERT INTO HouseImage
+       (surveyID, houseImage, houseTitle) 
+       VALUES (?, ?, ?)`,
+      [
+        surveyId,
+        houseImageBuffer,
+        houseTitle || 'House Image'
+      ]
+    );
+    console.log(`Image "${houseTitle}" added successfully`);
+  } catch (error) {
+    console.error(`Error adding house image "${houseTitle}":`, error);
+    throw error;
+  }
+};
+
 export const addWaterInfo = async (surveyId, water, connection) => {
+  
   if (!water) return null;
   
   await connection.query(
@@ -157,21 +450,53 @@ export const addWaterInfo = async (surveyId, water, connection) => {
      VALUES (?, ?, ?, ?)`,
     [
       surveyId,
-      water.accessWater,
+      water.waterAccess,
       water.potableWater,
-      water.sourceWater
+      water.waterSources
     ]
   );
 };
 
+export const addFarmlots = async (surveyId, farmlots, connection) => {
+  if (!farmlots) return null;
+
+  await connection.query(
+    `INSERT INTO Farmlots
+     (surveyID, cultivation, pastureland, forestland) 
+     VALUES (?, ?, ?, ?)`,
+    [
+      surveyId,
+      farmlots.cultivation || 0,
+      farmlots.pastureland || 0,
+      farmlots.forestland || 0
+    ]
+  );
+};
+
+export const addCommunityIssues = async (surveyId, communityIssues, connection) => {
+
+  if (!communityIssues || !communityIssues.issues) {
+    console.log('No community issues data to insert');
+    return null;
+  }
+
+  await connection.query(
+    `INSERT INTO CommunityIssues (surveyID, issues) VALUES (?, ?)`,
+    [ surveyId, communityIssues.issues || 'N/A' ]
+  );
+};
+
+
+
 export const addLivestock = async (surveyId, livestock, connection) => {
+
   if (!livestock || Object.keys(livestock).length === 0) {
     console.log('No livestock data to insert');
     return null;
   }
   
   const livestockValues = Object.entries(livestock).map(([animal, data]) => {
-    // Extract the values and convert to integers
+    
     const totalNumber = parseInt(data.number) || 0;
     const own = parseInt(data.own) || 0;
     const dispersal = parseInt(data.dispersal) || 0;
@@ -195,34 +520,19 @@ export const addLivestock = async (surveyId, livestock, connection) => {
   }
 };
 
-export const addFarmlots = async (surveyId, farmlots, connection) => {
-  if (!farmlots) return null;
-
-  await connection.query(
-    `INSERT INTO Farmlots
-     (surveyID, cultivation, pastureland, forestland) 
-     VALUES (?, ?, ?, ?)`,
-    [
-      surveyId,
-      farmlots.cultivation || 0,
-      farmlots.pastureland || 0,
-      farmlots.forestland || 0
-    ]
-  );
-};
-
 export const addCropsPlanted = async (surveyId, cropsPlanted, connection) => {
+
   if (!cropsPlanted || !cropsPlanted.crops || Object.keys(cropsPlanted.crops).length === 0) {
     console.log('No crops planted data to insert');
     return null;
   }
 
   const cropsPlantedValues = Object.entries(cropsPlanted.crops)
-    .filter(([crop, size]) => size && size.trim() !== '')
+    .filter(([crop, size]) => parseInt(size) > 0)
     .map(([crop, size]) => [
       surveyId,
       crop,
-      parseInt(size) || 0
+      parseInt(size)
     ]);
 
   if (cropsPlantedValues.length > 0) {
@@ -241,11 +551,11 @@ export const addFruitBearingTree = async (surveyId, treeData, connection) => {
   }
 
   const fruitBearingTreeValues = Object.entries(treeData.tree)
-    .filter(([tree, totalNumber]) => totalNumber && totalNumber.trim() !== '')
+    .filter(([tree, totalNumber]) => parseInt(totalNumber) > 0)
     .map(([tree, totalNumber]) => [
       surveyId,
       tree,
-      parseInt(totalNumber) || 0
+      parseInt(totalNumber)
     ]);
 
     if(fruitBearingTreeValues.length > 0) {
@@ -264,19 +574,19 @@ export const addFamilyResources = async (surveyId, resourcesData, connection) =>
   }
 
   const familyResourcesValues = Object.entries(resourcesData.resources)
-    .filter(([resource, amount]) => amount && amount.trim() !== '') // Only insert non-empty values
+    .filter(([resource, amount]) => parseFloat(amount.replace(/,/g, '').trim()) > 0)
     .map(([resource, amount]) => [
       surveyId,
       resource,
-      parseFloat(amount) || 0
+      parseFloat(amount.replace(/,/g, '').trim())
     ]);
 
-    if(familyResourcesValues.length > 0) {
-      await connection.query(
-        `INSERT INTO FamilyResources (surveyID, resources, amount) VALUES ?`,
-        [ familyResourcesValues ]
-      );
-    }
+  if(familyResourcesValues.length > 0) {
+    await connection.query(
+      `INSERT INTO FamilyResources (surveyID, resources, amount) VALUES ?`,
+      [ familyResourcesValues ]
+    );
+  }
 };
 
 export const addAppliancesOwn = async (surveyId, appliancesData, connection) => {
@@ -287,63 +597,56 @@ export const addAppliancesOwn = async (surveyId, appliancesData, connection) => 
   }
 
   const appliancesOwnValues = Object.entries(appliancesData.appliances)
-    .filter(([appliance, totalAppliances]) => totalAppliances && totalAppliances.trim() !== '') // Only insert non-empty values
+    .filter(([appliance, totalAppliances]) => parseInt(totalAppliances) > 0)
     .map(([appliance, totalAppliances]) => [
       surveyId,
       appliance,
-      parseInt(totalAppliances) || 0
+      parseInt(totalAppliances)
     ]);
 
-    if(appliancesOwnValues.length > 0) {
-      await connection.query(
-        `INSERT INTO AppliancesOwn (surveyID, appliances, totalAppliances) VALUES ?`,
-        [ appliancesOwnValues ]
-      );
-    }
+  if(appliancesOwnValues.length > 0) {
+    await connection.query(
+      `INSERT INTO AppliancesOwn (surveyID, applianceName, totalOwned) VALUES ?`,
+      [ appliancesOwnValues ]
+    );
+  }
 };
 
 export const addAmenities = async (surveyId, amenities, connection) => {
 
-  if (amenities?.amenities) {
-    const amenitiesValues = Object.entries(amenities.amenities).map(([amenity, totalAmenities]) => [
-      surveyId,
-      amenity,
-      parseInt(totalAmenities) || 0
-    ]);
-
-    if(amenitiesValues.length > 0) {
-      await connection.query(
-        `INSERT INTO Amenities (surveyID, amenities, totalAmenities) VALUES ?`,
-        [ amenitiesValues ]
-      );
-    }
-  }
-};
-
-export const addCommunityIssues = async (surveyId, communityData, connection) => {
-
-  if (!communityData || !communityData.issue) {
-    console.log('No community issues data to insert');
+  if (!amenities || !amenities.amenities || Object.keys(amenities.amenities).length === 0) {
+    console.log('No amenities data to insert');
     return null;
   }
 
-  await connection.query(
-    `INSERT INTO CommunityIssues (surveyID, issues) VALUES (?, ?)`,
-    [ surveyId, communityData.issue || 'N/A' ]
-  );
+  const amenitiesValues = Object.entries(amenities.amenities)
+    .filter(([amenity, totalAmenities]) => parseInt(totalAmenities) > 0)
+    .map(([amenity, totalAmenities]) => [
+      surveyId,
+      amenity,
+      parseInt(totalAmenities)
+    ]);
+
+  if(amenitiesValues.length > 0) {
+    await connection.query(
+      `INSERT INTO Amenities (surveyID, amenityName, totalOwned) VALUES ?`,
+      [ amenitiesValues ]
+    );
+  }
 };
 
 export const addServiceAvailed = async (surveyId, serviceAvailed, connection) => {
+
   if (!serviceAvailed || serviceAvailed.length === 0) return null;
   
   const serviceAvailedValues = serviceAvailed.map(service => [
     surveyId,
-    service.date,
-    service.ngo,
-    service.assistance,
-    parseInt(service.male),
-    parseInt(service.female),
-    parseInt(service.total),
+    service.dateServiceAvailed,
+    service.ngoName,
+    service.serviceAvailed,
+    parseInt(service.maleServed),
+    parseInt(service.femaleServed),
+    parseInt(service.totalServed),
     service.howServiceHelp
   ]);
   
@@ -361,63 +664,12 @@ export const addServiceAvailed = async (surveyId, serviceAvailed, connection) =>
 
   return null;
 };
- 
-export const addGovernmentAffiliation = async (surveyId, affiliation, connection) => {
-  if (!affiliation || affiliation.length === 0) return null;
-  
-  const affiliationValues = affiliation.map(aff => [
-    surveyId,
-    aff.name,
-    aff.officer,
-    aff.member,
-    aff.organization
-  ]);
-  
-  if(affiliationValues.length > 0) {
-    const [result] = await connection.query(
-      `INSERT INTO GovernmentAffiliation
-       (surveyID, nameAffiliated, asOfficer, asMember, organizationName) 
-       VALUES ?`,
-      [affiliationValues]
-    );
 
-    return result;
-  }
 
-  return null;
-};
 
-export const addNonIvatan = async (surveyId, nonIvatan, connection) => {
-  if (!nonIvatan || nonIvatan.length === 0) return null;
-  
-  const nonIvatanValues = nonIvatan.map(ipula => [
-    surveyId,
-    ipula.name,
-    ipula.settlement,
-    ipula.ethnicity,
-    ipula.origin,
-    ipula.transient,
-    ipula.houseOwner,
-    ipula.transientRegistered,
-    (!ipula.transientDateRegistered || ipula.transientDateRegistered === 'N/A' || ipula.transientDateRegistered.trim() === '')
-      ? null
-      : ipula.transientDateRegistered.split('T')[0]
-  ]);
-  
-  if (nonIvatanValues.length > 0) {
-    const [result] = await connection.query(
-      `INSERT INTO NonIvatan
-       (surveyID, ipulaName, settlementDetails, ethnicity, placeOfOrigin,
-        isTransient, houseOwner, isRegistered, dateRegistered) 
-       VALUES ?`,
-      [nonIvatanValues]
-    );
 
-    return result;
-  } 
-  
-  return null;
-};
+
+
 
 
 

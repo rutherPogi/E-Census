@@ -1,20 +1,22 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@mui/material';
 
-
-import { TextInput, CurrencyInput, DropdownInput } from '../others/FormFields'
-import { SD_REQUIRED_FIELDS } from '../../utils/constants';
-import { formatCurrency } from '../../utils/formatter'
-import { useFormContext } from "../../pages/FormContext";
-import { Notification } from '../../../../components/common/Notification'
-import { BARANGAY_OPTIONS, FAMILY_CLASS_OPTIONS, INCOME_EMPLOYMENT_OPTIONS, 
+import { SD_REQUIRED_FIELDS } from '../../utils/requiredFields';
+import { SD_INITIAL_VALUES } from '../../utils/initialValues';
+import { Notification, FormButtons } from '../../../../components/common'
+import { BARANGAY_OPTIONS, FAMILY_CLASS_OPTIONS, 
          MUNICIPALITY_OPTIONS } from '../../utils/options';
+import { TextInput, CurrencyInput, DropdownInput } from "../../../../components/common/FormFields";
+
+import { useFormContext } from '../../pages/FormContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useNotification } from '../../hooks/useNotification';
 import { useAuth } from '../../../../utils/auth/authContext'
 
 
 
-export default function SurveyDetails({ handleNext}) {
+
+export default function SurveyDetails({ handleNext }) {
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,97 +25,40 @@ export default function SurveyDetails({ handleNext}) {
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  // Use custom hooks
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+    handleIncomeChange,
+  } = useFormValidation(
+    SD_INITIAL_VALUES(surveyNumber, userData.accountName),
+    true, 
+    SD_REQUIRED_FIELDS
+  );
 
-  const [values, setValues] = useState({
-    surveyID: surveyNumber,
-    respondent: '',
-    interviewer: userData.accountName,
-    barangay: '',
-    municipality: 'Itbayat',
-    totalMonthlyIncome: '',
-    irregularIncome: '',
-    familyIncome: '',
-    familyClass: '',
-    employmentType: ''
-  }); 
-
-  const [errors, setErrors] = useState({
-    respondent: false,
-    interviewer: false,
-    barangay: false,
-    municipality: false,
-    totalMonthlyIncome: false,
-    irregularIncome: false,
-    familyIncome: false,
-    familyClass: false,
-    employmentType: false
-  }); 
-
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
-
-  const handleBack = () => {
-    navigate('/main/survey');
-  }
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   useEffect(() => {
     if (formData.surveyData) {
       setValues(prev => ({
         ...prev,
-        ...formData.surveyData,
-        surveyID: surveyNumber
+        ...formData.surveyData
       }));
     }
-  }, [formData.surveyData, surveyNumber]);
+  }, [formData.surveyData, surveyNumber, setValues]);
 
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    // Validate required fields
-    SD_REQUIRED_FIELDS.forEach(key => {
-      const value = values[key];
-      if (!value) {
-        newErrors[key] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: value ? '' : errors[field] }));
-  };
-
-  const handleIncomeChange = (field) => (e) => {
-    const value = e.target.value;
-    const plainNumber = value.replace(/,/g, '');
-    
-    if (!/^\d*$/.test(plainNumber)) {
-      setErrors(prev => ({ ...prev, [field]: 'Please enter numbers only' }));
-      return;
-    }
-    
-    if (Number(plainNumber) > 999999999) {
-      setErrors(prev => ({ ...prev, [field]: 'Amount cannot exceed ₱999,999,999' }));
-      return;
-    }
-    
-    setErrors(prev => ({ ...prev, [field]: false }));
-    setValues(prev => ({ ...prev, [field]: formatCurrency(plainNumber) }));
-  };
+  const handleBack = () => {
+    navigate('/main/survey');
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -122,6 +67,10 @@ export default function SurveyDetails({ handleNext}) {
       showNotification('Please fill in all required fields', 'error')
       return;
     }
+
+    if( values.familyClass === null || values.familyClass === undefined || values.familyClass === '') { 
+      values.familyClass = 'N/A' 
+    };
     
     updateFormData('surveyData', values);
     console.log("Survey Details:", values);
@@ -130,10 +79,13 @@ export default function SurveyDetails({ handleNext}) {
   };
 
 
+
+
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>SURVEY DETAILS</div>
       <div className='responsive-form'>
+        <div className="section-title field-full">Household Information</div>
         <TextInput
           label='Respondent'
           value={values.respondent}
@@ -143,11 +95,17 @@ export default function SurveyDetails({ handleNext}) {
           placeholder = 'Enter respondents name'
           required
         />
-        <TextInput
-          label='Interviewer'
-          value={values.interviewer}
-          disabled
+        <DropdownInput
+          label = 'Family Class'
+          options = {FAMILY_CLASS_OPTIONS}
+          value = {values.familyClass}
+          onChange = {(e, newValue) => handleChange('familyClass')(e, newValue)}
+          error = {errors.familyClass} 
+          helperText = {errors.familyClass}
+          placeholder = 'Enter family class'
+          required
         />
+        <div className="section-title field-full">Location Information</div>
         <DropdownInput
           label = 'Barangay'
           options = {BARANGAY_OPTIONS}
@@ -166,32 +124,14 @@ export default function SurveyDetails({ handleNext}) {
           disabled
           required
         />
-        <DropdownInput
-          label = 'Family Class'
-          options = {FAMILY_CLASS_OPTIONS}
-          value = {values.familyClass}
-          onChange = {(e, newValue) => handleChange('familyClass')(e, newValue)}
-          error = {errors.familyClass} 
-          helperText = {errors.familyClass}
-          placeholder = 'Enter family class'
-          required
-        />
+        <div className="section-title field-full">Financial Information</div>
         <CurrencyInput
           label = 'Average Monthly Income'
-          value =  {values.totalMonthlyIncome}
-          onChange =  {handleIncomeChange('totalMonthlyIncome')}
-          error =  {errors.totalMonthlyIncome}
-          helperText = {errors.totalMonthlyIncome}
+          value =  {values.monthlyIncome}
+          onChange =  {handleIncomeChange('monthlyIncome')}
+          error =  {errors.monthlyIncome}
+          helperText = {errors.monthlyIncome}
           placeholder= '0.00'
-        />
-        <DropdownInput
-          label = 'Employment Type'
-          options = {INCOME_EMPLOYMENT_OPTIONS}
-          value = {values.employmentType}
-          onChange = {(e, newValue) => handleChange('employmentType')(e, newValue)}
-          error = {errors.employmentType} 
-          helperText = {errors.employmentType}
-          placeholder = 'Enter family class'
           required
         />
         <CurrencyInput
@@ -213,12 +153,12 @@ export default function SurveyDetails({ handleNext}) {
           required
         />
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons 
+        onBack={handleBack}
+        onNext={handleSubmit}
+        backLabel="Cancel"
+        nextLabel="Next"
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

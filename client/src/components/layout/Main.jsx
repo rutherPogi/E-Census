@@ -18,13 +18,17 @@ const LayoutContainer = styled(Box)(({ theme }) => ({
 // Styled component for the main content area
 const MainContent = styled('div')(({ theme }) => ({
   gridArea: 'main',
-  padding: '3em',
+  padding: theme.spacing(2), // Default padding
+  [theme.breakpoints.up('sm')]: {
+    padding: theme.spacing(4),
+  },
   overflow: 'auto',
 }));
 
 const Layout = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile);
   const [mobileOpen, setMobileOpen] = useState(false);
 

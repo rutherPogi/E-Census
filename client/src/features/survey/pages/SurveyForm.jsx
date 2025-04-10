@@ -4,30 +4,43 @@ import { SurveyDetails, FamilyProfile, FamilyProfile2,
          FoodExpenses, EducationExpenses, FamilyExpenses, MonthlyExpenses,
          HouseInfo, HouseInfo2, WaterInfo, Livestock, Farmlots, CropsPlanted, 
          FruitBearingTree, FamilyResources, AppliancesOwn, Amenities, 
-         CommunityIssue, ServiceAvailed, ServiceAvailed2, Affiliation, Affiliation2,
-         NonIvatan, NonIvatan2, DisplaySurvey } from "../components/steps";
+         CommunityIssue, ServiceAvailed, ServiceAvailed2, DisplaySurvey,
+         ViewSurvey } from "../components/steps";
 
 
-export default function Form({ isEditing = false }) {
+         
+export default function Form({ isViewing = false, isEditing = false }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
+
+  const [viewing, setViewing] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [update, setUpdate] = useState(false);
 
   useEffect(() => {
-    if (isEditing) {
-      setCurrentPage(25);
-      setEditing(true)
+    if (isViewing) {
+      setCurrentPage(22);
+      setViewing(true);
+    } else if (isEditing) {
+      setCurrentPage(21);
+      setEditing(true);
     }
-  }, [isEditing]);
+  }, [isViewing, isEditing]);
 
   const handleNext = () => {
-    if (previousPage === 25) {
-      setCurrentPage(25);
+    if (previousPage === 21) {
+      setCurrentPage(21);
       setPreviousPage(null);
-    } else if (currentPage < 25) {
+      setEditing(false);
+      setUpdate(true);
+    } else if (currentPage < 21) {
       setCurrentPage((prev) => prev + 1);
     }
+  };
+
+  const handleSkip = () => {
+    setCurrentPage((prev) => prev + 2);
   };
 
   const handleBack = () => {
@@ -35,16 +48,16 @@ export default function Form({ isEditing = false }) {
   };
 
   const handleEdit = (pageNumber) => {
-    setPreviousPage(25); // Store that we came from display page
+    setPreviousPage(21); // Store that we came from display page
     setCurrentPage(pageNumber);
   };
 
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 0 && <SurveyDetails handleNext={handleNext}/>}
+        {currentPage === 1 && <SurveyDetails handleNext={handleNext}/>}
         {currentPage === 2 && <FamilyProfile handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 3 && <FamilyProfile2 handleNext={handleNext} handleBack={() => setCurrentPage(2)}/>}
+        {currentPage === 3 && <FamilyProfile2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 4 && <FoodExpenses handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 5 && <EducationExpenses handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 6 && <FamilyExpenses handleNext={handleNext} handleBack={handleBack}/>}
@@ -60,17 +73,20 @@ export default function Form({ isEditing = false }) {
         {currentPage === 16 && <AppliancesOwn handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 17 && <Amenities handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 18 && <CommunityIssue handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 19 && <ServiceAvailed handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 19 && <ServiceAvailed handleNext={handleNext} handleBack={handleBack} handleSkip={handleSkip}/>}
         {currentPage === 20 && <ServiceAvailed2 handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 21 && <Affiliation handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 22 && <Affiliation2 handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 23 && <NonIvatan handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 24 && <NonIvatan2 handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 1 && <DisplaySurvey handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit} isEditing={editing}/>}
+        {currentPage === 21 && 
+          <DisplaySurvey 
+          handleBack={handleBack} 
+          handleEdit={handleEdit} 
+          isEditing={editing}
+          isUpdating={update}/>
+        }
+        {currentPage === 22 && <ViewSurvey handleEdit={handleEdit} isViewing={viewing}/>}
 
 
         <div className='form-pagination'>
-          {Array.from({ length: 25 }, (_, index) => (
+          {Array.from({ length: 21 }, (_, index) => (
             <div key={index} className={`circle ${currentPage === index + 1 ? "active" : ""}`}></div>
           ))}
         </div>

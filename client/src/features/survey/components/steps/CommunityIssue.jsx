@@ -1,54 +1,41 @@
-import { useState, useEffect } from "react";
-import { Button } from '@mui/material';
+import { useEffect } from "react";
 
-import { TextInput } from "../others/FormFields";
-import { useFormContext } from "../../pages/FormContext";
-import { Notification } from '../../../../components/common/Notification'
+import { CI_INITIAL_VALUES } from "../../utils/initialValues";
+import { Notification, FormButtons } from '../../../../components/common'
+import { TextInput } from "../../../../components/common/FormFields";
 
-
+import { useFormContext } from '../../pages/FormContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useNotification } from "../../hooks/useNotification";
 
 export default function CommunityIssue({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [values, setValues] = useState({ issue: formData.issue || '' })
-  const [errors, setErrors] = useState({issue: false});
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange
+  } = useFormValidation(
+    CI_INITIAL_VALUES, 
+    true, 
+    ['issues']);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
-
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
-
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   useEffect(() => {
     if (formData.communityIssues) {
       setValues(prev => ({ ...prev, ...formData.communityIssues }));
     }
   }, [formData.communityIssues]);
-
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = { issue: false };
-  
-    if (!values.issue.trim()) {
-      newErrors.issue = "This field is required.";
-      isValid = false;
-    }
-  
-    setErrors(newErrors);
-    return isValid;
-  };
-  
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,7 +46,7 @@ export default function CommunityIssue({ handleBack, handleNext }) {
     };
 
     updateFormData('communityIssues', values);
-    console.log("Current Form Values:", values);
+    console.log("COMMUNITY ISSUES:", values);
 
     handleNext()
   };
@@ -67,22 +54,22 @@ export default function CommunityIssue({ handleBack, handleNext }) {
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>ISSUES/PROBLEMS IN THE COMMUNITY</div>
-      <form id='survey-form' className='responsive-details' onSubmit={handleSubmit}>
+      <form id='survey-form' className='responsive-form details' onSubmit={handleSubmit}>
         <TextInput
           label='Issues/Problems in the community'
-          value={values.issue}
-          onChange={handleChange('issue')}
-          error={errors.issue}
-          helperText={errors.issue || 'Enter what are the issues/problem in the community.'}
+          value={values.issues}
+          onChange={handleChange('issues')}
+          error={errors.issues}
+          helperText={errors.issues || 'Write the issues/problem in the community.'}
           multiline
         />
       </form>
-      <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-            <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-          </div>     
-      </div>
+      <FormButtons 
+        onBack={handleBack}
+        onNext={handleSubmit}
+        backLabel="Back"
+        nextLabel="Next"
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

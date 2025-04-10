@@ -50,26 +50,33 @@ const uploadToMemory = multer({
 
 // Middleware to process uploaded file for database storage
 const processImageForDatabase = (req, res, next) => {
-  if (!req.file) {
+  if (!req.files || req.files.length === 0) {
     return next();
   }
-
-  // File is already in memory with memoryStorage
-  // We can access it via req.file.buffer
+  
+  // Files are already in memory with memoryStorage
+  // We can access them via req.files array
+  // Each file in the array has a buffer property
+  console.log(`Processing ${req.files.length} images for database`);
   next();
 };
 
 // Handle base64 image data directly from client
 const handleBase64Image = (req, res, next) => {
-  // If the request already has base64 image data (from React frontend)
-  if (req.body.image && req.body.image.base64) {
-    // Convert base64 to buffer if needed
-    const base64Data = req.body.image.base64.split(';base64,').pop();
-    req.file = {
-      buffer: Buffer.from(base64Data, 'base64'),
-      mimetype: req.body.image.mimeType || 'image/jpeg',
-      originalname: req.body.image.fileName || 'image.jpg'
-    };
+  // Check if we have base64 image data in the request body
+  if (req.body.images && Array.isArray(req.body.images)) {
+    req.files = req.body.images.map((image, index) => {
+      if (image && image.base64) {
+        // Convert base64 to buffer
+        const base64Data = image.base64.split(';base64,').pop();
+        return {
+          buffer: Buffer.from(base64Data, 'base64'),
+          mimetype: image.mimeType || 'image/jpeg',
+          originalname: image.fileName || `image_${index}.jpg`
+        };
+      }
+      return null;
+    }).filter(Boolean); // Remove any null entries
   }
   next();
 };

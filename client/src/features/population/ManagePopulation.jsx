@@ -54,6 +54,7 @@ const ManagePopulation = () => {
 
   useEffect(() => {
     fetchSurveyData();
+    console.log('FILTERED DATA:', surveyData);
   }, []);
 
   const updateSearchResults = (searchTerm) => {
@@ -132,8 +133,8 @@ const ManagePopulation = () => {
   };
 
   const renderSurveyRow = (survey, index) => (
-    <TableRow key={survey.surveyID || index}>
-      <TableCell>{survey.familyProfileID}</TableCell>
+    <TableRow key={survey.populationID || index}>
+      <TableCell>{survey.populationID}</TableCell>
       <TableCell>
         {survey.firstName + ' ' +
          (survey.middleName || '') + ' ' +
@@ -148,12 +149,15 @@ const ManagePopulation = () => {
       <TableCell>{survey.relationToFamilyHead}</TableCell>
       <TableCell>{survey.educationalAttainment}</TableCell>
       <TableCell>{survey.occupation}</TableCell>
-      <TableCell>{survey.skillsTraining}</TableCell>
+      <TableCell>{survey.skills}</TableCell>
       <TableCell>{survey.employmentType}</TableCell>
       <TableCell>{survey.philhealthNumber}</TableCell>
-      <TableCell>{survey.monthlyIncome}</TableCell>
+      <TableCell>{`P${survey.monthlyIncome}`}</TableCell>
       <TableCell>{survey.healthStatus}</TableCell>
       <TableCell>{survey.remarks}</TableCell>
+      <TableCell>{survey.pwdIDNumber || 'N/A'}</TableCell>
+      <TableCell>{survey.soloParentIDNumber || 'N/A'}</TableCell>
+      <TableCell>{survey.seniorCitizenIDNumber || 'N/A'}</TableCell>
       <TableCell>
         <Box sx={{ 
           display: 'flex', 
@@ -188,7 +192,7 @@ const ManagePopulation = () => {
   return (
     <div className="responsive-container">
       <div className="responsive-header">Populations</div>
-      <div className='responsive-table'>
+      <div className='responsive-form details'>
         <SearchBar 
           onSearch={updateSearchResults}
           placeholder="Search by respondent, interviewer or ID"

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Edit, Delete } from '@mui/icons-material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
-         Paper, IconButton, Button } from '@mui/material';
+         Paper, IconButton } from '@mui/material';
 import dayjs from 'dayjs';
 
 import { useFormContext } from "../../pages/FormContext";
-import { Notification } from '../../../../components/common/Notification'
+import { Notification, FormButtons } from '../../../../components/common'
 
 
 
@@ -66,15 +66,15 @@ export default function ServiceAvailed2({ handleBack, handleNext }) {
               {serviceAvailed.map((service, index) => (
                 <TableRow key={index}>
                   <TableCell>
-                    {service.date && dayjs(service.date).isValid() 
-                      ? dayjs(service.date).format('MM/DD/YYYY') 
+                    {service.dateServiceAvailed && dayjs(service.dateServiceAvailed).isValid() 
+                      ? dayjs(service.dateServiceAvailed).format('MM/DD/YYYY') 
                       : 'N/A'}
                   </TableCell>
-                  <TableCell>{service.ngo || 'N/A'}</TableCell>
-                  <TableCell>{service.assistance || 'N/A'}</TableCell>
-                  <TableCell>{service.male}</TableCell>
-                  <TableCell>{service.female}</TableCell>
-                  <TableCell>{service.total}</TableCell>
+                  <TableCell>{service.ngo || service.ngoName || 'N/A'}</TableCell>
+                  <TableCell>{service.assistance || service.serviceAvailed || 'N/A'}</TableCell>
+                  <TableCell>{service.maleServed}</TableCell>
+                  <TableCell>{service.femaleServed}</TableCell>
+                  <TableCell>{service.total || service.totalServed}</TableCell>
                   <TableCell>{service.howServiceHelp || 'N/A'}</TableCell>
                   <TableCell>
                     <IconButton 
@@ -98,12 +98,12 @@ export default function ServiceAvailed2({ handleBack, handleNext }) {
           </Table>
         </TableContainer>
       </div>
-      <div className='form-buttons'>
-          <div className='form-buttons-right'>
-            <Button variant='outlined' onClick={handleAdd} sx={{ width: '100%' }}>Add +</Button>
-            <Button variant='contained' onClick={handleNext} sx={{ width: '100%' }}>Next</Button>
-          </div>     
-      </div>
+      <FormButtons 
+        onBack={handleBack}
+        onNext={handleNext}
+        backLabel="Add +"
+        nextLabel="Next"
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

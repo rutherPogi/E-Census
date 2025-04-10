@@ -10,6 +10,7 @@ const initialFormData = {
   familyExpenses: {},
   monthlyExpenses: {},
   houseInfo: {},
+  houseLocation: {},
   waterInfo: {},
   livestock: {},
   farmlots: {},
@@ -20,9 +21,6 @@ const initialFormData = {
   amenitiesOwn: {},
   communityIssues: {},
   serviceAvailed: [],
-  affiliation: [],
-  nonIvatan: [],
-  transient: {}
 }; 
 
 export function FormProvider({ children }) {
@@ -37,9 +35,6 @@ export function FormProvider({ children }) {
     setFormData(prev => ({ ...prev, [section]: data }));
   };
 
-  // Generic function to add an item to any array in formData
-  // addItem('familyMembers', memberData);
-  // addItem('serviceAvailed', serviceData);
   const addItem = (section, item) => {
     setFormData(prev => ({ ...prev, [section]: [...prev[section], item] }));
   };
@@ -56,7 +51,6 @@ export function FormProvider({ children }) {
     setFormData(initialFormData);
   };
 
-  // Create a value object with all the context functions
   const contextValue = {
     formData,
     updateFormData,

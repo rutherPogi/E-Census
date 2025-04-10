@@ -1,86 +1,56 @@
-import { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
+import { useEffect } from "react";
+import { useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
-import dayjs from "dayjs";
 
-import { useFormContext } from "../others/FormContext";
 import { CIVIL_STATUS_OPTIONS, SUFFIX_OPTIONS, SEX_OPTIONS, PI_REQUIRED_FIELDS } from '../../utils/constants';
 import { Notification } from "../../../components/Notification";
 import { TextInput, DropdownInput, DateInput } from "../../../../../components/common/FormFields";
-import { PI_ERROR_STATE, PI_INITIAL_STATE } from "../../utils/initialStates";
+import { PI_INITIAL_STATE } from "../../utils/initialStates";
+
+import { useFormContext } from "../others/FormContext";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useTransformData } from "../../hooks/useTransformData";
 
 
 export default function PersonalInfo({ handleBack, handleNext}) {
 
-  const location = useLocation();
-  const pwdID = location.state?.applicantNumber;
+  const { pwdID, populationID } = useParams();
+
   const { formData, updateFormData } = useFormContext();
+  const { fetchPersonData } = useTransformData(populationID);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+    handleDateChange
+  } = useFormValidation(
+    PI_INITIAL_STATE(pwdID),
+    true, 
+    PI_REQUIRED_FIELDS
+  );
 
-  const [values, setValues] = useState(PI_INITIAL_STATE(pwdID)); 
-  const [errors, setErrors] = useState(PI_ERROR_STATE); 
-
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   useEffect(() => {
+
+    if(populationID) {
+      fetchPersonData();
+    }
+    
     if (formData.personalInfo) {
-      setValues(prev => ({
-        ...prev,
-        ...formData.personalInfo,
-        pwdID: pwdID
-      }));
+      setValues(prev => ({ ...prev, ...formData.personalInfo, pwdID: pwdID }));
     }
   }, [formData.personalInfo, pwdID]);
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    PI_REQUIRED_FIELDS.forEach(field => {
-      if (!values[field]) {
-        newErrors[field] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleDateChange = (newValue) => {
-    // Check if the date is valid
-    if (!newValue || !newValue.isValid()) {
-      setValues(prev => ({ ...prev, birthdate: null }));
-      setErrors(prev => ({ ...prev, birthdate: 'Invalid date' }));
-      return;
-    }
-
-    // Check if the selected date is in the future
-    const today = dayjs();
-
-    if (newValue.isAfter(today)) {
-      setValues(prev => ({ ...prev, birthdate: newValue }));
-      setErrors(prev => ({ ...prev, birthdate: 'Birthdate cannot be in the future' }));
-      return;
-    }
-
-    // Valid date and not in the future
-    setValues(prev => ({ ...prev, birthdate: newValue }));
-    setErrors(prev => ({ ...prev, birthdate: false }));
-  };
-
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,6 +72,7 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     });
     
     updateFormData('personalInfo', processedValues);
+
     console.log("Personal Details:", processedValues);
     
     handleNext();

@@ -10,7 +10,7 @@ const HousePinsLayer = ({
 
   return (
     <>  
-      {houseData.map((house) => (
+      {houseData.houseInfo.map((house) => (
         <Marker 
           key={house.houseInfoID} 
           position={[parseFloat(house.latitude), parseFloat(house.longitude)]}

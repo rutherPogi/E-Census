@@ -5,16 +5,17 @@ import { PersonalInfo, DisabilityInfo, ContactInfo, ProfessionalInfo, Organizati
          DisplayPWDInfo, PwdMedia, PrintID} from '../components/steps'
 
 
-export default function PWDForm() {
+
+export default function PWDForm(hasPWDID = false, isRegistered = false) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
 
   const handleNext = () => {
-    if (previousPage === 12) {
-      setCurrentPage(12);
+    if (previousPage === 14) {
+      setCurrentPage(14);
       setPreviousPage(null);
-    } else if (currentPage < 12) {
+    } else if (currentPage < 14) {
       setCurrentPage((prev) => prev + 1);
     }
   };
@@ -24,16 +25,17 @@ export default function PWDForm() {
   };
 
   const handleEdit = (pageNumber) => {
-    setPreviousPage(12);
+    setPreviousPage(14);
     setCurrentPage(pageNumber);
   };
 
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && <PersonalInfo handleNext={handleNext}/>}
-        {currentPage === 9 && <DisabilityInfo handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 0 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
+        
+        {currentPage === 1 && <PersonalInfo handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 2 && <DisabilityInfo handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 3 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 4 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 5 && <OrganizationInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 6 && <IDReferenceInfo handleNext={handleNext} handleBack={handleBack}/>}
@@ -41,12 +43,12 @@ export default function PWDForm() {
         {currentPage === 8 && <AccomplishedBy handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 9 && <OtherInfo handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 10 && <ReportingUnit handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 2 && <PwdMedia handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 0 && <DisplayPWDInfo handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
-        {currentPage === 3 && <PrintID handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 11 && <PwdMedia handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 12 && <DisplayPWDInfo handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 13 && <PrintID handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
 
         <div className='form-pagination'>
-          {Array.from({ length: 12 }, (_, index) => (
+          {Array.from({ length: 14 }, (_, index) => (
             <div key={index} className={`circle ${currentPage === index + 1 ? "active" : ""}`}></div>
           ))}
         </div>

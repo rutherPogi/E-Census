@@ -1,101 +1,51 @@
-import { useState, useEffect } from "react";
-import { Button, } from '@mui/material';
+import { FOOD_EXPENSES } from '../../utils/initialValues';
+import { FormButtons } from "../../../../components/common";
+import { CurrencyInput } from "../../../../components/common/FormFields";
 
 import { useFormContext } from "../../pages/FormContext";
-import { CurrencyInput } from "../others/FormFields"
-import { formatCurrency } from '../../utils/formatter'
-import { FOOD_EXPENSES } from '../../utils/constants';
+import { useExpenses } from "../../hooks/useExpenses";
+import { useEffect } from 'react';
 
 
 export default function FoodExpenses({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [values, setValues] = useState(() => {
-    const existingData = formData.foodExpenses?.expenses || {};
-    return Object.fromEntries(FOOD_EXPENSES.map(type => [
-      type, 
-      typeof existingData[type] === 'string' ? existingData[type] : ''
-    ]));
-  }); 
-
-  const [errors, setErrors] = useState(
-    Object.fromEntries(FOOD_EXPENSES.map(type => [type, false]))
-  );
-
-  const [foodTotal, setFoodTotal] = useState(() => {
-    const existingData = formData.foodExpenses?.expenses || {};
-    return Object.values(existingData).reduce((sum, val) => 
-      sum + (parseFloat(val?.replace(/,/g, '')) || 0), 0
-    );
+  const {
+    values,
+    errors,
+    total,
+    handleChange,
+    formatCurrency,
+  } = useExpenses({
+    formKey: 'foodExpenses',
+    expenseTypes: FOOD_EXPENSES,
+    formData,
+    updateFormData
   });
 
-  useEffect(() => {
-    if (formData.foodExpenses && formData.foodExpenses.expenses) {
-      setValues(prev => {
-        const newValues = { ...prev };
-        
-        // Ensure we're getting the correct data structure
-        const expenses = formData.foodExpenses.expenses;
-        
-        FOOD_EXPENSES.forEach(field => {
-          if (typeof expenses[field] === 'string') {
-            newValues[field] = expenses[field];
-          }
-        });
-        
-        return newValues;
-      });
-    }
-  }, [formData.foodExpenses]);
-
-  const handleChange = (field) => (e) => {
-    const value = e.target.value;
-    const plainNumber = value.replace(/,/g, '');
-    
-    if (!/^\d*$/.test(plainNumber)) {
-      setErrors(prev => ({ ...prev, [field]: 'Please enter numbers only' }));
-      return;
-    }
-    
-    if (Number(plainNumber) > 999999999) {
-      setErrors(prev => ({ ...prev, [field]: 'Total Amount cannot exceed ₱999,999,999' }));
-      return;
-    }
-
-    setErrors(prev => ({ ...prev, [field]: false }));
-    
-    setValues(prevValues => {
-
-      const updatedValues = { ...prevValues, [field]: formatCurrency(plainNumber) };
-
-      const newFoodTotal = Object.values(updatedValues).reduce((sum, val) => {
-        const valStr = typeof val === 'string' ? val : val?.toString() || '0';
-        return sum + (parseFloat(valStr.replace(/,/g, '')) || 0);
-      }, 0);
-      
-      setFoodTotal(newFoodTotal);
-      return updatedValues;
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const onSubmit = (e) => {
     e.preventDefault();
-
+    
     const processedValues = { ...values };
     
     Object.keys(processedValues).forEach((key) => {
       const value = processedValues[key];
-        if (value === '' || value === null) {
-          processedValues[key] = '0';
-        }
+      if (value === '' || value === null || value === undefined) {
+        processedValues[key] = '0';
+      }
     });
 
-    updateFormData('foodExpenses', { expenses: processedValues, foodTotal });
-    console.log(processedValues)
+    updateFormData('foodExpenses', { 
+      expenses: processedValues, 
+      foodTotal: total,
+      foodExpensesID: formData.foodExpenses.foodExpensesID 
+    });
 
+    console.log('FOOD EXPENSES: ', formData.foodExpenses);
     handleNext();
   };
+
 
   
   
@@ -110,22 +60,22 @@ export default function FoodExpenses({ handleBack, handleNext }) {
             value={values[field]}
             onChange={handleChange(field)}
             error={errors[field]}
-            helperText = {errors[field] || `Enter ${field} expenses`}
+            helperText = {errors[field] || `${field} expenses`}
             placeholder={'0.00'}
           />
         ))}
           <CurrencyInput
             label = "Total Monthly Food Expenses"
-            value = {`${formatCurrency(foodTotal.toString())}`}
+            value = {`${formatCurrency(total.toString())}`}
             variant = {'filled'}
           />
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack={handleBack}
+        onNext={onSubmit}
+        backLabel = 'Back'
+        nextLabel = 'Next'
+      />
     </div>
   );
 }

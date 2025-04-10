@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Box, Typography, Button, useMediaQuery, TextField, Autocomplete, InputAdornment } from "@mui/material";
+import { Box, Typography, Button, useMediaQuery, TextField, Autocomplete, InputAdornment,
+         FormControlLabel, Checkbox, FormHelperText } from "@mui/material";
 import { LocalizationProvider, DesktopDatePicker } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
@@ -204,6 +205,7 @@ export const DropdownInput = ({
   return (
     <Autocomplete
       disabled = {disabled}
+      required = {required}
       freeSolo = {freeSolo}
       options = {options}
       value = {options.find(option => option.value === value) || null}
@@ -355,5 +357,39 @@ export const ContactNumberInput = ({
       size = {isMobile ? 'small' : 'medium'}
       {...props}
     />
+  );
+};
+
+export const CheckboxInput = ({ 
+  label, 
+  checked, 
+  onChange, 
+  error, 
+  helperText,
+  disabled = false,
+  ...props 
+}) => {
+  const isMobile = useMediaQuery('(max-width:425px)');
+  
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={checked || false}
+            onChange={onChange}
+            disabled={disabled}
+            size={isMobile ? 'small' : 'medium'}
+            {...props}
+          />
+        }
+        label={label}
+      />
+      {(error || helperText) && (
+        <FormHelperText error={Boolean(error)}>
+          {error || helperText}
+        </FormHelperText>
+      )}
+    </Box>
   );
 };

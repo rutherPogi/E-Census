@@ -13,5 +13,8 @@ export const MANAGE_TABLE_HEADERS = [
   'Monthly Income',
   'Health Status',
   'Remarks',
+  'PWD ID',
+  'Solo Parent ID',
+  'Senior Citizen ID',
   'Actions'
 ];

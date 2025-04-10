@@ -5,7 +5,7 @@ import { Tooltip, Box, useMediaQuery, useTheme, Snackbar, Alert,
 import dayjs from 'dayjs';
 
 import { SearchBar, ActionButton, DeleteDialog, ManageTable } from '../components/others';
-import { MANAGE_TABLE_HEADERS } from '../utils/constants';
+import { MANAGE_TABLE_HEADERS } from '../utils/tableHeaders';
 import { get, del } from '../../../utils/api/apiService';
 import { Notification } from '../../../components/common/Notification'
 
@@ -99,7 +99,7 @@ const ManageSurvey = () => {
     setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
     
     try {
-      const response = await del(`/surveys/delete-survey/${survey.surveyID}`);
+      const response = await del(`/surveys/delete-survey/${survey.surveyID}/${survey.populationID}`);
       
       if (response.success) {
         const updatedData = surveyData.filter(s => s.surveyID !== survey.surveyID);
@@ -122,8 +122,11 @@ const ManageSurvey = () => {
       <TableCell>{survey.respondent}</TableCell>
       <TableCell>{survey.interviewer}</TableCell>
       <TableCell>
-        {survey.surveyDate ? dayjs(survey.surveyDate).format('MM/DD/YYYY') : 'N/A'}
+        {survey.surveyDate 
+         ? dayjs(survey.surveyDate).format('MM/DD/YYYY') 
+         : 'N/A'}
       </TableCell>
+      <TableCell>{survey.barangay}</TableCell>
       <TableCell>
         <Box sx={{ 
           display: 'flex', 
@@ -137,6 +140,16 @@ const ManageSurvey = () => {
                 label="View"
                 color="#0d47a1"
                 to={`/main/view-survey/${survey.surveyID}`}
+              />
+            </Box>
+          </Tooltip>
+          <Tooltip title="Edit Survey Details">
+            <Box>
+              <ActionButton   
+                icon={<Edit />}
+                label="Edit"
+                color="#ff9800"
+                to={`/main/edit-survey/${survey.surveyID}`}
               />
             </Box>
           </Tooltip>

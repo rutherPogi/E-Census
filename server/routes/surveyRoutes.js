@@ -8,12 +8,19 @@ const router = express.Router();
 
 router.post('/submit-survey', 
   authenticateToken, 
-  uploadToMemory.single('houseImage'),  // Use memory storage for database
+  uploadToMemory.array('houseImages', 10),
   processImageForDatabase,
   surveyController.submitSurvey);
+router.put('/update-survey', 
+  authenticateToken, 
+  uploadToMemory.array('houseImages', 10),
+  processImageForDatabase,
+  surveyController.updateSurvey);
+
 router.get('/manage-survey', authenticateToken, surveyController.manageSurvey);
 router.get('/view-survey/:surveyID', authenticateToken, surveyController.viewSurvey);
-router.delete('/delete-survey/:surveyID', authenticateToken, surveyController.deleteSurvey);
+
+router.delete('/delete-survey/:surveyID/:populationID', authenticateToken, surveyController.deleteSurvey);
 router.get('/generate-surveyID', authenticateToken, surveyController.getNewSurveyId);
 
 export default router; 

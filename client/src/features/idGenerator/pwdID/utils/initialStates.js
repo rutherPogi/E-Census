@@ -11,14 +11,23 @@ export const PI_INITIAL_STATE = (pwdID) => ({
   pwdNumber: ''
 })
 
-export const PI_ERROR_STATE = {
-  firstName: false,
-  middleName: false,
-  lastName: false,
-  suffix: false,
-  birthdate: false,
-  sex: false,
-  civilStatus: false,
-  pwdNumber: false
-}
+export const FP_INITIAL_VALUES = () => ({
+  firstName: '',
+  middleName: '',
+  lastName: '',
+  suffix: '',
+  birthdate: null,
+  sex: ''
+})
+
+export const PI_REQUIRED_FIELDS = [
+  'firstName',
+  'middleName',
+  'lastName',
+  'suffix',
+  'birthdate',
+  'sex',
+  'civilStatus',
+  'pwdNumber'
+]
     

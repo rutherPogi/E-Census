@@ -16,6 +16,8 @@ router.post('/submit-pwdID',
   pwdIDControllers.submitPwdId
 );
 router.get('/manage-pwdID', authenticateToken, pwdIDControllers.managePwdId);
+router.get('/get-personDetails/:populationID', authenticateToken, pwdIDControllers.getPersonDetails);
+router.post('/find-pwdID', authenticateToken, pwdIDControllers.findPwdID);
 
 
 export default router; 

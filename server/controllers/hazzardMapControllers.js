@@ -4,9 +4,10 @@ import pool from '../config/database.js';
 // Get all house pins
 export const getCoordinates = async (req, res) => {
   try {
-    const [rows] = await pool.query(`SELECT * FROM HouseInformation`);
+    const [houseInfo] = await pool.query(`SELECT * FROM HouseInformation`);
+    const [rows] = await pool.query(`SELECT * FROM HouseImage`);
 
-    const processedRows = rows.map(row => {
+    const houseImages = rows.map(row => {
       let processedRow = {...row};
 
       if (row.houseImage) {
@@ -15,8 +16,11 @@ export const getCoordinates = async (req, res) => {
       
       return processedRow;
     });
-    
-    res.json(processedRows);
+
+    console.log('HOUSE INFO:', houseInfo);
+    console.log('HOUSE IMAGES:', houseImages);
+
+    res.status(200).json({houseInfo, houseImages});
   } catch (error) {
     console.error('Error getting House Information:', error);
     res.status(500).json({ message: 'Server error' });

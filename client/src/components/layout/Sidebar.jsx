@@ -7,12 +7,12 @@ import { Home, Assignment, Badge, Map, Person, ExpandLess, ExpandMore,
          Groups } from '@mui/icons-material';
 
 import { useAuth } from '../../utils/auth/authContext';
-import logo from '../../assets/questionnaire.png'
+import logo from '../../assets/MSWDO-Logo.png'
 
 
 
 const Logo = () => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center', width: '100%' }}>
     <Box
       component="img"
       src={logo}
@@ -26,7 +26,7 @@ const Logo = () => (
       fontSize={'28px'}
       color="#fff"
     > 
-      <span style={{ color: '#FF5733' }}>e</span>Census
+      <span style={{ color: '#FF5733' }}>e</span>Tbayat
     </Typography>
   </Box>
 )
@@ -124,10 +124,10 @@ const Sidebar = ({
         {/* News and Updates */}
         <Tooltip title={!open ? "News and Updates" : ""} placement="right">
           <ListItem 
-            onClick={() => handleItemClick('/main/edit')}
-            sx={listItemStyles(isActive('/main/edit'))}
+            onClick={() => handleItemClick('/main/updates')}
+            sx={listItemStyles(isActive('/main/updates'))}
           >
-            <ListItemIcon sx={{ color: isActive('/main/edit') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+            <ListItemIcon sx={{ color: isActive('/main/updates') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
               <Newspaper />
             </ListItemIcon>
             {open && <ListItemText primary="News and Updates" />}
@@ -153,9 +153,9 @@ const Sidebar = ({
         <Tooltip title={!open ? "Census" : ""} placement="right">
           <ListItem 
             onClick={() => handleItemClick('/main/survey')}
-            sx={listItemStyles(isActive('/main/survey'))}
+            sx={listItemStyles(isActive('/main/survey') || isActive('/main/manage-survey'))}
           >
-            <ListItemIcon sx={{ color: isActive('/main/survey') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+            <ListItemIcon sx={{ color: isActive('/main/survey') || isActive('/main/manage-survey') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
               <Assignment />
             </ListItemIcon>
             {open && <ListItemText primary="Census" />}

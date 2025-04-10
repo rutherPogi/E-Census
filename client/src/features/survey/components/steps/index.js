@@ -1,5 +1,3 @@
-export { default as Affiliation } from './Affiliation';
-export { default as Affiliation2 } from './Affiliation2';
 export { default as AppliancesOwn } from './AppliancesOwn';
 export { default as Amenities } from './Amenities';
 export { default as CommunityIssue } from './CommunityIssue';
@@ -16,11 +14,10 @@ export { default as HouseInfo } from './HouseInfo';
 export { default as HouseInfo2 } from './HouseInfo2';
 export { default as Livestock } from './Livestock';
 export { default as MonthlyExpenses } from './MonthlyExpenses';
-export { default as NonIvatan } from './NonIvatan';
-export { default as NonIvatan2 } from './NonIvatan2';
 export { default as ServiceAvailed } from './ServiceAvailed';
 export { default as ServiceAvailed2 } from './ServiceAvailed2';
 export { default as WaterInfo } from './WaterInfo';
 
+export { default as ViewSurvey } from './ViewSurvey';
 export { default as DisplaySurvey } from './DisplaySurvey';
 export { default as SurveyDetails } from './SurveyDetails';

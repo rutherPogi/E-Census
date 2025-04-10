@@ -1,6 +1,7 @@
 // controllers/surveyController.js - Survey submission logic
 import pool from '../config/database.js';
 import * as surveyModel from '../models/surveyModel.js';
+import * as updateSurveyModel from '../models/updateSurveyModel.js';
 
 export const getNewSurveyId = async (req, res) => {
   const connection = await pool.getConnection();
@@ -34,84 +35,106 @@ export const submitSurvey = async (req, res) => {
     // Parse the surveyData JSON string
     const surveyData = JSON.parse(req.body.surveyData);
     const surveyID = surveyData.surveyData.surveyID;
-
+    const populationID = `P${surveyID}`;
     
-    // 1. Insert Survey Data
-    console.log("Step 1");
+    console.log("Inserting Survey Details");
     await surveyModel.createSurvey(surveyData.surveyData, connection);
-    
-    // 2. Insert Family Members
-    console.log("Step 2");
-    await surveyModel.addFamilyMembers(surveyID, surveyData.familyMembers, connection);
-    
-    // 3. Insert Expenses
-    console.log("Step 3");
-    await surveyModel.addExpenses(
-      surveyID, 
-      surveyData.foodExpenses, surveyData.educationExpenses,
-      surveyData.familyExpenses, surveyData.monthlyExpenses,
-      connection
-    );
 
-    const houseImageBuffer = req.file ? req.file.buffer : null;
-    console.log("Image buffer size:", req.file ? req.file.buffer.length : 0);
-
-    // 4. Insert House Info
-    console.log("Step 4");
-    await surveyModel.addHouseInfo(
-      surveyID, 
-      surveyData.houseInfo, 
-      houseImageBuffer,
-      connection
-    );
+    console.log("Inserting Household");
+    await surveyModel.addHousehold(surveyData.surveyData, connection);
     
-    // 5. Insert Water Info
-    console.log("Step 5");
-    await surveyModel.addWaterInfo(surveyID, surveyData.water, connection);
 
-    // 6. Insert Livestock
-    console.log("Step 6");
+    // POPULATION
+    console.log("Inserting Population");
+    await surveyModel.addPopulation(populationID, surveyID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Personal Info");
+    await surveyModel.addPersonalInfo(populationID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Professional Info");
+    await surveyModel.addProfessionalInfo(populationID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Contact Info");
+    await surveyModel.addContactInfo(populationID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Affiliation");
+    await surveyModel.addGovernmentAffiliation(populationID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Ipula/Non-Ivatan");
+    await surveyModel.addNonIvatan(populationID, surveyData.familyMembers, connection);
+
+
+    // EXPENSES
+    console.log("Inserting Food Expenses");
+    await surveyModel.addFoodExpenses(surveyID, surveyData.foodExpenses, connection);
+
+    console.log("Inserting Education Expenses");
+    await surveyModel.addEducationExpenses(surveyID, surveyData.educationExpenses, connection);
+
+    console.log("Inserting Family Expenses");
+    await surveyModel.addFamilyExpenses(surveyID, surveyData.familyExpenses, connection);
+
+    console.log("Inserting Monthly Expenses");
+    await surveyModel.addMonthlyExpenses(surveyID, surveyData.monthlyExpenses, connection);
+    
+
+    console.log("Inserting House Info");
+    await surveyModel.addHouseInfo(surveyID, surveyData.houseInfo, surveyData.houseLocation, connection);
+
+    console.log("Inserting House Images");
+
+    if (req.files && req.files.length > 0) {
+
+      console.log(`Processing ${req.files.length} uploaded images`);
+      
+      // Get image titles from the form data
+      const imageTitles = surveyData.houseInfo.houseImages?.map(img => img.title) || [];
+      
+      // Process each image
+      for (let i = 0; i < req.files.length; i++) {
+        const imageFile = req.files[i];
+        const imageTitle = i < imageTitles.length ? imageTitles[i] : `House Image ${i+1}`;
+        
+        await surveyModel.addHouseImage(
+          surveyID,
+          imageTitle,
+          imageFile.buffer,
+          connection
+        );
+      }
+    } else {
+      console.log("No images to process");
+    }
+    
+    console.log("Inserting Water Info");
+    await surveyModel.addWaterInfo(surveyID, surveyData.waterInfo, connection);
+
+    console.log("Inserting Livestock");
     await surveyModel.addLivestock(surveyID, surveyData.livestock, connection);
 
-    // 7. Insert FarmLots
-    console.log("Step 7");
+    console.log("Inserting FarmLots");
     await surveyModel.addFarmlots(surveyID, surveyData.farmlots, connection);
 
-    // 8. Insert Crops Planted
-    console.log("Step 8");
+    console.log("Inserting Crops Planted");
     await surveyModel.addCropsPlanted(surveyID, surveyData.cropsPlanted, connection);
 
-    // 9. Insert Fruit Bearing Tree
-    console.log("Step 9");
+    console.log("Inserting Fruit Bearing Tree");
     await surveyModel.addFruitBearingTree(surveyID, surveyData.fruitBearingTree, connection);
 
-    // 10. Insert Family Resources
-    console.log("Step 10");
+    console.log("Inserting Family Resources");
     await surveyModel.addFamilyResources(surveyID, surveyData.familyResources, connection);
 
-    // 11. Insert Appliances Own
-    console.log("Step 11");
+    console.log("Inserting Appliances Own");
     await surveyModel.addAppliancesOwn(surveyID, surveyData.appliancesOwn, connection);
 
-    // 12. Insert Other Amenities
-    console.log("Step 12");
+    console.log("Inserting Amenities Own");
     await surveyModel.addAmenities(surveyID, surveyData.amenitiesOwn, connection);
 
-    // 13. Insert Community Issues
-    console.log("Step 13");
+    console.log("Inserting Community Issues");
     await surveyModel.addCommunityIssues(surveyID, surveyData.communityIssues, connection);
 
-    // 14. Insert Assistance/Service Availed
-    console.log("Step 14");
+    console.log("Inserting Service Availed");
     await surveyModel.addServiceAvailed(surveyID, surveyData.serviceAvailed, connection);
-
-    // 15. Insert Government Affiliation
-    console.log("Step 15");
-    await surveyModel.addGovernmentAffiliation(surveyID, surveyData.affiliation, connection);
-
-    // 16. Insert IPULA / Non-Ivatan
-    console.log("Step 16");
-    await surveyModel.addNonIvatan(surveyID, surveyData.nonIvatan, connection);
 
 
     await connection.commit();
@@ -126,12 +149,287 @@ export const submitSurvey = async (req, res) => {
     console.error('Error submitting survey:', {
       message: error.message,
       stack: error.stack,
-      requestBody: JSON.stringify(req.body, null, 2)
+      //requestBody: JSON.stringify(req.body, null, 2)
     });
 
     res.status(500).json({ 
       success: false, 
       message: 'Error submitting survey', 
+      error: error.message,
+      details: error.stack
+    });
+
+  } finally {
+    connection.release();
+  }
+};
+
+export const updateSurvey = async (req, res) => {
+  const connection = await pool.getConnection();
+  
+  try {
+    await connection.beginTransaction();
+
+    const surveyData = JSON.parse(req.body.surveyData);
+    console.log('SURVEY DATA:', surveyData);
+    const surveyID = surveyData.surveyData.surveyID;
+    const householdID = surveyData.surveyData.householdID;
+    const populationID = `P${surveyID}`;
+    const foodExpensesID = surveyData.foodExpenses.foodExpensesID;
+    const educationExpensesID = surveyData.educationExpenses.educationExpensesID;
+    const familyExpensesID = surveyData.familyExpenses.familyExpensesID;
+    const monthlyExpensesID = surveyData.monthlyExpenses.monthlyExpensesID;
+    const houseInfoID = surveyData.houseLocation.houseInfoID;
+    const hasHouseImageID = surveyData.houseInfo?.houseImages?.some(img => img.houseImageID != null);
+    const waterInfoID = surveyData.waterInfo.waterInfoID;
+    const farmlotID = surveyData.farmlots.farmlotID;
+    const communityIssuesID = surveyData.communityIssues.communityIssuesID;
+
+    const isCreating = (IDtype, tableName) => surveyData[tableName].every(
+      member => member[IDtype] === null || member[IDtype] === undefined
+    );
+    
+
+
+    console.log("Updating Survey Details");
+    await updateSurveyModel.updateSurvey(surveyData.surveyData, connection);
+
+
+    if(householdID === null || householdID === undefined) {
+      console.log("Creating Household");
+      await surveyModel.addHousehold(surveyData.surveyData, connection);
+    } else {
+      console.log("Updating Household");
+      await updateSurveyModel.updateHousehold(surveyData.surveyData, connection);
+    }
+
+    
+    console.log("Creating Population");
+
+    if(isCreating('populationID', 'familyMembers')) {
+      console.log("Creating Population");
+      await surveyModel.addPopulation(populationID, surveyID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Population");
+      await updateSurveyModel.updatePopulation(surveyData.familyMembers, connection);
+    }
+    
+
+    if(isCreating('personalInfoID', 'familyMembers')) {
+      console.log("Creating Personal Info");
+      await surveyModel.addPersonalInfo(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Personal Info");
+      await updateSurveyModel.updatePersonalInfo(surveyData.familyMembers, connection);
+    }
+
+    if(isCreating('professionalInfoID', 'familyMembers')) {
+      console.log("Creating Professional Info");
+      await surveyModel.addProfessionalInfo(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Professional Info");
+      await updateSurveyModel.updateProfessionalInfo(surveyData.familyMembers, connection);
+    }
+
+    if(isCreating('contactInfoID', 'familyMembers')) {
+      console.log("Creating Contact Info");
+      await surveyModel.addContactInfo(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Contact Info");
+      await updateSurveyModel.updateContactInfo(surveyData.familyMembers, connection);
+    }
+
+    if(isCreating('governmentAffiliationID', 'familyMembers')) {
+      console.log("Creating Government Affiliation");
+      await surveyModel.addGovernmentAffiliation(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Government Affiliation");
+      await updateSurveyModel.updateGovernmentAffiliation(surveyData.familyMembers, connection);
+    }
+
+    if(isCreating('nonIvatanID', 'familyMembers')) {
+      console.log("Creating Ipula/Non-Ivatan");
+      await surveyModel.addNonIvatan(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Ipula/Non-Ivatan");
+      await updateSurveyModel.updateNonIvatan(surveyData.familyMembers, connection);
+    }
+
+    
+    if(foodExpensesID === null || foodExpensesID === undefined) {
+      console.log("Creating Food Expenses");
+      await surveyModel.addFoodExpenses(surveyID, surveyData.foodExpenses, connection);
+    } else {
+      console.log("Updating Food Expenses");
+      await updateSurveyModel.updateFoodExpenses(surveyID, surveyData.foodExpenses, connection);
+    }
+
+    if(educationExpensesID === null || educationExpensesID === undefined) {
+      console.log("Creating Education Expenses");
+      await surveyModel.addEducationExpenses(surveyID, surveyData.educationExpenses, connection);
+    } else {
+      console.log("Updating Education Expenses");
+      await updateSurveyModel.updateEducationExpenses(surveyID, surveyData.educationExpenses, connection);
+    }
+
+    if(familyExpensesID === null || familyExpensesID === undefined) {
+      console.log("Creating Family Expenses");
+      await surveyModel.addFamilyExpenses(surveyID, surveyData.familyExpenses, connection);
+    } else {
+      console.log("Updating Family Expenses");
+      await updateSurveyModel.updateFamilyExpenses(surveyID, surveyData.familyExpenses, connection);
+    }
+
+    if(monthlyExpensesID === null || monthlyExpensesID === undefined) {
+      console.log("Creating Monthly Expenses");
+      await surveyModel.addMonthlyExpenses(surveyID, surveyData.monthlyExpenses, connection);
+    } else {
+      console.log("Updating Monthly Expenses");
+      await updateSurveyModel.updateMonthlyExpenses(surveyID, surveyData.monthlyExpenses, connection);
+    }
+
+    if(houseInfoID === null || houseInfoID === undefined) {
+      console.log("Creating House Info");
+      await surveyModel.addHouseInfo(surveyID, surveyData.houseInfo, surveyData.houseLocation, connection);
+    } else {
+      console.log("Updating House Info");
+      await updateSurveyModel.updateHouseInfo(surveyData.houseInfo, surveyData.houseLocation, connection);
+    }
+    
+
+    if(req.files && req.files.length > 0) {
+
+      console.log(`Processing ${req.files.length} uploaded images`);
+
+      const newImageTitles = surveyData.houseInfo.houseImages
+        ?.filter(img => !img.houseImageID)
+        ?.map(img => img.title) || [];
+      
+      // Process each image
+      for (let i = 0; i < req.files.length; i++) {
+        const imageFile = req.files[i];
+        const imageTitle = i < newImageTitles.length ? newImageTitles[i] : `House Image ${i+1}`;
+        
+        await surveyModel.addHouseImage(
+          surveyID,
+          imageTitle,
+          imageFile.buffer,
+          connection
+        );
+      }
+    } else {
+      console.log("No images to process");
+    }
+    
+    if(hasHouseImageID) {
+      console.log("Updating House Image");
+      await updateSurveyModel.updateHouseImage(surveyData.houseInfo, surveyData.houseLocation, connection);
+    }
+
+    if(waterInfoID === null || waterInfoID === undefined) {
+      console.log("Creating Water Info");
+      await surveyModel.addWaterInfo(surveyID, surveyData.waterInfo, connection);
+    } else {
+      console.log("Updating Water Info");
+      await updateSurveyModel.updateWaterInfo(surveyID, surveyData.waterInfo, connection);
+    }
+
+    if(farmlotID === null || farmlotID === undefined) {
+      console.log("Creating Farmlots");
+      await surveyModel.addFarmlots(surveyID, surveyData.farmlots, connection);
+    } else {
+      console.log("Updating Farmlots");
+      await updateSurveyModel.updateFarmlots(surveyID, surveyData.farmlots, connection);
+    }
+
+    if(communityIssuesID === null || communityIssuesID === undefined) {
+      console.log("Creating Community Issues");
+      await surveyModel.addCommunityIssues(surveyID, surveyData.communityIssues, connection);
+    } else {
+      console.log("Updating Community Issues");
+      await updateSurveyModel.updateCommunityIssues(surveyID, surveyData.communityIssues, connection);
+    }
+
+    if(isCreating('serviceAvailedID', 'serviceAvailed')) {
+      console.log("Creating Service Availed");
+      await surveyModel.addServiceAvailed(surveyID, surveyData.serviceAvailed, connection);
+    } else {
+      console.log("Updating Service Availed");
+      await updateSurveyModel.updateServiceAvailed(surveyID, surveyData.serviceAvailed, connection);
+    }
+
+    const isCreatingObject = (IDtype, tableName) =>
+      Object.values(surveyData[tableName]).every(
+        member => member[IDtype] === null || member[IDtype] === undefined
+      );
+
+    if(isCreatingObject('livestockID', 'livestock')) {
+      console.log("Creating Livestock");
+      await surveyModel.addLivestock(surveyID, surveyData.livestock, connection);
+    } else {
+      console.log("Updating Livestock");
+      await updateSurveyModel.updateLivestock(surveyID, surveyData.livestock, connection);
+    }
+
+    if(!surveyData.cropsPlanted) {
+      console.log("Creating CropsPlanted");
+      await surveyModel.addCropsPlanted(surveyID, surveyData.cropsPlanted, connection);
+    } else {
+      console.log("Updating CropsPlanted");
+      await updateSurveyModel.updateCropsPlanted(surveyID, surveyData.cropsPlanted, connection);
+    }
+
+    if(!surveyData.fruitBearingTree) {
+      console.log("Creating FruitBearingTree");
+      await surveyModel.addFruitBearingTree(surveyID, surveyData.fruitBearingTree, connection);
+    } else {
+      console.log("Updating FruitBearingTree");
+      await updateSurveyModel.updateFruitBearingTree(surveyID, surveyData.fruitBearingTree, connection);
+    }
+
+    if(!surveyData.familyResources) {
+      console.log("Creating FamilyResources");
+      await surveyModel.addFamilyResources(surveyID, surveyData.familyResources, connection);
+    } else {
+      console.log("Updating FamilyResources");
+      await updateSurveyModel.updateFamilyResources(surveyID, surveyData.familyResources, connection);
+    }
+    
+    if(!surveyData.appliancesOwn) {
+      console.log("Creating AppliancesOwn");
+      await surveyModel.addAppliancesOwn(surveyID, surveyData.appliancesOwn, connection);
+    } else {
+      console.log("Updating AppliancesOwn");
+      await updateSurveyModel.updateAppliancesOwn(surveyID, surveyData.appliancesOwn, connection);
+    }
+
+    if(!surveyData.amenitiesOwn) {
+      console.log("Creating Amenities");
+      await surveyModel.addAmenities(surveyID, surveyData.amenitiesOwn, connection);
+    } else {
+      console.log("Updating Amenities");
+      await updateSurveyModel.updateAmenities(surveyID, surveyData.amenitiesOwn, connection);
+    }
+
+
+    await connection.commit();
+    res.status(200).json({ 
+      success: true, 
+      message: 'Survey updated successfully',
+      surveyID 
+    });
+
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error updating survey:', {
+      message: error.message,
+      stack: error.stack,
+      //requestBody: JSON.stringify(req.body, null, 2)
+    });
+
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error updating survey', 
       error: error.message,
       details: error.stack
     });
@@ -148,9 +446,10 @@ export const manageSurvey = async (req, res) => {
         sr.surveyID,
         sr.respondent,
         sr.interviewer,
-        sr.surveyDate
+        sr.surveyDate,
+        sr.barangay
       FROM 
-        SurveyResponses sr
+        Surveys sr
       ORDER BY 
         sr.surveyDate DESC
     `);
@@ -172,17 +471,135 @@ export const viewSurvey = async (req, res) => {
 
   try {
 
-    // 1. Get Survey Responses
+    console.log('Retrieving Surveys');
     const [surveyResponses] = await connection.query(`
-      SELECT * FROM SurveyResponses WHERE surveyID = ?
+      SELECT 
+        s.surveyID,
+        s.respondent,
+        s.interviewer,
+        s.surveyDate,
+        s.barangay,
+        s.municipality,
+        h.householdID,
+        h.familyClass,
+        h.monthlyIncome,
+        h.irregularIncome,
+        h.familyIncome
+      FROM Surveys s
+      LEFT JOIN Households h ON s.surveyID = h.surveyID
+      WHERE s.surveyID = ?
     `, [surveyID]);
 
-    // 2. Get House Information
-    const [rows] = await connection.query(`
+    console.log('Retrieving Population');
+    const [familyProfile] = await connection.query(`
+      SELECT 
+        p.populationID,
+        p.surveyID,
+        p.philhealthNumber,
+        p.healthStatus,
+        p.remarks,
+        p.isOSY,
+        p.inSchool,
+        p.outOfTown,
+        p.isOFW,
+        p.isPWD,
+        p.isSoloParent,
+
+        pi.personalInfoID,
+        pi.firstName,
+        pi.middleName,
+        pi.lastName,
+        pi.suffix,
+        pi.birthdate,
+        pi.age,
+        pi.sex,
+        pi.birthplace,
+        pi.religion,
+        pi.civilStatus,
+        pi.relationToFamilyHead,
+
+        prof.professionalInfoID,
+        prof.educationalAttainment,
+        prof.skills,
+        prof.occupation,
+        prof.company,
+        prof.employmentStatus,
+        prof.employmentCategory,
+        prof.employmentType,
+        prof.monthlyIncome,
+        prof.annualIncome,
+
+        ci.contactInfoID,
+        ci.street,
+        ci.barangay,
+        ci.municipality,
+        ci.province,
+        ci.region,
+        ci.mobileNumber,
+        ci.landlineNumber,
+        ci.emailAddress,
+
+        ga.governmentAffiliationID,
+        ga.isAffiliated,
+        ga.asOfficer,
+        ga.asMember,
+        ga.organizationAffiliated,
+
+        ni.nonIvatanID,
+        ni.isIpula,
+        ni.settlementDetails,
+        ni.ethnicity,
+        ni.placeOfOrigin,
+        ni.isTransient,
+        ni.houseOwner,
+        ni.isRegistered,
+        ni.dateRegistered
+
+      FROM Population p
+      LEFT JOIN PersonalInformation pi ON p.populationID = pi.populationID
+      LEFT JOIN ProfessionalInformation prof ON p.populationID = prof.populationID
+      LEFT JOIN ContactInformation ci ON p.populationID = ci.populationID
+      LEFT JOIN GovernmentAffiliation ga ON p.populationID = ga.populationID
+      LEFT JOIN NonIvatan ni ON p.populationID = ni.populationID
+
+      WHERE p.surveyID = ?
+    `, [surveyID]);
+
+
+
+    console.log('Retrieving: Food Expenses');
+    const [foodExpenses] = await connection.query(`
+      SELECT * FROM FoodExpenses WHERE surveyID = ?
+    `, [surveyID]);
+
+    console.log('Retrieving: Education Expenses');
+    const [educationExpenses] = await connection.query(`
+      SELECT * FROM EducationExpenses WHERE surveyID = ?
+    `, [surveyID]);
+
+    console.log('Retrieving: Family Expenses');
+    const [familyExpenses] = await connection.query(`
+      SELECT * FROM FamilyExpenses WHERE surveyID = ?
+    `, [surveyID]);
+
+    console.log('Retrieving: Monthly Expenses');
+    const [monthlyExpenses] = await connection.query(`
+      SELECT * FROM MonthlyExpenses WHERE surveyID = ?
+    `, [surveyID]);
+
+
+
+    console.log('Retrieving House Info');
+    const [houseInformation] = await connection.query(`
       SELECT * FROM HouseInformation WHERE surveyID = ?
     `, [surveyID]);
 
-    const houseInformation = rows.map(row => {
+    console.log('Retrieving: House Images');
+    const [rows] = await connection.query(`
+      SELECT * FROM HouseImage WHERE surveyID = ?
+    `, [surveyID]);
+
+    const houseImages = rows.map(row => {
       let processedRow = {...row};
 
       if (row.houseImage) {
@@ -192,95 +609,77 @@ export const viewSurvey = async (req, res) => {
       return processedRow;
     });
 
-    // 3. Get Water Information
+    console.log('Retrieving Water Info');
     const [waterInformation] = await connection.query(`
       SELECT * FROM WaterInformation WHERE surveyID = ?
     `, [surveyID]);
 
-    // 4. Get Farmlots
-    const [farmlots] = await connection.query(`
-      SELECT * FROM Farmlots WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 5. Get Community Issues
-    const [communityIssues] = await connection.query(`
-      SELECT * FROM CommunityIssues WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 2. Get family profile data
-    const [familyProfile] = await connection.query(`
-      SELECT * FROM FamilyProfile WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 3. Get expenses data
-    const [expenses] = await connection.query(`
-      SELECT * FROM Expenses WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 4. Get livestock data
+    console.log('Retrieving Livestock');
     const [livestock] = await connection.query(`
       SELECT * FROM Livestock WHERE surveyID = ?
     `, [surveyID]);
 
-    // 5. Get crops planted data
+    console.log('Retrieving Farm Lots');
+    const [farmlots] = await connection.query(`
+      SELECT * FROM Farmlots WHERE surveyID = ?
+    `, [surveyID]);
+
+    console.log('Retrieving Crops Planted');
     const [cropsPlanted] = await connection.query(`
       SELECT * FROM CropsPlanted WHERE surveyID = ?
     `, [surveyID]);
 
-    // 6. Get fruit bearing tree data
+    console.log('Retrieving Fruit Bearing Tree');
     const [fruitBearingTree] = await connection.query(`
       SELECT * FROM FruitBearingTree WHERE surveyID = ?
     `, [surveyID]);
 
-    // 7. Get family resources data
+    console.log('Retrieving Family Resources');
     const [familyResources] = await connection.query(`
       SELECT * FROM FamilyResources WHERE surveyID = ?
     `, [surveyID]);
 
-    // 8. Get appliances own data
+    console.log('Retrieving Appliances');
     const [appliancesOwn] = await connection.query(`
       SELECT * FROM AppliancesOwn WHERE surveyID = ?
     `, [surveyID]);
 
-    // 9. Get amenities data
+    console.log('Retrieving Amenities');
     const [amenities] = await connection.query(`
       SELECT * FROM Amenities WHERE surveyID = ?
     `, [surveyID]);
 
-    // 10. Get service availed data
+    console.log('Retrieving Issues');
+    const [communityIssues] = await connection.query(`
+      SELECT * FROM CommunityIssues WHERE surveyID = ?
+    `, [surveyID]);
+
+    console.log('Retrieving Service Availed');
     const [serviceAvailed] = await connection.query(`
       SELECT * FROM ServiceAvailed WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 11. Get government affiliation data
-    const [governmentAffiliation] = await connection.query(`
-      SELECT * FROM GovernmentAffiliation WHERE surveyID = ?
-    `, [surveyID]);
-
-    // 12. Get non-Ivatan data
-    const [nonIvatan] = await connection.query(`
-      SELECT * FROM NonIvatan WHERE surveyID = ?
     `, [surveyID]);
 
 
 
     res.status(200).json({
       surveyResponses,
+      familyProfile,
+      foodExpenses,
+      educationExpenses,
+      familyExpenses,
+      monthlyExpenses,
       houseInformation,
+      houseImages,
       waterInformation,
       farmlots,
       communityIssues, 
-      familyProfile,
-      expenses,
       livestock,
       cropsPlanted,
       fruitBearingTree,
       familyResources,
       appliancesOwn,
       amenities,
-      serviceAvailed,
-      governmentAffiliation,
-      nonIvatan
+      serviceAvailed
     });
 
   } catch (error) {
@@ -298,30 +697,41 @@ export const viewSurvey = async (req, res) => {
 export const deleteSurvey = async (req, res) => {
   const connection = await pool.getConnection();
   const surveyID = req.params.surveyID;
-
+  console.log(req.params)
   try {
     await connection.beginTransaction();
-    
-    // Delete from all related tables in reverse order of creation
-    // This avoids foreign key constraint issues
-    await connection.query('DELETE FROM NonIvatan WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM GovernmentAffiliation WHERE surveyID = ?', [surveyID]);
+
     await connection.query('DELETE FROM ServiceAvailed WHERE surveyID = ?', [surveyID]);
+
     await connection.query('DELETE FROM Amenities WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM AppliancesOwn WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM FamilyResources WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM FruitBearingTree WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM CropsPlanted WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM Farmlots WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM Livestock WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM WaterInformation WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM HouseInformation WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM Expenses WHERE surveyID = ?', [surveyID]);
-    await connection.query('DELETE FROM FamilyProfile WHERE surveyID = ?', [surveyID]);
+
+    await connection.query('DELETE FROM Farmlots WHERE surveyID = ?', [surveyID]);
     await connection.query('DELETE FROM CommunityIssues WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM WaterInformation WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM HouseImage WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM HouseInformation WHERE surveyID = ?', [surveyID]);
+
+    await connection.query('DELETE FROM MonthlyExpenses WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM FamilyExpenses WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM EducationExpenses WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM FoodExpenses WHERE surveyID = ?', [surveyID]);
     
-    // Finally delete the main survey record
-    await connection.query('DELETE FROM SurveyResponses WHERE surveyID = ?', [surveyID]);
+
+    await connection.query('DELETE FROM NonIvatan WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM GovernmentAffiliation WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM ContactInformation WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM ProfessionalInformation WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM ProfessionalInformation WHERE surveyID = ?', [surveyID]);
+    await connection.query('DELETE FROM Population WHERE surveyID = ?', [surveyID]);
+    
+    await connection.query('DELETE FROM Households WHERE surveyID = ?', [surveyID]);
+
+    await connection.query('DELETE FROM Surveys WHERE surveyID = ?', [surveyID]);
     
     await connection.commit();
     

@@ -17,7 +17,12 @@ const initialFormData = {
 }; 
 
 export function FormProvider({ children }) {
+
   const [formData, setFormData] = useState(initialFormData);
+
+  const setEntireFormData = (newFormData) => {
+    setFormData(newFormData);
+  };
 
   const updateFormData = (section, data) => {
     setFormData(prev => ({
@@ -53,7 +58,8 @@ export function FormProvider({ children }) {
     updateFormData,
     addItem,
     updateItem,
-    clearFormData
+    clearFormData,
+    setEntireFormData,
   };
 
   return (

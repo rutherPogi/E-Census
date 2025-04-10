@@ -8,6 +8,7 @@ import { getImageSource } from '../../hooks/getImageSource';
 
 const HouseDetailsDialog = ({ open, onClose, selectedHouse }) => {
 
+  console.log('SELECTED HOUSE', selectedHouse);
   if (!selectedHouse) return null;
 
   return (

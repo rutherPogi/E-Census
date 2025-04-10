@@ -1,12 +1,11 @@
+import { useEffect } from "react";
 
-import { useState, useEffect } from "react";
-import { Button } from '@mui/material';
+import { AMENITY_TYPES } from "../../utils/initialValues";
+import { FormButtons } from '../../../../components/common';
+import { NumberInput } from "../../../../components/common/FormFields";
 
-import { useFormContext } from "../../pages/FormContext";
-import { NumberInput } from "../others/FormFields"
-import { AMENITY_TYPES } from "../../utils/constants";
-import { formatCurrency } from "../../utils/formatter";
-import { Notification } from '../../../../components/common/Notification'
+import { useFormContext } from '../../pages/FormContext';
+import { useFormValidation } from '../../hooks/useFormValidation';
 
 
 
@@ -15,27 +14,19 @@ export default function Amenities({ handleBack, handleNext }) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
-
-  const [values, setValues] = useState(() => {
+  const initialValues = () => {
     const existingData = formData.amenitiesOwn?.amenities || {};
-    return Object.fromEntries(AMENITY_TYPES.map(type => [
-      type, 
-      existingData[type] || ''
-    ]));
-  }); 
+    return Object.fromEntries(
+      AMENITY_TYPES.map(type => [ type, existingData[type] || '' ])
+    );
+  }; 
 
-  const [errors, setErrors] = useState(
-    Object.fromEntries(AMENITY_TYPES.map(type => [type, false]))
-  );
-
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
+  const {
+    values,
+    setValues,
+    errors,
+    handleNumChange,
+  } = useFormValidation(initialValues);
 
   useEffect(() => {
     if (formData.amenitiesOwn) {
@@ -43,52 +34,8 @@ export default function Amenities({ handleBack, handleNext }) {
     }
   }, [formData.amenitiesOwn]);
 
-
-  const handleChange = (field) => (e) => {
-    const value = e.target.value;
-    const plainNumber = value.replace(/,/g, '');
-    
-    if (!/^\d*$/.test(plainNumber)) {
-      setErrors(prev => ({ ...prev, [field]: 'Please enter numbers only' }));
-      return;
-    }
-    
-    if (Number(plainNumber) > 999) {
-      setErrors(prev => ({ ...prev, [field]: 'Total area cannot exceed 999' }));
-      return;
-    }
-
-    setErrors(prev => ({ ...prev, [field]: false }));
-    
-    setValues(prevValues => {
-      const updatedValues = { ...prevValues, [field]: formatCurrency(plainNumber)};
-      return updatedValues;
-    });
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    const hasValue = Object.values(values).some(val => {
-      if (!val || val === '') return false;
-      const numValue = parseFloat(String(val).replace(/,/g, ''));
-      return numValue > 0;
-    });
-
-    if (!hasValue) { isValid = false; }
-
-    setErrors(prev => ({ ...prev, ...newErrors }));
-    return isValid;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      showNotification("Please fill in at least one!", 'error');
-      return;
-    }
 
     const processedValues = { ...values };
     
@@ -100,7 +47,7 @@ export default function Amenities({ handleBack, handleNext }) {
     });
 
     updateFormData('amenitiesOwn', { amenities: processedValues });
-    console.log("Current Form Values:", processedValues);
+    console.log("AMENITIES OWN:", processedValues);
 
     handleNext();
   };
@@ -114,23 +61,17 @@ export default function Amenities({ handleBack, handleNext }) {
             key={field}
             label={field}
             value={values[field]}
-            onChange={handleChange(field)}
+            onChange={handleNumChange(field)}
             error={errors[field]}
             helperText={errors[field] || `No. of ${field} own`}
           />
         ))}
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div>     
-      </div>
-      <Notification
-        snackbarMessage={snackbarMessage} 
-        snackbarOpen={snackbarOpen} 
-        setSnackbarOpen={setSnackbarOpen} 
-        severity={severity}
+      <FormButtons 
+        onBack={handleBack}
+        onNext={handleSubmit}
+        backLabel="Back"
+        nextLabel="Next"
       />
     </div>
   );

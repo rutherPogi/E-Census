@@ -5,6 +5,16 @@ import pool from '../config/database.js';
 export const getCoordinates = async (req, res) => {
   try {
     const [houseInfo] = await pool.query(`SELECT * FROM HouseInformation`);
+
+    res.status(200).json(houseInfo);
+  } catch (error) {
+    console.error('Error getting House Information:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const getImages = async (req, res) => {
+  try {
     const [rows] = await pool.query(`SELECT * FROM HouseImage`);
 
     const houseImages = rows.map(row => {
@@ -17,12 +27,30 @@ export const getCoordinates = async (req, res) => {
       return processedRow;
     });
 
-    console.log('HOUSE INFO:', houseInfo);
-    console.log('HOUSE IMAGES:', houseImages);
-
-    res.status(200).json({houseInfo, houseImages});
+    res.status(200).json(houseImages);
   } catch (error) {
-    console.error('Error getting House Information:', error);
+    console.error('Error getting House Image:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const getHousehold = async (req, res) => {
+  try {
+    const [household] = await pool.query(`
+      SELECT 
+        pi.populationID, 
+        pi.firstName, 
+        pi.middleName, 
+        pi.lastName, 
+        pi.suffix,
+        pop.surveyID
+      FROM PersonalInformation pi
+      JOIN Population pop 
+        ON pi.populationID = pop.populationID`);
+    console.log('HOUSEHOLD:', household);
+    res.status(200).json(household);
+  } catch (error) {
+    console.error('Error getting Household:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

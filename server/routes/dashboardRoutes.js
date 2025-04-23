@@ -5,7 +5,7 @@ import { authenticateToken } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.get('/getTotal', dashboardController.getTotal);
-
+router.get('/barangayStats', dashboardController.getBarangayStats);
 
 
 

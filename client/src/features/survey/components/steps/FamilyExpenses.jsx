@@ -42,7 +42,7 @@ export default function FamilyExpenses({ handleBack, handleNext }) {
       familyTotal: total,
       familyExpensesID: formData.familyExpenses.familyExpensesID
     });
-    console.log('FAMILY EXPENSES: ', formData.familyExpenses);
+    console.log('FAMILY EXPENSES: ', processedValues);
     handleNext();
   };
   

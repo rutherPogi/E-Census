@@ -6,8 +6,9 @@ import { uploadToMemory, processImageForDatabase } from '../middlewares/multer.j
 
 const router = express.Router();
 
-router.get('/generate-seniorCitizenID', authenticateToken, seniorCitizenIDControllers.getNewSeniorCitizenId);
-router.post('/submit-seniorCitizenID',     
+router.get('/generate', authenticateToken, seniorCitizenIDControllers.getNewSeniorCitizenId);
+
+router.post('/submit',     
   authenticateToken,
   uploadToMemory.fields([
     { name: 'photoID', maxCount: 1 },
@@ -16,6 +17,25 @@ router.post('/submit-seniorCitizenID',
   processImageForDatabase, 
   seniorCitizenIDControllers.submitSeniorCitizenID
 );
-router.get('/manage-seniorCitizenID', authenticateToken, seniorCitizenIDControllers.manageSeniorCitizenId);
+
+router.put('/update',     
+  authenticateToken,
+  uploadToMemory.fields([
+    { name: 'photoID', maxCount: 1 },
+    { name: 'signature', maxCount: 1 }
+  ]), 
+  processImageForDatabase, 
+  seniorCitizenIDControllers.updateSeniorCitizenID
+);
+
+router.get('/list', authenticateToken, seniorCitizenIDControllers.manageSeniorCitizenId);
+
+router.get('/view/:scApplicationID', authenticateToken, seniorCitizenIDControllers.viewApplication);
+
+router.delete('/delete/:scApplicationID', authenticateToken, seniorCitizenIDControllers.deleteApplication);
+
+router.get('/get-personal-info/:populationID', authenticateToken, seniorCitizenIDControllers.getPersonDetails);
+
+router.post('/find', authenticateToken, seniorCitizenIDControllers.findID);
 
 export default router; 

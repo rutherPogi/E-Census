@@ -4,8 +4,8 @@ import { Button, Box } from "@mui/material";
 
 
 import { useFormContext } from "../others/FormContext";
-import IDFront from "../others/IDFront";
-import IDBack from "../others/IDBack";
+import IDFront from "../others/IDCardSection/IDFront";
+import IDBack from "../others/IDCardSection/IDBack";
 
 
 

@@ -7,7 +7,9 @@ export const FormButtons = ({
   onNext, 
   backLabel = 'Cancel', 
   nextLabel = 'Next', 
-  disabled = false
+  backDisabled = false,
+  nextDisabled = false
+
 }) => {
   return (
     <div className='form-buttons'>
@@ -16,7 +18,7 @@ export const FormButtons = ({
           variant='outlined' 
           onClick={onBack} 
           sx={{ width: '100%' }}
-          disabled={disabled}
+          disabled={backDisabled}
         >
           {backLabel}
         </Button>
@@ -24,7 +26,7 @@ export const FormButtons = ({
           variant='contained' 
           onClick={onNext} 
           sx={{ width: '100%' }}
-          disabled={disabled}
+          disabled={nextDisabled}
         >
           {nextLabel}
         </Button>

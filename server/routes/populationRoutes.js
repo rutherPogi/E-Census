@@ -7,6 +7,6 @@ import { authenticateToken } from '../middlewares/auth.js';
 const router = express.Router();
 
 
-router.get('/manage-population', authenticateToken, populationController.managePopulation);
+router.get('/get', authenticateToken, populationController.managePopulation);
 
 export default router; 

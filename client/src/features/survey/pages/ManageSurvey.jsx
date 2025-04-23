@@ -9,16 +9,13 @@ import { MANAGE_TABLE_HEADERS } from '../utils/tableHeaders';
 import { get, del } from '../../../utils/api/apiService';
 import { Notification } from '../../../components/common/Notification'
 
+import { useNotification } from '../hooks/useNotification';
 
 
 const ManageSurvey = () => {
 
   const [surveyData, setSurveyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
 
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
@@ -29,16 +26,18 @@ const ManageSurvey = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const showNotification = (message, type) => {
-    setSnackbarMessage(message);
-    setSeverity(type);
-    setSnackbarOpen(true);
-  };
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   const fetchSurveyData = async () => {
     setLoading(true);
     try {
-      const response = await get('/surveys/manage-survey');
+      const response = await get('/surveys/list');
       setSurveyData(response);
       setFilteredData(response);
     } catch (err) {
@@ -56,6 +55,7 @@ const ManageSurvey = () => {
   }, []);
 
   const updateSearchResults = (searchTerm) => {
+
     if (!searchTerm) {
       setFilteredData(surveyData);
       return;
@@ -171,7 +171,7 @@ const ManageSurvey = () => {
   return (
     <div className="responsive-container">
       <div className="responsive-header">SURVEYS</div>
-      <div className='responsive-table'>
+      <div className='responsive-form details'>
         <SearchBar 
           onSearch={updateSearchResults}
           placeholder="Search by respondent, interviewer or ID"

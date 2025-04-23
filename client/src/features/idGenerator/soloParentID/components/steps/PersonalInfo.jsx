@@ -1,123 +1,100 @@
 import { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
-import { Button } from '@mui/material';
-import dayjs from "dayjs";
+import { useParams } from 'react-router-dom';
 
-import { useFormContext } from "../../components/others/FormContext";
-import { CIVIL_STATUS_OPTIONS, SUFFIX_OPTIONS, SEX_OPTIONS, PI_REQUIRED_FIELDS } from '../../utils/constants';
-import { Notification } from "../../../components/Notification";
-import { TextInput, DropdownInput, DateInput } from '../../../../../components/common/FormFields'
-import { RELIGION_OPTIONS } from "../../utils/constants";
+import { Notification, FormButtons } from "../../../../../components/common";
+import { PI_INITIAL_VALUES } from "../../utils/initialValues";
+import { PI_REQUIRED_FIELDS } from "../../utils/requiredFields";
+
+import { useFormContext } from "../others/FormContext";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useTransformData } from "../../hooks/useTransformData";
+
+import { 
+  PersonalDetails,
+  ProfessionalDetails,
+  ContactDetails,
+  Beneficiary,
+  Checkbox,
+  Indigenous,
+  OtherDetails
+ } from '../others/PersonalInfoSection';
 
 
-export default function PersonalInfo({ handleBack, handleNext}) {
 
-  const location = useLocation();
-  const soloParentID = location.state?.soloParentID;
+
+export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
+
+  const { spApplicationID } = useParams();
+
   const { formData, updateFormData } = useFormContext();
+  const { fetchPersonData } = useTransformData();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const [values, setValues] = useState({
-    soloParentID: soloParentID,
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    suffix: '',
-    birthdate: null,
-    age: '',
-    sex: '',
-    birthplace: '',
-    civilStatus: '',
-    religion: '',
-    phylsisNumber: ''
-  }); 
- 
-  const [errors, setErrors] = useState({
-    firstName: false,
-    middleName: false,
-    lastName: false,
-    suffix: false,
-    birthdate: false,
-    sex: false,
-    birthplace: false,
-    civilStatus: false,
-    religion: false,
-    phylsisNumber: false
-  }); 
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+    handleDateChange,
+    handleContactChange,
+    handleIncomeChange
+  } = useFormValidation(
+    PI_INITIAL_VALUES(spApplicationID),
+    true, 
+    PI_REQUIRED_FIELDS
+  );
+
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
+
+  useEffect(() => {
+    if (isRegistered && !initialFetchDone) {
+      console.log('fetching...');
+      fetchPersonData()
+        .then(() => {
+          setInitialFetchDone(true);
+        })
+        .catch(err => {
+          console.error('Error fetching survey data:', err);
+          setInitialFetchDone(true);
+        });
+    }
+  }, [isRegistered, initialFetchDone, fetchPersonData]);
+  
+  useEffect(() => {
+    if (isRegistered && initialFetchDone && formData.personalInfo) {
+      setValues(prev => ({
+        ...prev,
+        ...formData.personalInfo,
+        spApplicationID: spApplicationID,
+      }));
+    }
+  }, [isRegistered, initialFetchDone, formData.personalInfo, spApplicationID]);
 
   useEffect(() => {
     if (formData.personalInfo) {
       setValues(prev => ({
         ...prev,
         ...formData.personalInfo,
-        soloParentID: soloParentID
+        spApplicationID: spApplicationID,
       }));
     }
-  }, [formData.personalInfo, soloParentID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo, spApplicationID]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    PI_REQUIRED_FIELDS.forEach(field => {
-      if (!values[field]) {
-        newErrors[field] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleBirthdateChange = (dateValue) => {
-    if (!dateValue) {
-      setValues({ ...values, birthdate: null, age: '' });
-      return;
-    }
-
-    if (dateValue.isAfter(dayjs())) {
-      setErrors(true);
-      setValues({ ...values, birthdate: dateValue, age: '' });
-      return;
-    }
-
-    setErrors(false);
-    const birthdate = dateValue.toDate(); // Convert dayjs to JavaScript Date
-    const today = new Date();
-    let age = today.getFullYear() - birthdate.getFullYear();
-    
-    // Adjust if the birthday hasn't occurred this year yet
-    const monthDiff = today.getMonth() - birthdate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
-      age--;
-    }
-  
-    setValues({ 
-      ...values, 
-      birthdate: dateValue,
-      age: age >= 0 ? age : '' 
-    });
-  };
-
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
-      
-      return;
+      return showNotification("Please fill in all required fields", 'error');
     }
 
     const processedValues = { ...values };
@@ -125,8 +102,8 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     Object.keys(processedValues).forEach((key) => {
       if (!PI_REQUIRED_FIELDS.includes(key)) {
         const value = processedValues[key];
-        if (value === '' || value === null) {
-          processedValues[key] = 'N/A';
+        if (value === '' || value === undefined) {
+          processedValues[key] = null;
         }
       }
     });
@@ -141,100 +118,59 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     <div className='responsive-container'>
       <div className='responsive-header'>PERSONAL INFORMATION</div>
       <div className='responsive-form'>
-        <TextInput
-          label='First Name'
-          value={values.firstName}
-          onChange={handleChange('firstName')}
-          error={errors.firstName}
-          helperText = {errors.firstName || 'e.g. Juan'}
-          required
+        <PersonalDetails
+          values={values}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          errors={errors}
         />
-        <TextInput
-          label='Middle Name'
-          value={values.middleName}
-          onChange={handleChange('middleName')}
-          error={errors.middleName}
-          helperText = {errors.middleName || 'e.g. Santos'}
+        <ContactDetails
+          values={values}
+          handleChange={handleChange}
+          handleContactChange={handleContactChange}
+          errors={errors}
         />
-        <TextInput
-          label='Last Name'
-          value={values.lastName}
-          onChange={handleChange('lastName')}
-          error={errors.lastName}
-          helperText = {errors.lastName || 'e.g. Dela Cruz'}
-          required
+        <ProfessionalDetails
+          values={values}
+          handleChange={handleChange}
+          handleIncomeChange={handleIncomeChange}
+          errors={errors}
         />
-        <DropdownInput
-          label = 'Suffix'
-          options = {SUFFIX_OPTIONS}
-          value = {values.suffix}
-          onChange = {(e, newValue) => handleChange('suffix')(e, newValue)}
-          error = {errors.suffix} 
-          helperText = {errors.suffix || 'e.g. Jr - Junior'}
+        <OtherDetails
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <DateInput
-          label =  'Birthdate'
-          value =  {values.birthdate}
-          onChange={handleBirthdateChange}
-          error = {errors.birthdate}  
-          helperText =  {errors.birthdate}
-          required
+        <Checkbox
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <TextInput
-          label='Age'
-          value={values.age}
-          disabled
-        />
-        <DropdownInput
-          label = 'Sex'
-          options = {SEX_OPTIONS}
-          value = {values.sex}
-          onChange = {(e, newValue) => handleChange('sex')(e, newValue)}
-          error = {errors.sex} 
-          helperText = {errors.sex || 'e.g. Male'}
-          required
-        />
-        <TextInput
-          label='Place of Birth'
-          value={values.birthplace}
-          onChange={handleChange('birthplace')}
-          error={errors.birthplace}
-          helperText = {errors.birthplace || 'e.g. ---'}
-          required
-        />
-        <DropdownInput
-          label = 'Civil Status'
-          options = {CIVIL_STATUS_OPTIONS}
-          value = {values.civilStatus}
-          onChange = {(e, newValue) => handleChange('civilStatus')(e, newValue)}
-          error = {errors.civilStatus} 
-          helperText = {errors.civilStatus || 'e.g. Single'}
-          required
-        />
-        <DropdownInput
-          label = 'Religion'
-          options = {RELIGION_OPTIONS}
-          value = {values.religion}
-          onChange = {(e, newValue) => handleChange('religion')(e, newValue)}
-          error = {errors.religion} 
-          helperText = {errors.religion || 'e.g. Catholic'}
-          required
-        />
-        <TextInput
-          label='Phylsis Card Number'
-          value={values.phylsisNumber}
-          onChange={handleChange('phylsisNumber')}
-          error={errors.phylsisNumber}
-          helperText = {errors.phylsisNumber || 'e.g. ---'}
-          required
-        />
+
+        {values.isBeneficiary && (
+          <Beneficiary
+            values={values}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        )}
+
+        {values.isIndigenous && (
+          <Indigenous
+            values={values}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        )}
+
+        
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Cancel' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

@@ -6,21 +6,28 @@ import { uploadToMemory, processImageForDatabase } from '../middlewares/multer.j
 
 const router = express.Router();
 
-router.post('/submit-survey', 
+router.get('/generate', authenticateToken, surveyController.newSurveyID);
+
+router.post('/submit', 
   authenticateToken, 
   uploadToMemory.array('houseImages', 10),
   processImageForDatabase,
-  surveyController.submitSurvey);
-router.put('/update-survey', 
+  surveyController.submitSurvey
+);
+
+router.put('/update', 
   authenticateToken, 
   uploadToMemory.array('houseImages', 10),
   processImageForDatabase,
-  surveyController.updateSurvey);
+  surveyController.updateSurvey
+);
 
-router.get('/manage-survey', authenticateToken, surveyController.manageSurvey);
-router.get('/view-survey/:surveyID', authenticateToken, surveyController.viewSurvey);
+router.get('/list', authenticateToken, surveyController.listSurvey);
 
-router.delete('/delete-survey/:surveyID/:populationID', authenticateToken, surveyController.deleteSurvey);
-router.get('/generate-surveyID', authenticateToken, surveyController.getNewSurveyId);
+router.get('/view/:surveyID', authenticateToken, surveyController.viewSurvey);
+
+router.delete('/delete/:surveyID/:populationID', authenticateToken, surveyController.deleteSurvey);
+
+
 
 export default router; 

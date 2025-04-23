@@ -4,73 +4,71 @@ import pool from '../config/database.js';
 import * as userModel from '../models/userModel.js';
 
 export const registerBatch = async (req, res) => {
-  try {
 
-    const { accounts } = req.body;
-    console.log('Accounts', accounts);
-    
-    if (!accounts || !Array.isArray(accounts) || accounts.length === 0) {
-      return res.status(400).json({ error: "Invalid accounts data" });
-    }
-    
-    const results = {
-      success: [],
-      errors: []
-    };
-    
-    // Process each account
-    for (const account of accounts) {
-      try {
-        const { userID, accountName, username, password, position } = account;
-        
-        // Check if user already exists
-        const existingUser = await userModel.findUserByUsername(username);
-        if (existingUser) {
-          results.errors.push({ 
-            username, 
-            error: "Username already exists" 
-          });
-          continue;
-        }
-        
-        // Hash the password
-        const hash = await bcrypt.hash(password, 10);
-        
-        // Save user to database (assuming you'll update your model to include name and position)
-        await userModel.createUser(userID, accountName, username, hash, position);
-        
-        results.success.push(username);
-      } catch (err) {
-        console.error(`Error processing account ${account.username}:`, err);
-        results.errors.push({ 
-          username: account.username, 
-          error: err.message 
-        });
-      }
-    }
-    
-    // Return appropriate response
-    if (results.errors.length === 0) {
-      return res.status(201).json({ 
-        message: `Successfully registered ${results.success.length} accounts`,
-        accounts: results.success
-      });
-    } else if (results.success.length === 0) {
-      return res.status(400).json({ 
-        error: "Failed to register any accounts", 
-        details: results.errors 
-      });
-    } else {
-      return res.status(207).json({
-        message: `Registered ${results.success.length} accounts with ${results.errors.length} failures`,
-        success: results.success,
-        errors: results.errors
-      });
-    }
+  const connection = await pool.getConnection();
+  const accounts = req.body;
+  console.log('Accounts', accounts);
+  // const hash = await bcrypt.hash(password, 10);
+
+  try {
+    const accountsValues = accounts.map(user => [
+      user.userID,
+      user.accountName,
+      user.username,
+      user.password,
+      user.position,
+      user.barangay
+    ]);
+
+    const [result] = await connection.query(
+      `INSERT INTO users (userID, accountName, username, password, position, barangay) 
+       VALUES ?`,
+      [ accountsValues ]
+    );
+
+    return res.status(201).json({ 
+      message: `Accounts Added!`,
+      accounts: result.success
+    });
   } catch (err) {
-    console.error("Error in batch registration:", err);
-    res.status(500).json({ error: "Error processing batch registration", details: err.message });
+    console.error("Error adding accounts:", err);
+    res.status(500).json({ error: "Error adding accounts", details: err.message });
+  } finally {
+    connection.release();
   }
+}
+
+export const addAccount = async (req, res) => {
+
+  const connection = await pool.getConnection();
+  const newAccount = req.body;
+  console.log('NEW ACCOUNT', newAccount);
+  const hash = await bcrypt.hash(newAccount.password, 10);
+
+  try {
+    const [results] = await connection.query(
+      `INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)`,
+      [ newAccount.userID,
+        newAccount.accountName,
+        newAccount.username,
+        hash,
+        newAccount.position,
+        newAccount.barangay
+       ]
+    );
+
+    return res.status(201).json({ 
+      message: `Account Added!`,
+      accounts: results.success
+    });
+  } catch (err) {
+    console.error("Error adding account:", err);
+    res.status(500).json({ error: "Error adding account", details: err.message });
+  } finally {
+    connection.release();
+  }
+  
+
 }
 
 export const login = async (req, res) => {

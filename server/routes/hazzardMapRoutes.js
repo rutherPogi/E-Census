@@ -6,6 +6,8 @@ import { authenticateToken } from '../middlewares/auth.js';
 const router = express.Router();
 
 router.get('/coordinates', authenticateToken, hazzardMapController.getCoordinates);
+router.get('/images', authenticateToken, hazzardMapController.getImages);
+router.get('/household', authenticateToken, hazzardMapController.getHousehold);
 router.get('/hazardAreas', authenticateToken, hazzardMapController.getHazardAreas);
 
 router.post('/hazardAreas', authenticateToken, hazzardMapController.postHazardAreas);

@@ -1,25 +1,57 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Button } from '@mui/material';
 
+import { post, put } from '../../../../../utils/api/apiService';
+
+import { Notification, FormButtons } from "../../../../../components/common";
+import { DisplayInfoSections } from '../others/DisplaySection/DisplaySection';
+
 import { useFormContext } from "../others/FormContext";
-import { post } from '../../../../../utils/api/apiService';
+import { useNotification } from '../../hooks/useNotification';
+import { useTransformData } from "../../hooks/useTransformData";
 
-import { AccomplishedBySection, ContactInfoSection, DisabilityInfoSection, 
-         FamilyBackgroundSection, IDReferenceSection, OrganizationalInfoSection, 
-         OtherInfoSection, PersonalInfoSection, PhotoIDSection, ProfessionalInfoSection, 
-         ReportingUnitSection } from "../../components/others/DisplaySection";
 
-import { Notification } from "../../../../../components/common/Notification";
 
-export default function DisplayPWDInfo({ handleBack, handleNext, handleEdit }) {
+export default function DisplayPWDInfo ({ 
+  handleBack, 
+  handleNext, 
+  handleEdit, 
+  isEditing = false, 
+  isUpdating = false,
+  firstMount = false
+}) {
 
   const navigate = useNavigate();
-  const { formData, clearFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const { pwdApplicationID } = useParams();
+
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
+
+  const { formData, clearFormData } = useFormContext();
+  const { fetchPersonData } = useTransformData(pwdApplicationID, null, true);
+
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
+
+  useEffect(() => {
+    if (isEditing && !initialFetchDone) {
+      console.log('Fetching application data for editing');
+      fetchPersonData()
+        .then(() => {
+          setInitialFetchDone(true);
+        })
+        .catch(err => {
+          console.error('Error fetching application data:', err);
+          setInitialFetchDone(true);
+        });
+    }
+  }, [isEditing, initialFetchDone, fetchPersonData]);
 
 
   const handleSubmit = async (e) => {
@@ -31,30 +63,34 @@ export default function DisplayPWDInfo({ handleBack, handleNext, handleEdit }) {
 
       formDataToSend.append('photoID', formData.pwdMedia.photoID);
       formDataToSend.append('signature', formData.pwdMedia.signature);
-      
-      delete processedFormData.pwdMedia.photoIDPreview;
-      delete processedFormData.pwdMedia.signaturePreview;
 
-      formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-      
-      console.log('Submitting form data:', processedFormData);
+      //delete formData.pwdMedia.photoIDPreview;
 
-      const response = await post('/pwdID/submit-pwdID', formDataToSend, true);
-      
-      if (response.success) {
-        alert('Application submitted successfully!');
-        clearFormData();
-        navigate('/main/survey');
+      if(isUpdating) {
+        console.log('UPDATING...');
+        console.log('APPLICATION DATA:', processedFormData);
+        formDataToSend.append('applicationData', JSON.stringify(processedFormData));
+        await put('/pwdID/update', formDataToSend, true);
+        showNotification('Application UPDATED successfully!', 'success');
+      } else {
+        console.log('SUBMITING...');
+        console.log('APPLICATION DATA:', processedFormData);
+        formDataToSend.append('applicationData', JSON.stringify(processedFormData));
+        await post('/pwdID/submit', formDataToSend, true);
+        showNotification('Application SUBMITTED successfully!', 'success');
       }
+
+      clearFormData();
+      setTimeout(() => navigate('/main/generate-id/pwd'), 1000);
     } catch (error) {
-      console.error('Error submitting survey:', error);
+      console.error('Error submitting application:', error);
         
       if (error.response) {
-        alert(`Server error: ${error.response.data.message || 'Unknown error'}`);
+        showNotification(`Server error: ${error.response.data.message || 'Unknown error'}`);
       } else if (error.request) {
-        alert('No response from server. Please check your connection.');
+        showNotification('No response from server. Please check your connection.');
       } else {
-        alert(`Error preparing request: ${error.message}`);
+        showNotification(`Error preparing request: ${error.message}`);
       }
     }
   };
@@ -69,25 +105,17 @@ export default function DisplayPWDInfo({ handleBack, handleNext, handleEdit }) {
           backgroundColor: '#fff',
           padding: '1em'
       }}>
-        <PhotoIDSection data={formData} handleEdit={handleEdit}/>
-        <PersonalInfoSection data={formData} handleEdit={handleEdit}/>
-        <DisabilityInfoSection data={formData} handleEdit={handleEdit}/>
-        <ContactInfoSection data={formData} handleEdit={handleEdit}/>
-        <ProfessionalInfoSection data={formData} handleEdit={handleEdit}/>
-        <OrganizationalInfoSection data={formData} handleEdit={handleEdit}/>
-        <IDReferenceSection data={formData} handleEdit={handleEdit}/>
-        <FamilyBackgroundSection data={formData} handleEdit={handleEdit}/>
-        <AccomplishedBySection data={formData} handleEdit={handleEdit}/>
-        <OtherInfoSection data={formData} handleEdit={handleEdit}/>
-        <ReportingUnitSection data={formData} handleEdit={handleEdit}/>
+        
+        <DisplayInfoSections formData={formData} handleEdit={handleEdit}/>
         
       </Box>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div>     
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Back' 
+        nextLabel = {isUpdating ? 'Update' : 'Submit'}
+        nextDisabled = { firstMount }
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

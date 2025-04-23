@@ -14,7 +14,7 @@ export const useSurveyData = (surveyID) => {
     if (!surveyID) return;
     
     try {
-      const response = await get(`/surveys/view-survey/${surveyID}`, {
+      const response = await get(`/surveys/view/${surveyID}`, {
         params: { surveyID },
       });
   

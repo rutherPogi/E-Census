@@ -6,8 +6,9 @@ import { uploadToMemory, processImageForDatabase } from '../middlewares/multer.j
 
 const router = express.Router();
 
-router.get('/generate-soloParentID', authenticateToken, soloParentIDControllers.getNewSoloParentId);
-router.post('/submit-soloParentID', 
+router.get('/generate', authenticateToken, soloParentIDControllers.getNewSoloParentId);
+
+router.post('/submit', 
   authenticateToken, 
   uploadToMemory.fields([
     { name: 'photoID', maxCount: 1 },
@@ -17,6 +18,24 @@ router.post('/submit-soloParentID',
   soloParentIDControllers.submitSoloParentID
 );
 
-router.get('/manage-soloParentID', authenticateToken, soloParentIDControllers.manageSoloParentId);
+router.put('/update', 
+  authenticateToken, 
+  uploadToMemory.fields([
+    { name: 'photoID', maxCount: 1 },
+    { name: 'signature', maxCount: 1 }
+  ]), 
+  processImageForDatabase,  
+  soloParentIDControllers.updateSoloParentID
+);
+
+router.get('/list', authenticateToken, soloParentIDControllers.manageSoloParentId);
+
+router.get('/view/:spApplicationID', authenticateToken, soloParentIDControllers.viewApplication);
+
+router.delete('/delete/:spApplicationID', authenticateToken, soloParentIDControllers.deleteApplication);
+
+router.get('/get-personal-info/:populationID', authenticateToken, soloParentIDControllers.getPersonDetails);
+
+router.post('/find', authenticateToken, soloParentIDControllers.findID);
 
 export default router; 

@@ -16,7 +16,7 @@ import { useAuth } from '../../../../utils/auth/authContext'
 
 
 
-export default function SurveyDetails({ handleNext }) {
+export default function SurveyDetails({ handleNext }) { 
 
   const navigate = useNavigate();
   const location = useLocation();

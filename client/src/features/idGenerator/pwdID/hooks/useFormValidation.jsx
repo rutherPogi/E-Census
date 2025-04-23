@@ -2,25 +2,47 @@ import { useState } from "react";
 import { formatters, formatCurrency } from '../utils/formatter'; 
 import dayjs from 'dayjs';
 
+import { AFFILIATION_REQUIRED_FIELDS } from "../utils/requiredFields";
 
 
 export const useFormValidation = (
   initialValues,
   required = false,
-  requiredFields
+  baseRequiredFields
 ) => {
 
   const [values, setValues] = useState(initialValues);
   const [errors, setErrors] = useState({});
+
+  const getRequiredFields = () => {
+    let updatedRequiredFields = [...baseRequiredFields];
+
+    if (values.isAffiliated) {
+      updatedRequiredFields = [...updatedRequiredFields, ...AFFILIATION_REQUIRED_FIELDS];
+    }
+
+    return updatedRequiredFields;
+  };
   
 
 
   const validateForm = () => {
     const newErrors = {};
     let isValid = true;
-
+  
+    if (values.emailAddress && !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(values.emailAddress)) {
+      newErrors.emailAddress = 'Please enter a valid email address';
+      isValid = false;
+    }
+  
+    if (values.landlineNumber && !/^0\d{2}-?\d{3}-?\d{4}$/.test(values.landlineNumber)) {
+      newErrors.landlineNumber = 'Please enter a valid landline number';
+      isValid = false;
+    }
+  
     if(required) {
-
+      const requiredFields = getRequiredFields();
+  
       requiredFields.forEach(key => {
         const value = values[key];
           if (!value) {
@@ -30,7 +52,7 @@ export const useFormValidation = (
           }
       });
     }
-
+  
     setErrors(newErrors);
     return isValid;
   };
@@ -39,7 +61,9 @@ export const useFormValidation = (
   const handleChange = (field) => (e, newValue) => {
     let value;
     
-    if (newValue?.value !== undefined) {
+    if (e === '' && newValue === null) {
+      value = '';
+    } else if (newValue?.value !== undefined) {
       // For dropdown/autocomplete
       value = newValue.value;
     } else if (e.target.type === 'checkbox') {
@@ -145,25 +169,6 @@ export const useFormValidation = (
     setValues(prev => ({ ...prev, [field]: plainNumber }));
   };
 
-  // Process form values before submission
-  const processValues = (defaultValueForEmpty = 'N/A', defaultValueForMoney = '0') => {
-    
-    const processedValues = { ...values };
-
-    Object.keys(processedValues).forEach((key) => {
-      const value = processedValues[key];
-      if (value === '' || value === null) {
-        if (key === 'monthlyIncome' || key.includes('Income') || key.includes('Amount')) {
-          processedValues[key] = defaultValueForMoney;
-        } else {
-          processedValues[key] = defaultValueForEmpty;
-        }
-      }
-    });
-
-    return processedValues;
-  };
-
   return {
     values,
     setValues,
@@ -174,7 +179,6 @@ export const useFormValidation = (
     handleContactChange,
     handleDateChange,
     handleIncomeChange,
-    handleNumChange,
-    processValues
+    handleNumChange
   };
 };

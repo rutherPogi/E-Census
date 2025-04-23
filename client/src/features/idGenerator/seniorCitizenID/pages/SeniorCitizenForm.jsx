@@ -1,22 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FormProvider } from "../components/others/FormContext";
 
-import { PersonalInfo, ContactInfo, ProfessionalInfo, FamilyComposition, FamilyComposition2,
-         OscaMembership, DisplayForm, SCMedia, PrintID } from '../components/steps'
+import { 
+  PersonalInfo, 
+  FamilyComposition, 
+  FamilyComposition2,
+  DispalySCInfo, 
+  SCMedia, 
+  PrintID 
+} from '../components/steps'
 
 
 
       
-export default function SeniorCitizenForm() {
+export default function SeniorCitizenForm({ hasSCID = false, isRegistered = false }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
 
+  const [registered, setRegistered] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [update, setUpdate] = useState(false);
+  const [mount, setMount] = useState(false);
+
+  useEffect(() => {
+    if (isRegistered) {
+      setRegistered(true);
+    } else if (hasSCID) {
+      setCurrentPage(5);
+      setEditing(true);
+      setMount(true);
+    }
+  }, [ isRegistered, hasSCID ]);
+
   const handleNext = () => {
-    if (previousPage === 8) {
-      setCurrentPage(8);
+    if (previousPage === 5) {
+      setCurrentPage(5);
       setPreviousPage(null);
-    } else if (currentPage < 8) {
+      setEditing(false);
+      setUpdate(true);
+      setMount(false);
+    } else if (currentPage < 6) {
       setCurrentPage((prev) => prev + 1);
     }
   };
@@ -26,25 +50,41 @@ export default function SeniorCitizenForm() {
   };
 
   const handleEdit = (pageNumber) => {
-    setPreviousPage(8);
+    setPreviousPage(5);
     setCurrentPage(pageNumber);
   };
 
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 0 && <PersonalInfo handleNext={handleNext}/>}
-        {currentPage === 2 && <ContactInfo handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 3 && <ProfessionalInfo handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 4 && <FamilyComposition handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 5 && <FamilyComposition2 handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 6 && <OscaMembership handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 7 && <SCMedia handleNext={handleNext} handleBack={handleBack}/>}
-        {currentPage === 8 && <DisplayForm handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
-        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
+
+        {currentPage === 1 && 
+          <PersonalInfo
+            handleNext={handleNext} 
+            handleBack={handleBack} 
+            isRegistered={registered} 
+          />
+        }
+        
+        {currentPage === 2 && <FamilyComposition handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 3 && <FamilyComposition2 handleNext={handleNext} handleBack={handleBack}/>}
+        
+        {currentPage === 4 && <SCMedia handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 5 && 
+          <DispalySCInfo 
+            handleNext={handleNext} 
+            handleBack={handleBack} 
+            handleEdit={handleEdit}
+            isEditing={editing}
+            isUpdating={update}
+            firstMount={mount}
+          />
+        }
+
+        {currentPage === 6 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
 
       <div className='form-pagination'>
-          {Array.from({ length: 8 }, (_, index) => (
+          {Array.from({ length: 6 }, (_, index) => (
             <div key={index} className={`circle ${currentPage === index + 1 ? "active" : ""}`}></div>
           ))}
         </div>

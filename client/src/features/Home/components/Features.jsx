@@ -40,9 +40,6 @@ const FeatureBox = ({ image, title, description }) => (
     >
       {title}
     </Typography>
-    <Typography sx={{ fontSize: { xs: 14, sm: 16 } }}>
-      {description}
-    </Typography>
   </Box>
 );
 
@@ -50,6 +47,7 @@ const FeatureBox = ({ image, title, description }) => (
  * Features section component showing key app functionalities
  */
 const Features = () => {
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -57,18 +55,15 @@ const Features = () => {
   const features = [
     {
       image: digitalSurvey,
-      title: "Digital Census",
-      description: "For faster and efficient census."
+      title: "Digital Census"
     },
     {
       image: idGenerator,
-      title: "ID Generator",
-      description: "For Solo Parent, Senior Citizen, and Person's with Disability."
+      title: "ID Generator"
     },
     {
       image: hazzardMap,
-      title: "Hazard Map",
-      description: "For awareness before, after, and during natural disasters."
+      title: "Hazard Map"
     }
   ];
 

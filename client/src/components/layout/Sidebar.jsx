@@ -4,7 +4,11 @@ import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse,
          Divider, Box, Tooltip, Container, Avatar, Typography } from '@mui/material';
 import { Home, Assignment, Badge, Map, Person, ExpandLess, ExpandMore, 
          Elderly, Accessible, EscalatorWarning, AccountCircle, Newspaper,
-         Groups } from '@mui/icons-material';
+         Groups, Storage, 
+         Wc,
+         Boy,
+         Female,
+         Hail} from '@mui/icons-material';
 
 import { useAuth } from '../../utils/auth/authContext';
 import logo from '../../assets/MSWDO-Logo.png'
@@ -41,6 +45,8 @@ const Sidebar = ({
 }) => {
 
   const [idGeneratorOpen, setIdGeneratorOpen] = useState(false);
+  const [dataBankOpen, setDataBankOpen] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { userData } = useAuth();
@@ -61,6 +67,10 @@ const Sidebar = ({
 
   const handleIdGeneratorClick = () => {
     setIdGeneratorOpen(!idGeneratorOpen);
+  };
+
+  const handleDataBankClick = () => {
+    setDataBankOpen(!dataBankOpen);
   };
 
   const handleItemClick = (href) => {
@@ -161,6 +171,133 @@ const Sidebar = ({
             {open && <ListItemText primary="Census" />}
           </ListItem>
         </Tooltip>
+
+        {/* Data Bank */}
+        {showIdGenerator && (
+          <>
+            <Tooltip title={!open ? "Data Bank" : ""} placement="right">
+              <ListItem 
+                onClick={open ? handleDataBankClick : onToggle}
+                sx={listItemStyles(selectedPath.includes('/main/databank'))}
+              >
+                <ListItemIcon sx={{ color: selectedPath.includes('/main/databank') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                  <Storage />
+                </ListItemIcon>
+                {open && (
+                  <>
+                    <ListItemText primary="Data Bank" />
+                    {dataBankOpen ? <ExpandLess /> : <ExpandMore />}
+                  </>
+                )}
+              </ListItem>
+            </Tooltip>
+            
+            {/* Data Bank Submenu - only show when sidebar is open */}
+            {open && (
+              <Collapse in={dataBankOpen} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {/* Segregation */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/segregation'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/segregation')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/segregation') ? '#FF5733' : 'inherit' }}>
+                      <Wc />
+                    </ListItemIcon>
+                    <ListItemText primary="Segregation" />
+                  </ListItem>
+                  
+                  {/* Youth Masterlist */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/youth-masterlist'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/youth-masterlist')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/youth-masterlist') ? '#FF5733' : 'inherit' }}>
+                      <Boy />
+                    </ListItemIcon>
+                    <ListItemText primary="Youth Masterlist" />
+                  </ListItem>
+
+                  {/* OSY */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/osy'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/osy')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/osy') ? '#FF5733' : 'inherit' }}>
+                      <Boy />
+                    </ListItemIcon>
+                    <ListItemText primary="OSY" />
+                  </ListItem>
+                  
+                  {/* Solo Parent */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/solo-parent'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/solo-parent')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/solo-parent') ? '#FF5733' : 'inherit' }}>
+                      <EscalatorWarning />
+                    </ListItemIcon>
+                    <ListItemText primary="Solo Parent" />
+                  </ListItem>
+
+                  {/* Women */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/women'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/women')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/women') ? '#FF5733' : 'inherit' }}>
+                      <Female />
+                    </ListItemIcon>
+                    <ListItemText primary="Women" />
+                  </ListItem>
+
+                  {/* PWD */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/pwd'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/pwd')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/pwd') ? '#FF5733' : 'inherit' }}>
+                      <Accessible />
+                    </ListItemIcon>
+                    <ListItemText primary="PWD" />
+                  </ListItem>
+
+                  {/* Non-Ivatan */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/non-ivatan'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/non-ivatan')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/non-ivatan') ? '#FF5733' : 'inherit' }}>
+                      <Hail />
+                    </ListItemIcon>
+                    <ListItemText primary="Non-Ivatan" />
+                  </ListItem>
+                </List>
+              </Collapse>
+            )}
+          </>
+        )}
 
         {/* Population */}
         <Tooltip title={!open ? "Population" : ""} placement="right">
@@ -291,7 +428,7 @@ const Sidebar = ({
         '& .MuiDrawer-paper': { 
           boxSizing: 'border-box', 
           width: drawerWidth,
-          bgcolor: '#2A2A3A', // Light gray background
+          bgcolor: '#2A2A3A',
         },
       }}
     >

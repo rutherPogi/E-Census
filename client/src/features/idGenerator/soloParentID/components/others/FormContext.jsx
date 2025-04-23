@@ -4,18 +4,18 @@ const FormContext = createContext();
 
 const initialFormData = {
   personalInfo: {},
-  contactInfo: {},
-  professionalInfo: {},
-  otherInfo: {},
   householdComposition: [],
   problemNeeds: {},
   emergencyContact: {},
-  applicationDetails: {},
   spMedia: {}
 }; 
 
 export function FormProvider({ children }) {
   const [formData, setFormData] = useState(initialFormData);
+
+  const setEntireFormData = (newFormData) => {
+    setFormData(newFormData);
+  };
 
   const updateFormData = (section, data) => {
     setFormData(prev => ({ ...prev, [section]: data }));
@@ -43,6 +43,7 @@ export function FormProvider({ children }) {
     updateFormData,
     addItem,
     updateItem,
+    setEntireFormData,
 
     addHouseholdComposition: (data) => addItem('householdComposition', data),
     clearFormData

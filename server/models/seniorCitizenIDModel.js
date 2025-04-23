@@ -11,8 +11,8 @@ export const generateSeniorCitizenId = async (connection) => {
   try {
     // Get the current sequence for today
     const [rows] = await connection.query(
-      `SELECT MAX(scApplicantID) as maxId FROM scApplication 
-       WHERE scApplicantID LIKE ?`,
+      `SELECT MAX(scApplicationID) as maxId FROM seniorCitizenApplication 
+       WHERE scApplicationID LIKE ?`,
       [`SC${datePrefix}%`]
     );
     
@@ -29,7 +29,7 @@ export const generateSeniorCitizenId = async (connection) => {
     
     // Verify this ID doesn't already exist (double-check)
     const [existingCheck] = await connection.query(
-      `SELECT COUNT(*) as count FROM scApplication WHERE scApplicantID = ?`,
+      `SELECT COUNT(*) as count FROM seniorCitizenApplication WHERE scApplicationID = ?`,
       [seniorCitizenID]
     );
     
@@ -37,6 +37,7 @@ export const generateSeniorCitizenId = async (connection) => {
       // In the unlikely event of a collision, recursively try again
       return generateSeniorCitizenId(connection);
     }
+
     return seniorCitizenID;
   } catch (error) {
     console.error('Error generating Senior Citizen ID:', error);
@@ -44,113 +45,259 @@ export const generateSeniorCitizenId = async (connection) => {
   }
 };
 
-export const createSeniorCitizenApplicant = async (seniorCitizenID, photoID, signature, connection) => {
+export const createSeniorCitizenApplicant = async (scApplicationID, photoID, signature, connection) => {
+
+  await connection.beginTransaction();
+
+  try {
+
+    const [applicantResult] = await connection.query(
+      `INSERT INTO Applicants (applicationType) VALUES ('SeniorCitizen')`
+    );
+    const applicantID = applicantResult.insertId;
+    
+    await connection.query(
+      `INSERT INTO seniorCitizenApplication (
+        scApplicationID, 
+        applicantID,
+        dateApplied, 
+        issuedAt, 
+        issuedOn, 
+        photoID, 
+        signature )
+       VALUES (?, ?, CURDATE(), CURDATE(), CURDATE(), ?, ?)`,
+      [ scApplicationID, 
+        applicantID,
+        photoID,
+        signature
+      ]
+    );
+
+    console.log('[ INSERTED SUCCESSFULLY seniorCitizenApplication ]')
+    return { applicantID };
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error creating SC Application:', error);
+    throw error;
+  }
+};
+
+export const addPersonalInfo = async (applicantID, personalInfo, connection) => {
+
+  await connection.beginTransaction();
+
+  try {
+
+    await connection.query(
+      `INSERT INTO PersonalInformation (
+        applicantID, 
+        firstName, 
+        middleName, 
+        lastName, 
+        suffix, 
+        birthdate, 
+        age, 
+        sex, 
+        civilStatus, 
+        birthplace,
+        seniorCitizenIDNumber )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [ applicantID, 
+        personalInfo.firstName,  
+        personalInfo.middleName,
+        personalInfo.lastName,
+        personalInfo.suffix,
+        personalInfo.birthdate ? personalInfo.birthdate.split('T')[0] : null,
+        personalInfo.age,
+        personalInfo.sex,
+        personalInfo.civilStatus,
+        personalInfo.birthplace,
+        personalInfo.seniorCitizenIDNumber || 123 ]
+    );
+
+    await connection.query(
+      `INSERT INTO ContactInformation (
+        applicantID, 
+        street, 
+        barangay, 
+        municipality, 
+        province, 
+        mobileNumber )
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [ applicantID, 
+        personalInfo.street,  
+        personalInfo.barangay,
+        personalInfo.municipality,
+        personalInfo.province,
+        personalInfo.mobileNumber ]
+    );
+
+    await connection.query(
+      `INSERT INTO ProfessionalInformation (
+        applicantID, 
+        occupation, 
+        educationalAttainment, 
+        annualIncome, 
+        skills )
+       VALUES (?, ?, ?, ?, ?)`,
+      [ applicantID, 
+        personalInfo.occupation,  
+        personalInfo.educationalAttainment,
+        parseFloat(personalInfo.annualIncome.replace(/,/g, '').trim()) || 0,
+        personalInfo.otherSkills ]
+    );
+
+    console.log('[ INSERTED SUCCESFULLY Personal Info ]');
+    return { success: true, applicantID };
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error creating Population:', error);
+    throw error;
+  }
+
   
-  const [result] = await connection.query(
-    `INSERT INTO scApplication (scApplicantID, dateApplied, issuedAt, issuedOn, photoID, signature)
-     VALUES (?, CURDATE(), CURDATE(), CURDATE(), ?, ?)`,
-    [ seniorCitizenID, 
-      photoID,
-      signature
-    ]
-  );
 
-  return result;
+  
 };
 
-export const addPersonalInfo = async (seniorCitizenID, personalInfo, connection) => {
-
-  const [result] = await connection.query(
-    `INSERT INTO scPersonalInformation 
-    (scApplicantID, firstName, middleName, lastName, suffix, birthdate, age, sex, civilStatus, birthplace)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [ seniorCitizenID, 
-      personalInfo.firstName,  
-      personalInfo.middleName,
-      personalInfo.lastName,
-      personalInfo.suffix,
-      personalInfo.birthdate ? personalInfo.birthdate.split('T')[0] : null,,
-      personalInfo.age,
-      personalInfo.sex,
-      personalInfo.civilStatus,
-      personalInfo.birthplace ]
-  );
-
-  return result;
-};
-
-export const addContactInfo = async (seniorCitizenID, contactInfo, connection) => {
-
-  const [result] = await connection.query(
-    `INSERT INTO scContactInformation 
-    (scApplicantID, street, barangay, municipality, province, mobileNumber)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [ seniorCitizenID, 
-      contactInfo.street,  
-      contactInfo.barangay,
-      contactInfo.municipality,
-      contactInfo.province,
-      contactInfo.mobileNumber ]
-  );
-
-  return result;
-};
-
-export const addProfessionalInfo = async (seniorCitizenID, professionalInfo, connection) => {
-
-  const [result] = await connection.query(
-    `INSERT INTO scProfessionalInformation 
-    (scApplicantID, occupation, educationalAttainment, annualIncome, otherSkills)
-     VALUES (?, ?, ?, ?, ?)`,
-    [ seniorCitizenID, 
-      professionalInfo.occupation,  
-      professionalInfo.educationalAttainment,
-      professionalInfo.annualIncome,
-      professionalInfo.otherSkills ]
-  );
-
-  return result;
-};
-
-export const addFamilyComposition = async (seniorCitizenID, familyComposition, connection) => {
+export const addFamilyComposition = async (scApplicationID, familyComposition, connection) => {
 
   if (!familyComposition || familyComposition.length === 0) return null;
 
   const familyCompositionValues = familyComposition.map(member => [
-    seniorCitizenID,
+    scApplicationID,
     member.firstName,
     member.middleName,
     member.lastName,
     member.suffix,
+    member.birthdate,
+    member.birthdate ? member.birthdate.split('T')[0] : null,
     member.age,
     member.relationship,
     member.civilStatus,
     member.occupation,
-    parseFloat(member.income)
+    parseFloat((member.annualIncome || '0').replace(/,/g, '').trim()) || 0
   ]);
 
-  const [result] = await connection.query(
-    `INSERT INTO scFamilyComposition 
-    (scApplicantID, firstName, middleName, lastName, suffix, age, relationship, 
-     civilStatus, occupation, income)
+  await connection.query(
+    `INSERT INTO FamilyComposition (
+      scApplicationID, 
+      firstName, 
+      middleName, 
+      lastName, 
+      suffix, 
+      age, 
+      relationship, 
+      civilStatus, 
+      occupation, 
+      annualIncome )
      VALUES ?`,
     [ familyCompositionValues ]
   );
 
-  return result;
+  return console.log('[ INSERTED SUCCESFULLY Family Composition ]');
 };
 
-export const addOscaInfo = async (seniorCitizenID, OscaInfo, connection) => {
+export const addOscaInfo = async (scApplicationID, personalInfo, connection) => {
 
-  const [result] = await connection.query(
-    `INSERT INTO scOscaInformation 
-    (scApplicantID, associationName, asOfficer, position)
+  console.log('INSERTING OSCA', scApplicationID);
+
+  await connection.query(
+    `INSERT INTO OscaInformation (
+      scApplicationID, 
+      associationName, 
+      asOfficer, 
+      position )
      VALUES (?, ?, ?, ?)`,
-    [ seniorCitizenID, 
-      OscaInfo.associationName,  
-      OscaInfo.asOfficer ? OscaInfo.asOfficer.split('T')[0] : null,
-      OscaInfo.position ]
+    [ scApplicationID, 
+      personalInfo.associationName,  
+      personalInfo.asOfficer ? personalInfo.asOfficer.split('T')[0] : null,
+      personalInfo.position ]
   );
 
-  return result;
+  return console.log('[ INSERTED SUCCESFULLY OSCA Info ]');
+};
+
+export const updatePopulation = async (applicantID, populationID, personalInfo, connection) => {
+
+  await connection.beginTransaction();
+
+  try {
+
+    await connection.query(
+      `UPDATE PersonalInformation
+       SET applicantID = ?,
+           firstName = ?,
+           middleName = ?, 
+           lastName = ?, 
+           suffix = ?, 
+           birthdate = ?, 
+           age = ?, 
+           sex = ?, 
+           civilStatus = ?, 
+           birthplace = ?,
+           seniorCitizenIDNumber = ?
+       WHERE personalInfoID = ? AND populationID = ?`,
+      [ applicantID, 
+        personalInfo.firstName,  
+        personalInfo.middleName,
+        personalInfo.lastName,
+        personalInfo.suffix,
+        personalInfo.birthdate ? personalInfo.birthdate.split('T')[0] : null,
+        personalInfo.age,
+        personalInfo.sex,
+        personalInfo.civilStatus,
+        personalInfo.birthplace,
+        personalInfo.seniorCitizenIDNumber, 
+        personalInfo.personalInfoID,
+        populationID ]
+    );
+
+    await connection.query(
+      `UPDATE ContactInformation 
+       SET applicantID = ?, 
+           street = ?, 
+           barangay = ?, 
+           municipality = ?, 
+           province = ?,  
+           mobileNumber = ?, 
+       WHERE contactInfoID = ? AND populationID = ?`,
+      [ applicantID, 
+        personalInfo.street,  
+        personalInfo.barangay,
+        personalInfo.municipality,
+        personalInfo.province,  
+        personalInfo.mobileNumber, 
+        personalInfo.contactID,
+        populationID
+      ]
+    );
+
+    await connection.query(
+      `UPDATE ProfessionalInformation 
+       SET applicantID = ?, 
+           educationalAttainment = ?, 
+           skills = ?,
+           occupation = ?,
+           annualIncome = ?
+       WHERE professionalInfoID = ? AND populationID = ?`,
+      [ applicantID, 
+        personalInfo.educationalAttainment, 
+        personalInfo.skills,  
+        personalInfo.occupation,
+        parseFloat(personalInfo.annualIncome.replace(/,/g, '').trim()) || 0,
+        personalInfo.professionalInfoID,
+        populationID
+      ]
+    );
+
+    await connection.commit();
+    
+    console.log('Population successfully Update!');
+    return { success: true, populationID };
+  } catch (error) {
+    await connection.rollback();
+    console.error('Error creating Population:', error);
+    throw error;
+  }
 };

@@ -6,79 +6,29 @@ export const managePopulation = async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT 
-        p.populationID,
-        p.surveyID,
-        p.philhealthNumber,
-        p.healthStatus,
-        p.remarks,
-        p.isOSY,
-        p.inSchool,
-        p.outOfTown,
-        p.isOFW,
-        p.isPWD,
-        p.isSoloParent,
-
-        pi.personalInfoID,
-        pi.firstName,
-        pi.middleName,
-        pi.lastName,
-        pi.suffix,
-        pi.birthdate,
-        pi.age,
-        pi.sex,
-        pi.birthplace,
-        pi.religion,
-        pi.civilStatus,
-        pi.relationToFamilyHead,
-        pi.pwdIDNumber,
-        pi.soloParentIDNumber,
-        pi.seniorCitizenIDNumber,
-
-        prof.professionalInfoID,
-        prof.educationalAttainment,
-        prof.skills,
-        prof.occupation,
-        prof.company,
-        prof.employmentStatus,
-        prof.employmentCategory,
-        prof.employmentType,
-        prof.monthlyIncome,
-        prof.annualIncome,
-
-        ci.contactInfoID,
-        ci.street,
-        ci.barangay,
-        ci.municipality,
-        ci.province,
-        ci.region,
-        ci.mobileNumber,
-        ci.landlineNumber,
-        ci.emailAddress,
-
-        ga.governmentAffiliationID,
-        ga.isAffiliated,
-        ga.asOfficer,
-        ga.asMember,
-        ga.organizationAffiliated,
-
-        ni.nonIvatanID,
-        ni.isIpula,
-        ni.settlementDetails,
-        ni.ethnicity,
-        ni.placeOfOrigin,
-        ni.isTransient,
-        ni.houseOwner,
-        ni.isRegistered,
-        ni.dateRegistered
-
-        FROM Population p
-        LEFT JOIN PersonalInformation pi ON p.populationID = pi.populationID
-        LEFT JOIN ProfessionalInformation prof ON p.populationID = prof.populationID
-        LEFT JOIN ContactInformation ci ON p.populationID = ci.populationID
-        LEFT JOIN GovernmentAffiliation ga ON p.populationID = ga.populationID
-        LEFT JOIN NonIvatan ni ON p.populationID = ni.populationID
-        
-        ORDER BY p.populationID ASC
+          ROW_NUMBER() OVER (ORDER BY p.populationID) AS 'ID',
+          p.populationID AS 'Population ID',
+          CONCAT_WS(' ', pi.lastName, pi.firstName, pi.middleName, pi.suffix) AS 'Name',
+          pi.birthdate AS 'Birthdate',
+          pi.age AS 'Age',
+          pi.civilStatus AS 'Civil Status',
+          pi.relationToFamilyHead AS 'Relationship to Family Head',
+          prof.educationalAttainment AS 'Educational Attainment',
+          prof.occupation AS 'Occupation',
+          prof.skills AS 'Skills',
+          prof.employmentType AS 'Employment Type',
+          gi.philhealthNumber AS 'Philhealth Number',
+          prof.monthlyIncome AS 'Monthly Income',
+          p.healthStatus AS 'Health Status',
+          p.remarks AS 'Remarks',
+          pi.pwdIDNumber AS 'PWD ID',
+          pi.soloParentIDNumber AS 'Solo Parent ID',
+          pi.seniorCitizenIDNumber AS 'Senior Citizen ID'
+      FROM Population p
+      LEFT JOIN PersonalInformation pi ON p.populationID = pi.populationID
+      LEFT JOIN ProfessionalInformation prof ON p.populationID = prof.populationID
+      LEFT JOIN GovernmentIDs gi ON p.populationID = gi.populationID
+      ORDER BY p.populationID ASC;
   `);
     
     res.status(200).json(rows);

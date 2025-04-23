@@ -60,7 +60,7 @@ export default function WaterInfo({ handleBack, handleNext}) {
     }
 
     updateFormData('waterInfo', values);
-    console.log("WATER INFO:", formData.waterInfo);
+    console.log("WATER INFO:", values);
 
     handleNext();
   };

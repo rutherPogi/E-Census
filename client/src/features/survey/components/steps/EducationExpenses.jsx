@@ -42,7 +42,7 @@ export default function EducationExpenses({ handleBack, handleNext }) {
       educationTotal: total,
       educationExpensesID: formData.educationExpenses.educationExpensesID
     });
-    console.log('EDUCATION EXPENSES: ', formData.educationExpenses);
+    console.log('EDUCATION EXPENSES: ', processedValues);
     handleNext();
   };
 

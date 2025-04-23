@@ -42,7 +42,7 @@ export default function HouseholdComposition2({ handleBack, handleNext }) {
   return (
     <div className='responsive-container'>
       <div className='responsive-header'>HOUSEHOLD COMPOSITION</div>
-      <div className='responsive-table'>
+      <div className='responsive-form table'>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -63,8 +63,10 @@ export default function HouseholdComposition2({ handleBack, handleNext }) {
               {householdComposition.map((member, index) => (
                 <TableRow key={index}>
                   <TableCell>
-                    {`${member.firstName} ${member.middleName} ${member.lastName} 
-                      ${member.suffix === 'N/A' ? '' : member.suffix}`}
+                    {`${member.firstName} 
+                      ${member.middleName ? member.middleName : ''} 
+                      ${member.lastName} 
+                      ${member.suffix ? member.suffix : ''}`}
                   </TableCell>
                   <TableCell>{member.sex}</TableCell>
                   <TableCell>{member.relationship}</TableCell>
@@ -72,7 +74,7 @@ export default function HouseholdComposition2({ handleBack, handleNext }) {
                   <TableCell>{member.age}</TableCell>
                   <TableCell>{member.civilStatus}</TableCell>
                   <TableCell>{member.educationalAttainment}</TableCell>
-                  <TableCell>{member.occupation}</TableCell>
+                  <TableCell>{member.occupation || 'N/A'}</TableCell>
                   <TableCell>{`₱${member.monthlyIncome === 'N/A' ? '0.00' : member.monthlyIncome}`}</TableCell>
                   <TableCell>
                     <Tooltip title='Edit'>

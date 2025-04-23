@@ -28,7 +28,7 @@ export const authRequest = async (method, endpoint, data = null, isMultipart = f
     const response = await axios(config);
     return response.data;
   } catch (error) {
-    // Handle token expiration
+
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('authToken');
       window.location.href = '/login';

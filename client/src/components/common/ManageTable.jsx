@@ -13,17 +13,22 @@ const ManageTable = ({
   page,              // Current page
   rowsPerPage,       // Rows per page
   onPageChange,      // Page change handler
-  count              // Total number of items
+  count,             // Total number of items
+  customHeaderRow    // Optional custom header row renderer
 }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
         <TableHead>
-          <TableRow>
-            {headers.map((header, index) => (
-              <TableCell key={index}>{header}</TableCell>
-            ))}
-          </TableRow>
+          {customHeaderRow ? (
+            customHeaderRow()
+          ) : (
+            <TableRow>
+              {headers.map((header, index) => (
+                <TableCell key={index}>{header}</TableCell>
+              ))}
+            </TableRow>
+          )}
         </TableHead>
         <TableBody>
           {loading ? (

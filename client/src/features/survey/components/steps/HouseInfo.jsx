@@ -31,7 +31,6 @@ export default function HouseInfo({ handleBack, handleNext}) {
     );
 
   useEffect(() => {
-    console.log('HOUSE INFO:', formData.houseInfo);
     if (formData.houseInfo) {
       setValues({
         //houseImageID : formData.
@@ -78,7 +77,7 @@ export default function HouseInfo({ handleBack, handleNext}) {
     }
 
     updateFormData('houseInfo', values);
-    console.log("HOUSE INFO 1:", formData.houseInfo);
+    console.log("HOUSE INFO 1:", values);
 
     handleNext();
   }; 

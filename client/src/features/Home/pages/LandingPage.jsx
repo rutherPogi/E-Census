@@ -7,6 +7,7 @@ import Features from "../components/Features";
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  
   const today = new Date(2025, 2, 25)
     .toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
 
@@ -29,79 +30,8 @@ export default function LandingPage() {
           <Features />
         </Box>
         
-        {/* News Section Header */}
-        <Box 
-          sx={{
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            borderBottom: '5px solid #FF5733',
-            pb: 2,
-            mb: 3
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem' }
-            }}
-          >
-            News and Updates
-          </Typography>
-          <Typography 
-            variant="subtitle1"
-            sx={{ 
-              fontSize: { xs: '0.8rem', sm: '1rem' }
-            }}
-          >
-            {today}
-          </Typography>
-        </Box>
-        
-        {/* News Content */}
-        <Box sx={{ px: { xs: 2, md: 4 }, mb: 4 }}>
-          <PostLists />
-        </Box>
-      </Container>
-
-      <Container>        
-        {/* News Section Header */}
-        <Box 
-          sx={{
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            borderBottom: '5px solid #FF5733',
-            pb: 2,
-            mb: 3
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem' }
-            }}
-          >
-            Services
-          </Typography>
-          <Typography 
-            variant="subtitle1"
-            sx={{ 
-              fontSize: { xs: '0.8rem', sm: '1rem' }
-            }}
-          >
-            {today}
-          </Typography>
-        </Box>
-        
-        {/* News Content */}
-        <Box sx={{ px: { xs: 2, md: 4 }, mb: 4 }}>
-          <PostLists />
-        </Box>
-      </Container>
-
-      
-      
+        <PostLists/>
+      </Container>    
     </Box>
   );
 }

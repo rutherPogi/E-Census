@@ -125,8 +125,7 @@ export const SKILLS_OPTIONS = [
   { value: 'Organic Farming / High-value Crops Production', label: 'Organic Farming / High-value Crops Production' },
   { value: 'Food Production / Preparation / Processing', label: 'Food Production / Preparation / Processing' },
   { value: 'Livestock Management (Swine / Goat / Cattle Breeding or Fattening)', label: 'Livestock Management (Swine / Goat / Cattle Breeding or Fattening)' },
-  { value: 'Others', label: 'Others' },
-  { value: 'None', label: 'None' },
+  { value: 'Others', label: 'Others' }
 ];
 
 export const FAMILY_CLASS_OPTIONS = [

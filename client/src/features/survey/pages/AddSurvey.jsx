@@ -13,7 +13,7 @@ export default function AddSurvey() {
   const generateNewSurveyId = async () => {
     try {
       setIsLoading(true);
-      const response = await get('/surveys/generate-surveyID');
+      const response = await get('/surveys/generate');
       const newSurveyNumber = response.surveyId;
       
       navigate(`/main/survey/${newSurveyNumber}`, { 

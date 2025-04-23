@@ -71,7 +71,7 @@ export default function HouseLocation({ handleBack, handleNext }) {
       municipality: values.municipality
     });
 
-    console.log('HOUSE INFO 2', formData.houseLocation)
+    console.log('HOUSE INFO 2', values)
     handleNext();
   };
 

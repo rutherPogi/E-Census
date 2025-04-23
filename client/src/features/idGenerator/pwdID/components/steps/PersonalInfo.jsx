@@ -1,24 +1,37 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
-import { Button } from '@mui/material';
 
-import { CIVIL_STATUS_OPTIONS, SUFFIX_OPTIONS, SEX_OPTIONS, PI_REQUIRED_FIELDS } from '../../utils/constants';
-import { Notification } from "../../../components/Notification";
-import { TextInput, DropdownInput, DateInput } from "../../../../../components/common/FormFields";
-import { PI_INITIAL_STATE } from "../../utils/initialStates";
+import { Notification, FormButtons } from "../../../../../components/common";
+import { PI_INITIAL_VALUES } from "../../utils/initialValues";
+import { PI_REQUIRED_FIELDS } from "../../utils/requiredFields";
 
 import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useTransformData } from "../../hooks/useTransformData";
 
+import { 
+  PersonalDetails,
+  ContactDetails,
+  ProfessionalDetails,
+  IDReferenceDetails,
+  Checkbox,
+  AffiliationDetails,
+  DisabilityDetails
+} from '../others/PersonalInfoSection';
 
-export default function PersonalInfo({ handleBack, handleNext}) {
 
-  const { pwdID, populationID } = useParams();
+
+
+
+export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
+
+  const { pwdApplicationID, populationID } = useParams();
 
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData(populationID);
+  const { fetchPersonData } = useTransformData(pwdApplicationID, populationID);
+
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const {
     values,
@@ -26,9 +39,10 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     errors,
     validateForm,
     handleChange,
-    handleDateChange
+    handleDateChange,
+    handleContactChange
   } = useFormValidation(
-    PI_INITIAL_STATE(pwdID),
+    PI_INITIAL_VALUES(pwdApplicationID),
     true, 
     PI_REQUIRED_FIELDS
   );
@@ -42,15 +56,41 @@ export default function PersonalInfo({ handleBack, handleNext}) {
   } = useNotification();
 
   useEffect(() => {
+    if (isRegistered && !initialFetchDone) {
+      console.log('fetching...');
+      fetchPersonData()
+        .then(() => {
+          setInitialFetchDone(true);
+        })
+        .catch(err => {
+          console.error('Error fetching survey data:', err);
+          setInitialFetchDone(true);
+        });
+    }
+  }, [isRegistered, initialFetchDone, fetchPersonData]);
+  
+  useEffect(() => {
+    // Once data is fetched and available, set the form values only once
+    if (isRegistered && initialFetchDone && formData.personalInfo) {
+      setValues(prev => ({
+        ...prev,
+        ...formData.personalInfo,
+        pwdApplicationID: pwdApplicationID,
+      }));
+    }
+  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdApplicationID]);
 
-    if(populationID) {
-      fetchPersonData();
-    }
-    
+  useEffect(() => {
+    // Once data is fetched and available, set the form values only once
     if (formData.personalInfo) {
-      setValues(prev => ({ ...prev, ...formData.personalInfo, pwdID: pwdID }));
+      setValues(prev => ({
+        ...prev,
+        ...formData.personalInfo,
+        pwdApplicationID: pwdApplicationID,
+      }));
     }
-  }, [formData.personalInfo, pwdID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdApplicationID]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,19 +100,24 @@ export default function PersonalInfo({ handleBack, handleNext}) {
       return;
     }
 
+    const specific = values.disabilitySpecific;
+
+    if(specific === '' || specific === undefined ) {
+      values.disabilitySpecific = null;
+    }
+
     const processedValues = { ...values };
     
     Object.keys(processedValues).forEach((key) => {
       if (!PI_REQUIRED_FIELDS.includes(key)) {
         const value = processedValues[key];
-        if (value === '' || value === null) {
-          processedValues[key] = 'N/A';
+        if (value === '' || value === undefined) {
+          processedValues[key] = null;
         }
       }
     });
     
     updateFormData('personalInfo', processedValues);
-
     console.log("Personal Details:", processedValues);
     
     handleNext();
@@ -82,85 +127,55 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     <div className='responsive-container'>
       <div className='responsive-header'>PERSONAL INFORMATION</div>
       <div className='responsive-form'>
-        <TextInput
-          label='First Name'
-          value={values.firstName}
-          onChange={handleChange('firstName')}
-          error={errors.firstName}
-          helperText = {errors.firstName || 'e.g., Juan'}
-          placeholder = 'Enter First Name'
-          required
+        <PersonalDetails
+          values={values}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          errors={errors}
         />
-        <TextInput
-          label='Middle Name'
-          value={values.middleName}
-          onChange={handleChange('middleName')}
-          error={errors.middleName}
-          helperText = {errors.middleName || 'e.g., Santos'}
-          placeholder = 'Enter Middle Name'
+        <DisabilityDetails
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <TextInput
-          label='Last Name'
-          value={values.lastName}
-          onChange={handleChange('lastName')}
-          error={errors.lastName}
-          helperText = {errors.lastName || 'e.g, Dela Cruz'}
-          placeholder = 'Enter Last Name'
-          required
+        <ContactDetails
+          values={values}
+          handleChange={handleChange}
+          handleContactChange={handleContactChange}
+          errors={errors}
         />
-        <DropdownInput
-          label = 'Suffix'
-          options = {SUFFIX_OPTIONS}
-          value = {values.suffix}
-          onChange = {(e, newValue) => handleChange('suffix')(e, newValue)}
-          error = {errors.suffix} 
-          helperText = {errors.suffix || 'e.g., Jr - Junior'}
-          placeholder = 'Enter your suffix'
+        <ProfessionalDetails
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <DateInput
-          label =  'Birthdate'
-          value =  {values.birthdate}
-          onChange={handleDateChange}
-          error = {errors.birthdate}  
-          helperText =  {errors.birthdate}
-          required
+        <IDReferenceDetails
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <DropdownInput
-          label = 'Sex'
-          options = {SEX_OPTIONS}
-          value = {values.sex}
-          onChange = {(e, newValue) => handleChange('sex')(e, newValue)}
-          error = {errors.sex} 
-          helperText = {errors.sex || 'e.g., Male'}
-          placeholder = 'Enter your sex'
-          required
+        <Checkbox
+          values={values}
+          handleChange={handleChange}
+          errors={errors}
         />
-        <DropdownInput
-          label = 'Civil Status'
-          options = {CIVIL_STATUS_OPTIONS}
-          value = {values.civilStatus}
-          onChange = {(e, newValue) => handleChange('civilStatus')(e, newValue)}
-          error = {errors.civilStatus} 
-          helperText = {errors.civilStatus || 'e.g, Single'}
-          placeholder = 'ex. Single'
-          required
-        />
-        <TextInput
-          label={'Person\'s with Disability Number'}
-          value={values.pwdNumber}
-          onChange={handleChange('pwdNumber')}
-          error={errors.pwdNumber}
-          helperText = {errors.pwdNumber || 'RR-PPMM-BBB-NNNNNNN'}
-          placeholder = ''
-          required
-        />
+        
+
+        {Boolean(values.isAffiliated) && (
+          <AffiliationDetails
+            values={values}
+            handleChange={handleChange}
+            handleContactChange={handleContactChange}
+            errors={errors}
+          />
+        )}
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Cancel' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

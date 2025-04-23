@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Box, TextField } from '@mui/material';
+import { Box, TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 const SearchBar = ({ onSearch, label, placeholder }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,7 +12,7 @@ const SearchBar = ({ onSearch, label, placeholder }) => {
   };
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box>
       <TextField
         label={label}
         variant="outlined"
@@ -20,6 +21,13 @@ const SearchBar = ({ onSearch, label, placeholder }) => {
         value={searchTerm}
         onChange={handleSearchChange}
         placeholder={placeholder}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon />
+            </InputAdornment>
+          )
+        }}
       />
     </Box>
   );

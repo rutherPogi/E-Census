@@ -5,8 +5,9 @@ import { uploadToMemory, processImageForDatabase } from '../middlewares/multer.j
 
 const router = express.Router();
 
-router.get('/generate-pwdID', authenticateToken, pwdIDControllers.getNewPwdId);
-router.post('/submit-pwdID', 
+router.get('/generate', authenticateToken, pwdIDControllers.getNewPwdId);
+
+router.post('/submit', 
   authenticateToken,
   uploadToMemory.fields([
     { name: 'photoID', maxCount: 1 },
@@ -15,9 +16,28 @@ router.post('/submit-pwdID',
   processImageForDatabase,  
   pwdIDControllers.submitPwdId
 );
-router.get('/manage-pwdID', authenticateToken, pwdIDControllers.managePwdId);
-router.get('/get-personDetails/:populationID', authenticateToken, pwdIDControllers.getPersonDetails);
-router.post('/find-pwdID', authenticateToken, pwdIDControllers.findPwdID);
+
+router.put('/update', 
+  authenticateToken,
+  uploadToMemory.fields([
+    { name: 'photoID', maxCount: 1 },
+    { name: 'signature', maxCount: 1 }
+  ]), 
+  processImageForDatabase,  
+  pwdIDControllers.updatePwdId
+);
+
+router.get('/list', authenticateToken, pwdIDControllers.managePwdId);
+
+router.get('/view/:pwdApplicationID', authenticateToken, pwdIDControllers.viewApplication);
+
+router.delete('/delete/:pwdApplicationID', authenticateToken, pwdIDControllers.deleteApplication);
+
+router.get('/get-personal-info/:populationID', authenticateToken, pwdIDControllers.getPersonDetails);
+
+router.post('/find', authenticateToken, pwdIDControllers.findPwdID);
+
+
 
 
 export default router; 

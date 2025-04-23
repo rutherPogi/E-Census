@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import { TextInput, DropdownInput } from "../../../../../components/common/FormFields";
-import { SUFFIX_OPTIONS } from "../../utils/constants";
+import { SUFFIX_OPTIONS } from "../../utils/options";
 
-export const NameFields = ({ title, values, handleChange, fieldPrefix }) => (
+export const NameFields = ({ title, values, handleChange, fieldPrefix, errors}) => (
   <Box>
-    <Typography sx = {{ mb: 2}}>{title}</Typography>
+    <Typography sx = {{ mb: 2 }}>{title || ''}</Typography>
     <Box 
       sx={{ 
         display: 'grid', 
@@ -16,6 +16,7 @@ export const NameFields = ({ title, values, handleChange, fieldPrefix }) => (
         label='First Name'
         value={values[`${fieldPrefix}FirstName`]}
         onChange={handleChange(`${fieldPrefix}FirstName`)}
+        error={errors[`${fieldPrefix}FirstName`]}
       />
       <TextInput
         label='Middle Name'
@@ -26,6 +27,7 @@ export const NameFields = ({ title, values, handleChange, fieldPrefix }) => (
         label='Last Name'
         value={values[`${fieldPrefix}LastName`]}
         onChange={handleChange(`${fieldPrefix}LastName`)}
+        error={errors[`${fieldPrefix}LastName`]}
       />
       <DropdownInput
         label='Suffix'

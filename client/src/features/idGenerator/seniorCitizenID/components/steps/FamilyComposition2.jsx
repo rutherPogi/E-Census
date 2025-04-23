@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
          Tooltip} from '@mui/material';
 
 import { useFormContext } from "../../components/others/FormContext";
-import { Notification } from "../../../components/Notification";
+import { Notification, FormButtons } from "../../../../../components/common";
  
 export default function FamilyComposition2({ handleBack, handleNext }) {
 
@@ -41,7 +41,7 @@ export default function FamilyComposition2({ handleBack, handleNext }) {
   return (
     <div className='responsive-container'>
       <div className='responsive-header'>FAMILY COMPOSITION</div>
-      <div className='responsive-table'>
+      <div className='responsive-form details'>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -59,14 +59,16 @@ export default function FamilyComposition2({ handleBack, handleNext }) {
               {familyComposition.map((member, index) => (
                 <TableRow key={index}>
                   <TableCell>
-                    {`${member.firstName} ${member.middleName} ${member.lastName} 
-                      ${member.suffix === 'N/A' ? '' : member.suffix}`}
+                    {`${member.firstName || ''} 
+                      ${member.middleName || ''} 
+                      ${member.lastName || ''} 
+                      ${member.suffix || ''}`}
                   </TableCell>
                   <TableCell>{member.age}</TableCell>
                   <TableCell>{member.relationship}</TableCell>
                   <TableCell>{member.civilStatus}</TableCell>
-                  <TableCell>{member.occupation}</TableCell>
-                  <TableCell>{`₱${member.income === 'N/A' ? '0.00' : member.income}`}</TableCell>
+                  <TableCell>{member.occupation || 'N/A'}</TableCell>
+                  <TableCell>{`₱${member.annualIncome || '0.00'}`}</TableCell>
                   <TableCell>
                     <Tooltip title='Edit'>
                       <IconButton color="primary" onClick={() => handleEdit(index)}>
@@ -85,12 +87,12 @@ export default function FamilyComposition2({ handleBack, handleNext }) {
           </Table>
         </TableContainer>
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleAdd} sx={{ width: '100%' }}>Add</Button>
-          <Button variant='contained' onClick={handleNext} sx={{ width: '100%' }}>Next</Button>
-        </div>
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleNext} 
+        backLabel = 'Add +' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

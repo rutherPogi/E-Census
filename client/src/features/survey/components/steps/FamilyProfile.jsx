@@ -84,14 +84,14 @@ export default function FamilyProfile({ handleBack, handleNext }) {
 
 
     if (!processedValues.isIpula) {
-      processedValues.settlementDetails = 'N/A';
-      processedValues.ethnicity = 'N/A';
-      processedValues.placeOfOrigin = 'N/A';
+      processedValues.settlementDetails = null;
+      processedValues.ethnicity = null;
+      processedValues.placeOfOrigin = null;
       processedValues.isTransient = false;
     }
 
     if (!processedValues.isTransient) {
-      processedValues.houseOwner = 'N/A';
+      processedValues.houseOwner = null;
       processedValues.isRegistered = false;
     }
 
@@ -102,7 +102,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     if (!processedValues.isAffiliated) {
       processedValues.asOfficer = null;
       processedValues.asMember = null;
-      processedValues.organizationAffiliated = 'N/A';
+      processedValues.organizationAffiliated = null;
     }
 
     Object.keys(processedValues).forEach((key) => {
@@ -116,12 +116,8 @@ export default function FamilyProfile({ handleBack, handleNext }) {
       }
       else if (!FP_REQUIRED_FIELDS.includes(key)) {
         const value = processedValues[key];
-        if (value === '' || value === null || value === undefined) {
-          if (key === 'monthlyIncome') {
-            processedValues[key] = '0';
-          } else {
-            processedValues[key] = 'N/A';
-          }
+        if (value === '' || value === undefined) {
+          processedValues[key] = null;
         }
       }
     });

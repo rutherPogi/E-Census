@@ -3,7 +3,7 @@ import pool from '../config/database.js';
 import * as surveyModel from '../models/surveyModel.js';
 import * as updateSurveyModel from '../models/updateSurveyModel.js';
 
-export const getNewSurveyId = async (req, res) => {
+export const newSurveyID = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
@@ -56,6 +56,9 @@ export const submitSurvey = async (req, res) => {
 
     console.log("Inserting Contact Info");
     await surveyModel.addContactInfo(populationID, surveyData.familyMembers, connection);
+
+    console.log("Inserting Government IDs");
+    await surveyModel.addGovernmentID(populationID, surveyData.familyMembers, connection);
 
     console.log("Inserting Affiliation");
     await surveyModel.addGovernmentAffiliation(populationID, surveyData.familyMembers, connection);
@@ -165,6 +168,7 @@ export const submitSurvey = async (req, res) => {
 };
 
 export const updateSurvey = async (req, res) => {
+  
   const connection = await pool.getConnection();
   
   try {
@@ -190,7 +194,6 @@ export const updateSurvey = async (req, res) => {
     );
     
 
-
     console.log("Updating Survey Details");
     await updateSurveyModel.updateSurvey(surveyData.surveyData, connection);
 
@@ -203,9 +206,6 @@ export const updateSurvey = async (req, res) => {
       await updateSurveyModel.updateHousehold(surveyData.surveyData, connection);
     }
 
-    
-    console.log("Creating Population");
-
     if(isCreating('populationID', 'familyMembers')) {
       console.log("Creating Population");
       await surveyModel.addPopulation(populationID, surveyID, surveyData.familyMembers, connection);
@@ -214,7 +214,6 @@ export const updateSurvey = async (req, res) => {
       await updateSurveyModel.updatePopulation(surveyData.familyMembers, connection);
     }
     
-
     if(isCreating('personalInfoID', 'familyMembers')) {
       console.log("Creating Personal Info");
       await surveyModel.addPersonalInfo(populationID, surveyData.familyMembers, connection);
@@ -237,6 +236,14 @@ export const updateSurvey = async (req, res) => {
     } else {
       console.log("Updating Contact Info");
       await updateSurveyModel.updateContactInfo(surveyData.familyMembers, connection);
+    }
+
+    if(isCreating('governmentID', 'familyMembers')) {
+      console.log("Creating Government ID");
+      await surveyModel.addGovernmentID(populationID, surveyData.familyMembers, connection);
+    } else {
+      console.log("Updating Government ID");
+      await updateSurveyModel.updateGovernmentID(surveyData.familyMembers, connection);
     }
 
     if(isCreating('governmentAffiliationID', 'familyMembers')) {
@@ -439,7 +446,7 @@ export const updateSurvey = async (req, res) => {
   }
 };
 
-export const manageSurvey = async (req, res) => {
+export const listSurvey = async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT 
@@ -495,7 +502,6 @@ export const viewSurvey = async (req, res) => {
       SELECT 
         p.populationID,
         p.surveyID,
-        p.philhealthNumber,
         p.healthStatus,
         p.remarks,
         p.isOSY,
@@ -539,6 +545,12 @@ export const viewSurvey = async (req, res) => {
         ci.landlineNumber,
         ci.emailAddress,
 
+        gi.sssNumber,
+        gi.gsisNumber,
+        gi.pagibigNumber,
+        gi.psnNumber,
+        gi.philhealthNumber,
+
         ga.governmentAffiliationID,
         ga.isAffiliated,
         ga.asOfficer,
@@ -559,13 +571,12 @@ export const viewSurvey = async (req, res) => {
       LEFT JOIN PersonalInformation pi ON p.populationID = pi.populationID
       LEFT JOIN ProfessionalInformation prof ON p.populationID = prof.populationID
       LEFT JOIN ContactInformation ci ON p.populationID = ci.populationID
+      LEFT JOIN GovernmentIDs gi ON p.populationID = gi.populationID
       LEFT JOIN GovernmentAffiliation ga ON p.populationID = ga.populationID
       LEFT JOIN NonIvatan ni ON p.populationID = ni.populationID
 
       WHERE p.surveyID = ?
     `, [surveyID]);
-
-
 
     console.log('Retrieving: Food Expenses');
     const [foodExpenses] = await connection.query(`

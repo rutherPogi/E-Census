@@ -41,7 +41,6 @@ export const useServiceForm = () => {
   // Load existing data for editing
   useEffect(() => {
     const storedEditIndex = sessionStorage.getItem('editingMemberIndex');
-    console.log(storedEditIndex);
     
     if (storedEditIndex !== null) {
       const index = parseInt(storedEditIndex);
@@ -123,12 +122,12 @@ export const useServiceForm = () => {
         ? values.dateServiceAvailed.format('YYYY-MM-DD')
         : null,
       // Ensure these are strings even if they were objects
-      ngoName: typeof values.ngoName === 'object' ? values.ngoName.value || '' : values.ngoName || '',
-      assistance: typeof values.assistance === 'object' ? values.assistance.value || '' : values.assistance || '',
+      ngoName: typeof values.ngoName === 'object' ? values.ngoName.value || null : values.ngoName || null,
+      assistance: typeof values.assistance === 'object' ? values.assistance.value || null : values.assistance || null,
       maleServed: parseInt(values.maleServed) || 0,
       femaleServed: parseInt(values.femaleServed) || 0,
       totalServed: parseInt(values.totalServed) || 0,
-      howServiceHelp: values.howServiceHelp || ''
+      howServiceHelp: values.howServiceHelp || null
     };
 
     if (isEditing) {

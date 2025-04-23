@@ -4,15 +4,8 @@ const FormContext = createContext();
 
 const initialFormData = {
   personalInfo: {},
-  disabilityInfo: {},
-  contactInfo: {},
-  professionalInfo: {},
-  organizationInfo: {},
-  idReferenceInfo: {},
   familyBackground: {},
-  accomplishedBy: {},
   otherInfo: {},
-  reportingUnit: {},
   pwdMedia: {}
 }; 
 

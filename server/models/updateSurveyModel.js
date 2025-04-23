@@ -55,8 +55,7 @@ export const updatePopulation = async (familyMembers, connection) => {
 
     const [result] = await connection.query(
       `UPDATE Population
-       SET philhealthNumber = ?,
-           healthStatus = ?,
+       SET healthStatus = ?,
            remarks = ?,
            isOSY = ?,
            inSchool = ?,
@@ -66,7 +65,6 @@ export const updatePopulation = async (familyMembers, connection) => {
            isSoloParent = ?
        WHERE populationID = ? AND surveyID = ?`,
       [
-        member.philhealthNumber || 'N/A',
         member.healthStatus || 'N/A',
         member.remarks || 'N/A',
         member.isOSY,
@@ -188,6 +186,30 @@ export const updateContactInfo = async (familyMembers, connection) => {
     );
     
     console.log('[ UPDATED ] Contact Info')
+    return result;
+  });
+
+  // Execute all updates and collect results
+  const results = await Promise.all(updatePromises);
+  return results;
+};
+
+export const updateGovernmentID = async (familyMembers, connection) => {
+
+  if (!familyMembers || familyMembers.length === 0) return null;
+
+  const updatePromises = familyMembers.map(async (member) => {
+
+    const [result] = await connection.query(
+      `UPDATE GovernmentIDs
+       SET philhealthNumber = ?
+       WHERE govID = ? AND populationID = ?`,
+      [
+        member.philhealthNumber || null
+      ]
+    );
+    
+    console.log('[ UPDATED ] Government ID')
     return result;
   });
 

@@ -5,6 +5,7 @@ import { authenticateToken } from '../middlewares/auth.js';
 
 const router = express.Router();
 
+router.post("/add-account", authController.addAccount);
 router.post("/register-batch", authController.registerBatch);
 router.post("/login", authController.login);
 

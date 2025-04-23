@@ -1,36 +1,32 @@
-import { useState, useEffect } from "react";
-import { Button, Container, Typography, Box} from '@mui/material';
+import { useEffect } from "react";
+
+import { NameFields } from "../others/Namefield";
+import { FormButtons } from '../../../../../components/common';
+import { FB_INITIAL_VALUES } from "../../utils/initialValues";
 
 import { useFormContext } from "../others/FormContext";
-import { NameFields } from "../../components/others/Namefield";
-import { Notification } from "../../../components/Notification";
-import { TextInput } from "../../../../../components/common/FormFields";
+import { useFormValidation } from '../../hooks/useFormValidation';
+
+
+
+
 
 export default function FamilyBackground({ handleBack, handleNext}) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
-
-  const [values, setValues] = useState({
-    fatherFirstName: '', fatherMiddleName: '', fatherLastName: '', fatherSuffix: '',
-    motherFirstName: '', motherMiddleName: '', motherLastName: '',
-    guardianFirstName: '', guardianMiddleName: '', guardianLastName: '', guardianSuffix: '',
-  }); 
+  const {
+    values,
+    setValues,
+    errors,
+    handleChange,
+  } = useFormValidation( FB_INITIAL_VALUES );
 
   useEffect(() => {
     if (formData.familyBackground) {
       setValues(prev => ({ ...prev, ...formData.familyBackground }));
     }
   }, [formData.familyBackground]);
-
-  const handleChange = (field) => (e, newValue) => {
-    let value = newValue?.value || e.target.value;
-
-    setValues(prev => ({ ...prev, [field]: value }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,48 +49,36 @@ export default function FamilyBackground({ handleBack, handleNext}) {
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>FAMILY BACKGROUND</div>
-      <Container sx = {{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
-        <NameFields title="Father's Name" values={values} handleChange={handleChange} fieldPrefix="father" />
-        <Box sx = {{mb: 2}}>
-          <Typography sx = {{ mb: 2}}>Mother's Name</Typography>
-          <Box 
-            sx={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(4, 1fr)', 
-              gap: 2 
-            }}
-          >
-            <TextInput
-              label='First Name'
-              value={values.motherFirstName}
-              onChange={handleChange(`motherFirstName`)}
-            />
-            <TextInput
-              label='Middle Name'
-              value={values.motherMiddleName}
-              onChange={handleChange(`motherMiddleName`)}
-            />
-            <TextInput
-              label='Last Name'
-              value={values.motherLastName}
-              onChange={handleChange(`motherLastName`)}
-            />
-            <Box/>
-          </Box>
-        </Box>
-        <NameFields title="Guardian's Name" values={values} handleChange={handleChange} fieldPrefix="guardian" />
-      </Container>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
+      <div className='responsive-form details'>
+        <div className="section-title field-full">Father's Name</div>
+        <NameFields 
+          values={values} 
+          handleChange={handleChange} 
+          fieldPrefix="father" 
+          errors={errors}
+        />
+  
+        <div className="section-title field-full">Mother's Name</div>
+        <NameFields 
+          values={values} 
+          handleChange={handleChange} 
+          fieldPrefix="mother" 
+          errors={errors}
+        />
+  
+        <div className="section-title field-full">Gurdian's Name</div>
+        <NameFields 
+          values={values} 
+          handleChange={handleChange} 
+          fieldPrefix="guardian" 
+          errors={errors}
+        />
       </div>
-      <Notification
-        snackbarMessage={snackbarMessage} 
-        snackbarOpen={snackbarOpen} 
-        setSnackbarOpen={setSnackbarOpen} 
-        severity={severity}
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Back' 
+        nextLabel = 'Next' 
       />
     </div>
   )

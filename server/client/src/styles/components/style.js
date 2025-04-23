@@ -1,7 +1,0 @@
-import './form.css'
-import './form-button.css'
-import './form-fields.css'
-import './form-table.css'
-import './form-file.css'
-import './form-view.css'
-import './pagination.css'

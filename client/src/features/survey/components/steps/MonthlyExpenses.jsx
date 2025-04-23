@@ -42,7 +42,7 @@ export default function MonthlyExpenses({ handleBack, handleNext }) {
         monthlyTotal: total,
         monthlyExpensesID: formData.monthlyExpenses.monthlyExpensesID
       });
-      console.log('MONTHLY EXPENSES: ', formData.MonthlyExpenses);
+      console.log('MONTHLY EXPENSES: ', processedValues);
       handleNext();
     };
   

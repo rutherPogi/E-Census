@@ -3,30 +3,29 @@ import { useNavigate } from "react-router-dom";
 import { Box, Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
 
-import { FP_INITIAL_VALUES } from "../utils/initialStates";
+import { FP_INITIAL_VALUES } from "../utils/initialValues";
 import { Notification } from "../../../../components/common";
 
 import { useFormValidation } from '../hooks/useFormValidation';
 import { useNotification } from "../hooks/useNotification";
 import { get, post } from "../../../../utils/api/apiService";
 
-import SearchResultsTable from '../components/others/FindPerson/SearchResult';
-import PersonSearchForm from "../components/others/FindPerson/PersonSearch";
-import FormButtons from '../components/others/FindPerson/FormButtons';
+import SearchResultsTable from '../components/others/FindPersonSection/SearchResult';
+import PersonSearchForm from "../components/others/FindPersonSection/PersonSearch";
+import FormButtons from '../components/others/FindPersonSection/FormButtons';
 
 
 
 
 
-
-export default function FindPerson() {
+export default function PWDFindPerson() {
 
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState(null);
-  const [populationID, setPopulationID] = useState('');
-  const [pwdIDNumber, setpwdIDNumber] = useState('');
 
+  const [populationID, setPopulationID] = useState('');
+  const [pwdApplicationID, setpwdApplicationID] = useState('');
 
   const navigate = useNavigate();
 
@@ -51,7 +50,7 @@ export default function FindPerson() {
 
   const generateNewSurveyId = async () => {
     try {
-      const response = await get('/pwdID/generate-pwdID');
+      const response = await get('/pwdID/generate');
       return response.pwdID;
     } catch (err) {
       console.error('Error fetching PWD ID:', err);
@@ -76,9 +75,7 @@ export default function FindPerson() {
             .split('T')[0]
         : null;
 
-      
-      // Option 1: Use POST method instead of GET to send search parameters
-      const response = await post('/pwdID/find-pwdID', {
+      const response = await post('/pwdID/find', {
         firstName: values.firstName,
         middleName: values.middleName || '',
         lastName: values.lastName,
@@ -104,35 +101,42 @@ export default function FindPerson() {
     }
   };
 
-  const handleSelectPerson = (person) => {
+  const handleSelectPerson = (person, uniqueKey) => {
+    // Store the relevant IDs
+    const id = person.populationID || person.pwdApplicationID || null;
+    
+    console.log('Selected ID:', id);
+    console.log('PWD ID NUMBER:', person.pwdApplicationID || 'None');
 
-    console.log('POPULATION ID:', person.populationID);
-    console.log('PWD ID NUMBER:', person.pwdIDNumber);
+    // Set the IDs to state variables
+    setPopulationID(person.populationID || null);
+    setpwdApplicationID(person.pwdApplicationID || null);
 
-    setPopulationID(person.populationID);
-    setpwdIDNumber(person.pwdIDNumber);
-
-    setSelectedPerson(person.populationID === selectedPerson ? null : person.populationID);
+    console.log('Population ID:', populationID);
+    console.log('PWD Application ID:', pwdApplicationID);
+    
+    // Toggle selection logic
+    setSelectedPerson(uniqueKey === selectedPerson ? null : uniqueKey);
   };
 
   const handleContinue = async () => {
 
-    if (populationID && pwdIDNumber) {
+    if (pwdApplicationID) {
       console.log('RENEWAL');
-      navigate(`/main/generate-id/pwd/renewal/${pwdIDNumber}/${populationID}`);
+      navigate(`/main/generate-id/pwd/renewal/${pwdApplicationID}`);
       return;
     } else if (populationID) {
       console.log('REGISTERED RESIDENT');
       const newApplicantID = await generateNewSurveyId();
       console.log('NEW APPLICANT ID:', newApplicantID);
       console.log('POPULATION ID:', populationID);
-      navigate(`/main/generate-id/pwd/registered/${newApplicantID}/${populationID}`);
+      navigate(`/main/generate-id/pwd/resident/${newApplicantID}/${populationID}`);
     } else {
       console.log('NEW APPLICANT');
       const newApplicantID = await generateNewSurveyId();
       console.log('NEW APPLICANT ID:', newApplicantID);
       navigate(`/main/generate-id/pwd/new/${newApplicantID}`, { 
-        state: { applicantNumber: newApplicantID } 
+        state: { pwdApplicationNumber: newApplicantID } 
       });
     }
     

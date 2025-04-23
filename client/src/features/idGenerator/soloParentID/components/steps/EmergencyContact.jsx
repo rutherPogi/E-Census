@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
-import { Button, Box } from '@mui/material';
+import { useEffect } from "react";
 
-import { useFormContext } from "../../components/others/FormContext";
-import { EC_REQUIRED_FIELDS, BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS, RELATIONSHIP_OPTIONS } from '../../utils/constants';
-import { Notification } from "../../../components/Notification";
-import { formatters } from "../../../utils/formatter";
+import { Notification, FormButtons } from "../../../../../components/common";
+import { RELATIONSHIP_OPTIONS, BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from "../../utils/options";
+import { EC_INITIAL_VALUES } from "../../utils/initialValues";
+import { EC_REQUIRED_FIELDS } from "../../utils/requiredFields";
 import { TextInput, DropdownInput, ContactNumberInput } from '../../../../../components/common/FormFields'
+
+import { useFormContext } from "../others/FormContext";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+
 
 
 
@@ -13,29 +17,27 @@ export default function EmergencyContact({ handleBack, handleNext}) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+  } = useFormValidation(
+    EC_INITIAL_VALUES,
+    true, 
+    EC_REQUIRED_FIELDS
+  );
 
-  const [values, setValues] = useState({
-    name: '',
-    relationship: '',
-    street: '',
-    barangay: '',
-    municipality: '',
-    province: '',
-    mobileNumber: ''
-  }); 
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
-  const [errors, setErrors] = useState({
-    name: false,
-    relationship: false,
-    street: false,
-    barangay: false,
-    municipality: false,
-    province: false,
-    mobileNumber: false
-  }); 
+
 
   useEffect(() => {
     if (formData.emergenyContact) {
@@ -43,41 +45,12 @@ export default function EmergencyContact({ handleBack, handleNext}) {
     }
   }, [formData.emergenyContact]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    EC_REQUIRED_FIELDS.forEach(field => {
-      if (!values[field]) {
-        newErrors[field] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleChange = (field) => (e, newValue) => {
-    let value = newValue?.value || e.target.value;
-
-    if (field === 'mobileNumber') {
-      value = formatters.phone(value, 'mobile');
-    }
-
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
-      
-      return;
+      return showNotification("Please fill in all required fields", 'error');
     }
 
     const processedValues = { ...values };
@@ -85,13 +58,13 @@ export default function EmergencyContact({ handleBack, handleNext}) {
     Object.keys(processedValues).forEach((key) => {
       if (!EC_REQUIRED_FIELDS.includes(key)) {
         const value = processedValues[key];
-        if (value === '' || value === null) {
-          processedValues[key] = 'N/A';
+        if (value === '' || value === undefined) {
+          processedValues[key] = null;
         }
       }
     });
     
-    updateFormData('emergenyContact', processedValues);
+    updateFormData('emergencyContact', processedValues);
     console.log("Emergency Contact:", processedValues);
     
     handleNext();
@@ -103,10 +76,10 @@ export default function EmergencyContact({ handleBack, handleNext}) {
       <div className='responsive-form'>
         <TextInput
           label='Name'
-          value={values.name}
-          onChange={handleChange('name')}
-          error={errors.name}
-          helperText = {errors.name || 'e.g. Juan Dela Cruz'}
+          value={values.contactName}
+          onChange={handleChange('contactName')}
+          error={errors.contactName}
+          helperText = {errors.contactName || 'e.g. Juan Dela Cruz'}
           required
         />
         <DropdownInput
@@ -128,7 +101,6 @@ export default function EmergencyContact({ handleBack, handleNext}) {
           variant = 'outlined'
           code = '+63'
         />
-        <Box></Box>
         <TextInput
           label='House Number & Street'
           value={values.street}
@@ -165,12 +137,12 @@ export default function EmergencyContact({ handleBack, handleNext}) {
           required
         />
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Back' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

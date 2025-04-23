@@ -1,26 +1,42 @@
-import { useState, useEffect } from "react";
-import { Box, Button, Container } from '@mui/material';
+import { useEffect } from "react";
+
+import { Notification, FormButtons } from "../../../../../components/common";
+import { OTHERINFO_INITIAL_VALUES } from "../../utils/initialValues";
+import { OTHERINFO_REQUIRED_FIELDS } from "../../utils/requiredFields";
 
 import { useFormContext } from "../others/FormContext";
-import { NameFields } from "../../components/others/Namefield";
-import { Notification } from "../../../components/Notification";
-import { TextInput } from "../../../../../components/common/FormFields";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+
+import AccomplishedBy from "../others/OtherInfoSection/AccomplishedBy";
+import CertifiedPhysician from "../others/OtherInfoSection/CertifiedPhysician";
+
+
 
 
 export default function OtherInfo({ handleBack, handleNext}) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+  } = useFormValidation( 
+    OTHERINFO_INITIAL_VALUES,
+    true,
+    OTHERINFO_REQUIRED_FIELDS
+  );
 
-  const [values, setValues] = useState({
-    cpFirstName: '', cpMiddleName: '', cpLastName: '', cpSuffix: '', license: '',
-    poFirstName: '', poMiddleName: '', poLastName: '', poSuffix: '',
-    aoFirstName: '', aoMiddleName: '', aoLastName: '', aoSuffix: '',
-    eFirstName: '', eMiddleName: '', eLastName: '', eSuffix: ''
-  }); 
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
   useEffect(() => {
     if (formData.otherInfo) {
@@ -28,14 +44,13 @@ export default function OtherInfo({ handleBack, handleNext}) {
     }
   }, [formData.otherInfo]);
 
-  const handleChange = (field) => (e, newValue) => {
-    let value = newValue?.value || e.target.value;
-
-    setValues(prev => ({ ...prev, [field]: value }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      showNotification("Please fill in all required fields", "error");
+      return;
+    }
 
     const processedValues = { ...values }
     
@@ -47,6 +62,7 @@ export default function OtherInfo({ handleBack, handleNext}) {
     });
 
     updateFormData('otherInfo', processedValues);
+    
     console.log("Accomplished By:", processedValues);
     
     handleNext();
@@ -56,33 +72,29 @@ export default function OtherInfo({ handleBack, handleNext}) {
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>OTHER INFORMATION</div>
-      <Container sx = {{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
-        <Box>
-          <NameFields title="Certified Physician" values={values} handleChange={handleChange} fieldPrefix="cp" />
-          <Box sx={{ display: 'grid',  gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
-            <TextInput
-              label='License No.'
-              value={values.license}
-              onChange={handleChange(`license`)}
-              helperText='e.g. --'
-            />
-          </Box>
-        </Box>
-        <NameFields title="Processing Officer" values={values} handleChange={handleChange} fieldPrefix="po" />
-        <NameFields title="Approving Officer" values={values} handleChange={handleChange} fieldPrefix="ao" />
-        <NameFields title="Encoder" values={values} handleChange={handleChange} fieldPrefix="e" />
-      </Container>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
+      <div className='responsive-form details'>
+        <AccomplishedBy
+          values = {values}
+          handleChange = {handleChange}
+          errors = {errors}
+        />
+        <CertifiedPhysician
+          values = {values}
+          handleChange = {handleChange}
+          errors = {errors}
+        />
       </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Back' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 
         setSnackbarOpen={setSnackbarOpen} 
-        setSeverity={severity}
+        severity={severity}
       />
     </div>
   )

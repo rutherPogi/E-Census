@@ -1,21 +1,36 @@
-import { useState, useEffect } from "react";
-import { Button, Typography } from '@mui/material';
+import { useEffect } from "react";
 
-import { useFormContext } from "../../components/others/FormContext";
-import { Notification } from "../../../components/Notification";
+import { Notification, FormButtons } from "../../../../../components/common";
 import { TextInput } from '../../../../../components/common/FormFields'
+import { PN_INITIAL_VALUES } from "../../utils/initialValues";
+
+import { useFormContext } from "../others/FormContext";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+
 
 
 export default function ProblemNeeds({ handleBack, handleNext}) {
 
   const { formData, updateFormData } = useFormContext();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+  } = useFormValidation( PN_INITIAL_VALUES );
 
-  const [values, setValues] = useState({ causeSoloParent: '', needsSoloParent: '' }); 
-  const [errors, setErrors] = useState({ causeSoloParent: false, needsSoloParent: false }); 
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
+
+
 
   useEffect(() => {
     if (formData.problemNeeds) {
@@ -23,44 +38,20 @@ export default function ProblemNeeds({ handleBack, handleNext}) {
     }
   }, [formData.problemNeeds]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    Object.keys(values).forEach(field => {
-      if (!values[field]) {
-        newErrors[field] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
-      
-      return;
+      return showNotification("Please fill in all required fields", 'error');
     }
 
     const processedValues = { ...values };
     
     Object.keys(processedValues).forEach((key) => {
       const value = processedValues[key];
-      if (value === '' || value === null) {
-        processedValues[key] = 'N/A';
+      if (value === '' || value === undefined) {
+        processedValues[key] = null;
       }
     });
     
@@ -73,7 +64,7 @@ export default function ProblemNeeds({ handleBack, handleNext}) {
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>SOLO PARENT CIRCUMTANCES, PROBLEMS, AND NEEDS</div>
-      <div className='responsive-details'>
+      <div className='responsive-form details'>
         <TextInput
           value={values.causeSoloParent}
           onChange={handleChange('causeSoloParent')}
@@ -93,12 +84,12 @@ export default function ProblemNeeds({ handleBack, handleNext}) {
           required
         />
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Back' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

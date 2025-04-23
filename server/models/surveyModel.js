@@ -44,8 +44,6 @@ export const generateSurveyId = async (connection) => {
   }
 };
 
-
-
 export const createSurvey = async (surveyData, connection) => {
 
   const [result] = await connection.query(
@@ -90,7 +88,6 @@ export const addPopulation = async (populationID, surveyId, familyMembers, conne
   const familyMemberValues = familyMembers.map((member, index) => [
     `${populationID}-${index + 1}`,
     surveyId,
-    member.philhealthNumber || 'N/A',
     member.healthStatus || 'N/A',
     member.remarks || 'N/A',
     member.isOSY,
@@ -103,7 +100,7 @@ export const addPopulation = async (populationID, surveyId, familyMembers, conne
   
   const [result] = await connection.query(
     `INSERT INTO Population
-     (populationID, surveyID, philhealthNumber, healthStatus, remarks,
+     (populationID, surveyID, healthStatus, remarks,
       isOSY, inSchool, outOfTown, isOFW, isPWD, isSoloParent) 
      VALUES ?`,
     [familyMemberValues]
@@ -185,6 +182,26 @@ export const addContactInfo = async (populationID, familyMembers, connection) =>
     `INSERT INTO ContactInformation
      ( populationID, 
        mobileNumber ) 
+     VALUES ?`,
+    [familyMemberValues]
+  );
+  
+  return result;
+};
+
+export const addGovernmentID = async (populationID, familyMembers, connection) => {
+  
+  if (!familyMembers || familyMembers.length === 0) return null;
+  
+  const familyMemberValues = familyMembers.map((member, index) => [
+    `${populationID}-${index + 1}`,
+    member.philhealthNumber || null
+  ]);
+  
+  const [result] = await connection.query(
+    `INSERT INTO GovernmentIDs
+     ( populationID, 
+       philhealthNumber ) 
      VALUES ?`,
     [familyMemberValues]
   );

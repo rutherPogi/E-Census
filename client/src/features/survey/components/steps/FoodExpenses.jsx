@@ -42,7 +42,7 @@ export default function FoodExpenses({ handleBack, handleNext }) {
       foodExpensesID: formData.foodExpenses.foodExpensesID 
     });
 
-    console.log('FOOD EXPENSES: ', formData.foodExpenses);
+    console.log('FOOD EXPENSES: ', processedValues);
     handleNext();
   };
 

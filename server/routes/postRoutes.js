@@ -6,26 +6,29 @@ import { uploadToMemory, processImageForDatabase } from '../middlewares/multer.j
 const router = express.Router();
 
 
-router.get('/getPosts', postController.getAllPosts);
-router.get('/posts/:id', authenticateToken, postController.getPostById);
+router.get('/getPosts', postController.getPosts);
+router.get('/getPostImages', postController.getImages);
+
+router.get('/get/:id', postController.getPostById);
+router.get('/get/:id/images', postController.getPostImages);
 
 
-router.post('/addPost', 
-  authenticateToken,
-  uploadToMemory.single('image'),  // Use memory storage for database
-  processImageForDatabase,        // Process image for database storage
+router.post('/add', 
+  authenticateToken, 
+  uploadToMemory.array('image', 10),
+  processImageForDatabase,
   postController.createPost
 );
 
-router.put('/posts/:id',
+router.put('/update/:postID',
   authenticateToken,
-  uploadToMemory.single('image'),  // Allow updating the image
+  uploadToMemory.array('image', 10),
   processImageForDatabase,
   postController.updatePost
 );
 
-
-router.delete('/posts/:id', authenticateToken, postController.deletePost);
+router.delete('/delete/:id', authenticateToken, postController.deletePost);
+router.post('/delete-multiple', authenticateToken, postController.deleteMultiplePosts);
 
 
 

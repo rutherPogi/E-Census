@@ -1,114 +1,97 @@
 import { useState, useEffect } from "react";
-import { useLocation } from 'react-router-dom';
-import { Button } from '@mui/material';
-import dayjs from "dayjs";
+import { useParams } from 'react-router-dom';
 
-import { useFormContext } from "../../components/others/FormContext";
-import { CIVIL_STATUS_OPTIONS, SUFFIX_OPTIONS, SEX_OPTIONS, PI_REQUIRED_FIELDS } from '../../utils/constants';
-import { Notification } from "../../../components/Notification";
-import { TextInput, DropdownInput, DateInput } from '../../../../../components/common/FormFields'
+import { Notification, FormButtons } from "../../../../../components/common";
+import { PI_INITIAL_VALUES } from "../../utils/initialValues";
+import { PI_REQUIRED_FIELDS } from "../../utils/requiredFields";
+
+import { useFormContext } from "../others/FormContext";
+import { useNotification } from '../../hooks/useNotification';
+import { useFormValidation } from '../../hooks/useFormValidation';
+import { useTransformData } from "../../hooks/useTransformData";
+
+import PersonalDetails from "../others/PersonalInfoSection/PersonalDetails";
+import ContactDetails from "../others/PersonalInfoSection/ContactDetails";
+import ProfessionalDetails from "../others/PersonalInfoSection/ProfessionalDetails";
+import OscaDetails from "../others/PersonalInfoSection/OscaDetails";
 
 
-export default function PersonalInfo({ handleBack, handleNext}) {
 
-  const location = useLocation();
-  const seniorCitizenID = location.state?.seniorCitizenID;
+export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
+
+  const { scApplicationID } = useParams();
+
   const { formData, updateFormData } = useFormContext();
+  const { fetchPersonData } = useTransformData();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [severity, setSeverity] = useState('');
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const [values, setValues] = useState({
-    seniorCitizenID: seniorCitizenID,
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    suffix: '',
-    birthdate: null,
-    age: '',
-    sex: '',
-    civilStatus: '',
-    birthplace: ''
-  }); 
- 
-  const [errors, setErrors] = useState({
-    firstName: false,
-    middleName: false,
-    lastName: false,
-    suffix: false,
-    birthdate: false,
-    sex: false,
-    civilStatus: false,
-    birthplace: false
-  }); 
+  const {
+    values,
+    setValues,
+    errors,
+    validateForm,
+    handleChange,
+    handleDateChange,
+    handleContactChange,
+    handleIncomeChange
+  } = useFormValidation(
+    PI_INITIAL_VALUES(scApplicationID),
+    true, 
+    PI_REQUIRED_FIELDS
+  );
+
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
+
 
   useEffect(() => {
-    if (formData.personalInfo) {
-      setValues(prev => ({ ...prev, ...formData.personalInfo, seniorCitizenID: seniorCitizenID }));
+    if (isRegistered && !initialFetchDone) {
+      console.log('fetching...');
+      fetchPersonData()
+        .then(() => {
+          setInitialFetchDone(true);
+        })
+        .catch(err => {
+          console.error('Error fetching survey data:', err);
+          setInitialFetchDone(true);
+        });
     }
-  }, [formData.personalInfo, seniorCitizenID]);
-
-  const validateForm = () => {
-    const newErrors = {};
-    let isValid = true;
-
-    PI_REQUIRED_FIELDS.forEach(field => {
-      if (!values[field]) {
-        newErrors[field] = 'This field is required';
-        isValid = false;
-      }
-    });
-
-    setErrors(newErrors);
-    return isValid;
-  };
-
-  const handleBirthdateChange = (dateValue) => {
-    if (!dateValue) {
-      setValues({ ...values, birthdate: null, age: '' });
-      return;
-    }
-
-    if (dateValue.isAfter(dayjs())) {
-      setErrors(true);
-      setValues({ ...values, birthdate: dateValue, age: '' });
-      return;
-    }
-
-    setErrors(false);
-    const birthdate = dateValue.toDate(); // Convert dayjs to JavaScript Date
-    const today = new Date();
-    let age = today.getFullYear() - birthdate.getFullYear();
-    
-    // Adjust if the birthday hasn't occurred this year yet
-    const monthDiff = today.getMonth() - birthdate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
-      age--;
-    }
+  }, [isRegistered, initialFetchDone, fetchPersonData]);
   
-    setValues({ 
-      ...values, 
-      birthdate: dateValue,
-      age: age >= 0 ? age : '' 
-    });
-  };
+  useEffect(() => {
+    // Once data is fetched and available, set the form values only once
+    if (isRegistered && initialFetchDone && formData.personalInfo) {
+      setValues(prev => ({
+        ...prev,
+        ...formData.personalInfo,
+        scApplicationID: scApplicationID,
+      }));
+    }
+  }, [isRegistered, initialFetchDone, formData.personalInfo, scApplicationID]);
 
-  const handleChange = (field) => (e, newValue) => {
-    const value = newValue?.value || e.target.value;
-    setValues(prev => ({ ...prev, [field]: value }));
-    setErrors(prev => ({ ...prev, [field]: false }));
-  };
+  useEffect(() => {
+    // Once data is fetched and available, set the form values only once
+    if (formData.personalInfo) {
+      setValues(prev => ({
+        ...prev,
+        ...formData.personalInfo,
+        scApplicationID: scApplicationID,
+      }));
+    }
+  }, [isRegistered, initialFetchDone, formData.personalInfo, scApplicationID]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
         
     if (!validateForm()) {
-      setSnackbarMessage("Please fill in all required fields");
-      setSeverity('error');
-      setSnackbarOpen(true);
-      
-      return;
+      return showNotification("Please fill in all required fields", 'error');
     }
 
     const processedValues = { ...values };
@@ -116,8 +99,8 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     Object.keys(processedValues).forEach((key) => {
       if (!PI_REQUIRED_FIELDS.includes(key)) {
         const value = processedValues[key];
-        if (value === '' || value === null) {
-          processedValues[key] = 'N/A';
+        if (value === '' || value === undefined) {
+          processedValues[key] = null;
         }
       }
     });
@@ -132,83 +115,37 @@ export default function PersonalInfo({ handleBack, handleNext}) {
     <div className='responsive-container'>
       <div className='responsive-header'>PERSONAL INFORMATION</div>
       <div className='responsive-form'>
-        <TextInput
-          label='First Name'
-          value={values.firstName}
-          onChange={handleChange('firstName')}
-          error={errors.firstName}
-          helperText = {errors.firstName || 'e.g. Juan'}
-          required
+        <PersonalDetails
+          values={values}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          errors={errors}
         />
-        <TextInput
-          label='Middle Name'
-          value={values.middleName}
-          onChange={handleChange('middleName')}
-          error={errors.middleName}
-          helperText = {errors.middleName || 'e.g. Santos'}
+        <ContactDetails
+          values={values}
+          handleChange={handleChange}
+          handleContactChange={handleContactChange}
+          errors={errors}
         />
-        <TextInput
-          label='Last Name'
-          value={values.lastName}
-          onChange={handleChange('lastName')}
-          error={errors.lastName}
-          helperText = {errors.lastName || 'e.g. Dela Cruz'}
-          required
+        <ProfessionalDetails
+          values={values}
+          handleChange={handleChange}
+          handleIncomeChange={handleIncomeChange}
+          errors={errors}
         />
-        <DropdownInput
-          label = 'Suffix'
-          options = {SUFFIX_OPTIONS}
-          value = {values.suffix}
-          onChange = {(e, newValue) => handleChange('suffix')(e, newValue)}
-          error = {errors.suffix} 
-          helperText = {errors.suffix || 'e.g. Jr - Junior'}
-        />
-        <DateInput
-          label =  'Birthdate'
-          value =  {values.birthdate}
-          onChange={handleBirthdateChange}
-          error = {errors.birthdate}  
-          helperText =  {errors.birthdate}
-          required
-        />
-        <TextInput
-          label='Age'
-          value={values.age}
-          disabled
-        />
-        <DropdownInput
-          label = 'Sex'
-          options = {SEX_OPTIONS}
-          value = {values.sex}
-          onChange = {(e, newValue) => handleChange('sex')(e, newValue)}
-          error = {errors.sex} 
-          helperText = {errors.sex || 'e.g. Male'}
-          required
-        />
-        <TextInput
-          label='Place of Birth'
-          value={values.birthplace}
-          onChange={handleChange('birthplace')}
-          error={errors.birthplace}
-          helperText = {errors.birthplace || 'e.g. ---'}
-          required
-        />
-        <DropdownInput
-          label = 'Civil Status'
-          options = {CIVIL_STATUS_OPTIONS}
-          value = {values.civilStatus}
-          onChange = {(e, newValue) => handleChange('civilStatus')(e, newValue)}
-          error = {errors.civilStatus} 
-          helperText = {errors.civilStatus || 'e.g. Single'}
-          required
+        <OscaDetails
+          values={values}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          errors={errors}
         />
       </div>
-      <div className='form-buttons'>
-        <div className='form-buttons-right'>
-          <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-          <Button variant='contained' onClick={handleSubmit} sx={{ width: '100%' }}>Next</Button>
-        </div> 
-      </div>
+      <FormButtons
+        onBack = {handleBack} 
+        onNext = {handleSubmit} 
+        backLabel = 'Cancel' 
+        nextLabel = 'Next' 
+      />
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

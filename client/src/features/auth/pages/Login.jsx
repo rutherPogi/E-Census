@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Button, Typography, Snackbar, Alert, useMediaQuery } from '@mui/material';
 import axios from "axios";
@@ -11,11 +11,15 @@ import { UsernameInput, PasswordInput } from "../../../components/common/FormFie
 
 const Login = () => {
 
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ username: false, password: false });
   const [isLoading, setIsLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+
 
 
   const { login } = useAuth();
@@ -29,6 +33,16 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!isOnline) {
+      console.log("You are offline. Please connect to the internet to log in.");
+      setSnackbar({ 
+        open: true, 
+        message: "You are offline. Please connect to the internet to log in.", 
+        severity: "error" 
+      });
+      return;
+    }
     
     // Form validation
     const newErrors = {
@@ -71,6 +85,9 @@ const Login = () => {
         userID: res.data.userID,
         position: res.data.position
       };
+
+      localStorage.setItem('authToken', res.data.token);
+      localStorage.setItem('userData', JSON.stringify(userData)); // optional: store extra user info
 
       login(res.data.token, userData);
       

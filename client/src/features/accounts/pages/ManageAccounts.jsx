@@ -9,7 +9,11 @@ import { ACCOUNT_TABLE_HEADERS, POSITION_MAP } from '../utils/constants';
 import { Notification } from '../../../components/common/Notification';
 import { useNotification } from '../hooks/useNotification';
 
+
+
+
 const ManageAccounts = () => {
+  
   const navigate = useNavigate();
 
   const [accountsData, setAccountsData] = useState([]);

@@ -1,47 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Box, Button, Typography, Snackbar, Alert, useMediaQuery } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import axios from "axios";
 
 import logo from "../../../assets/MSWDO-Logo.png";
-import { useAuth } from '../../../utils/auth/authContext';
+import { Notification } from "../../../components/common/Notification";
 import { UsernameInput, PasswordInput } from "../../../components/common/FormFields";
+
+import { useAuth } from '../../../utils/auth/authContext';
+import { post } from '../../../utils/api/apiService';
+import { useNotification } from "../../accounts/hooks/useNotification";
 
 
 
 const Login = () => {
 
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ username: false, password: false });
   const [isLoading, setIsLoading] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
-
-
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
+  const { 
+    snackbarOpen, 
+    snackbarMessage, 
+    severity, 
+    showNotification, 
+    setSnackbarOpen 
+  } = useNotification();
 
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!isOnline) {
-      console.log("You are offline. Please connect to the internet to log in.");
-      setSnackbar({ 
-        open: true, 
-        message: "You are offline. Please connect to the internet to log in.", 
-        severity: "error" 
-      });
-      return;
+      return showNotification("You are offline. Please connect to the internet to log in.", "error");
     }
     
     // Form validation
@@ -58,54 +54,38 @@ const Login = () => {
     
     // Start loading state
     setIsLoading(true);
+    console.log("Loggin In...");
     
     try {
-      // API call to login
-      const res = await axios.post("http://localhost:3000/api/auth/login", {
-        username,
-        password,
-      });
+      const res = await post("/auth/login", { username, password });
       
-      // Validate token from response
-      if (!res.data.token) {
-        console.error("No token received from server");
-        setSnackbar({ 
-          open: true, 
-          message: "Authentication error - no token received", 
-          severity: "error" 
-        });
-        return;
+      if (!res.token) {
+        return showNotification("Authentication error - no token received", "error");
       }
 
-      
-      // Store token, user data and update auth context
       const userData = {
-        username: res.data.username,
-        accountName: res.data.accountName,
-        userID: res.data.userID,
-        position: res.data.position
+        username: res.username,
+        accountName: res.accountName,
+        userID: res.userID,
+        position: res.position
       };
 
-      localStorage.setItem('authToken', res.data.token);
-      localStorage.setItem('userData', JSON.stringify(userData)); // optional: store extra user info
+      localStorage.setItem('authToken', res.token);
+      localStorage.setItem('userData', JSON.stringify(userData));
 
-      login(res.data.token, userData);
-      
-      // Set authorization header for future requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
-      
-      // Show success message and redirect
-      setSnackbar({ open: true, message: "Login successful!", severity: "success" });
+      login(res.token, userData);
+
+      axios.defaults.headers.common['Authorization'] = `Bearer ${res.token}`;
+
+      showNotification("Login successful!", "success");
       setTimeout(() => navigate('/main'), 1500);
     } catch (err) {
       console.error(err);
-      
-      // Handle different error cases
+
       let errorMessage = "Error logging in";
       if (err.response?.status === 401) errorMessage = "Invalid username or password";
       else if (err.response?.status === 404) errorMessage = "User not found";
-      
-      setSnackbar({ open: true, message: errorMessage, severity: "error" });
+      showNotification(errorMessage, "error");
     } finally {
       setIsLoading(false);
     }
@@ -119,22 +99,26 @@ const Login = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '100px',
+        gap: { xs: '40px', sm: '60px', md: '80px', lg: '100px' },
         backgroundColor: '#2A2A3A',
-        padding: { xs: '20px', sm: '40px' },
+        padding: { xs: '16px', sm: '24px', md: '32px', lg: '40px' },
         boxSizing: 'border-box'
-
-      }}>
-
+      }}
+    >
       {/* Logo and header section */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        width: '100%' 
+      }}>
         <Box
           component="img"
           src={logo}
           alt="eCensus Logo"
           sx={{
-            height: { xs: '50px', sm: '80px' },
-            marginBottom: '16px'
+            height: { xs: '40px', sm: '50px', md: '60px', lg: '80px' },
+            marginBottom: { xs: '8px', sm: '12px', md: '16px' }
           }}
         />
 
@@ -142,7 +126,9 @@ const Login = () => {
           variant="h2" 
           fontFamily={'Prosto One'} 
           color="#fff"
-          sx={{ fontSize: { xs: '28px', sm: '36px' } }}
+          sx={{ 
+            fontSize: { xs: '24px', sm: '28px', md: '32px', lg: '36px' }
+          }}
         > 
           <span style={{ color: '#FF5733' }}>e</span>Tbayat
         </Typography>
@@ -151,102 +137,81 @@ const Login = () => {
           variant="body1" 
           color="#E0E0E0"
           textAlign="center"
-          sx={{ mt: 2, mb: 1 }}
+          sx={{ 
+            mt: { xs: 1, sm: 1.5, md: 2 }, 
+            mb: 1,
+            px: 2,
+            fontSize: { xs: '14px', sm: '16px' }
+          }}
         >
           Please login to access your account.
         </Typography>
       </Box>
             
-        {/* Login form */}
-        <Box 
-          component="form" 
-          onSubmit={handleLogin} 
-          sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: 3, 
-            width: '450px' 
-          }}
-        >
-          {/* Form fields */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <UsernameInput
-              label="Username"
-              autoFocus
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              error={errors.username}
-              helperText={errors.username ? "Please enter your username" : ""}
-              placeholder="Enter username"
-              required
-            />
-            
-            <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              error={errors.password}
-              helperText={errors.password ? "Please enter your password" : ""}
-            />
-          </Box>
-          
-          {/* Login button */}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ 
-              py: 1.5, 
-              backgroundColor: '#FF5733', 
-              color: 'white',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: '#e65100',
-              },
-              borderRadius: '4px',
-              textTransform: 'none'
-            }}
-            disabled={isLoading}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </Button>
-          
-          {/* Forgot password link */}
-          <Typography 
-            component={Link} 
-            to="/forgot-password"
-            variant="body2" 
-            color="#E0E0E0"
-            textAlign="center"
-            sx={{ 
-              textDecoration: 'none',
-              '&:hover': {
-                textDecoration: 'underline',
-                color: '#FF5733'
-              },
-              cursor: 'pointer'
-            }}
-          >
-            Forgot Password?
-          </Typography>
-        </Box>
-
-      {/* Snackbar for notifications */}
-      <Snackbar 
-        open={snackbar.open} 
-        autoHideDuration={3000} 
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      {/* Login form */}
+      <Box 
+        component="form" 
+        onSubmit={handleLogin} 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: { xs: 2, sm: 2.5, md: 3 }, 
+          width: { xs: '100%', sm: '350px', md: '400px', lg: '450px' },
+          maxWidth: '90%'
+        }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity} 
-          sx={{ width: '100%' }}
-          variant="filled"
+        {/* Form fields */}
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 2.5, md: 3 } }}>
+          <UsernameInput
+            label="Username"
+            autoFocus
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            error={errors.username}
+            helperText={errors.username ? "Please enter your username" : ""}
+            placeholder="Enter username"
+            required
+            fullWidth
+          />
+          <PasswordInput
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={errors.password}
+            helperText={errors.password ? "Please enter your password" : ""}
+            fullWidth
+          />
+        </Box>
+        
+        {/* Login button */}
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ 
+            py: { xs: 1, sm: 1.25, md: 1.5 }, 
+            backgroundColor: '#FF5733', 
+            color: 'white',
+            fontSize: { xs: '14px', sm: '15px', md: '16px' },
+            fontWeight: 'bold',
+            '&:hover': {
+              backgroundColor: '#e65100',
+            },
+            borderRadius: '4px',
+            textTransform: 'none',
+            mt: { xs: 1, sm: 1.5, md: 2 }
+          }}
+          disabled={isLoading}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          {isLoading ? "Logging in..." : "Login"}
+        </Button>
+      </Box>
+
+      <Notification
+        snackbarMessage={snackbarMessage} 
+        snackbarOpen={snackbarOpen} 
+        setSnackbarOpen={setSnackbarOpen} 
+        severity={severity}
+      />
     </Box>
   );
 };

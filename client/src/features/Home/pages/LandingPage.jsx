@@ -25,11 +25,11 @@ export default function LandingPage() {
         {/* Features Section */}
         <Box sx={{ 
           py: { xs: 4, md: 6 },
-          px: { xs: 2, md: 4 }
+          px: { xs: 2, md: 4 },
+          mb: { xs: 4, md: 6 },
         }}>
           <Features />
         </Box>
-        
         <PostLists/>
       </Container>    
     </Box>

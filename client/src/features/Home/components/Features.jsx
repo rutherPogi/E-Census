@@ -26,14 +26,14 @@ const FeatureBox = ({ image, title, description }) => (
       src={image} 
       alt={title}
       sx={{
-        width: 100,
-        height: 100,
+        width: {xs:70, sm: 100, md: 150},
+        height: {xs:70, sm: 100, md: 150},
         mb: 2
       }}
     />
     <Typography 
       sx={{ 
-        fontSize: { xs: 20, sm: 24 }, 
+        fontSize: { xs: 16, sm: 24 }, 
         fontWeight: 'bold',
         mb: 1
       }}
@@ -43,13 +43,8 @@ const FeatureBox = ({ image, title, description }) => (
   </Box>
 );
 
-/**
- * Features section component showing key app functionalities
- */
-const Features = () => {
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+const Features = () => {
 
   // Feature data
   const features = [
@@ -71,7 +66,6 @@ const Features = () => {
     <Box 
       sx={{ 
         display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
         justifyContent: 'center',
         alignItems: 'center',
         gap: { xs: 3, md: 5 },

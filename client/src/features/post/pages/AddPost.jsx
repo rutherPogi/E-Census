@@ -63,11 +63,13 @@ export default function AddPost() {
         formData.append('image', image);
       });
 
+
       console.log("Sending form data:", Object.fromEntries(formData));
       const response = await post('/posts/add', formData, true);
       console.log("Post created:", response);
       showNotification('Post created successfully!', 'success');
       setValues(INITIAL_VALUES(userID));
+      if (setImagePreviews) {setImagePreviews([]);}
     } catch (error) {
       console.error("Error creating post:", error);
       showNotification('Error creating post. Please try again.', 'error');

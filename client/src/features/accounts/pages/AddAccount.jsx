@@ -1,23 +1,23 @@
 import { useState } from "react";
-import { Delete, PersonAdd, Save, Autorenew } from '@mui/icons-material'
-import { Box, Button, CardContent, IconButton, Paper, Stack,
-         Tab, Tabs, Table, TableBody, TableCell, TableContainer,
-         TableHead, TableRow, Typography } from "@mui/material";
-import axios from "axios";
-import { ArrowBack } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom"; // Added missing import
+import { useNavigate } from "react-router-dom";
+import { PersonAdd, ArrowBack } from '@mui/icons-material'
+import { Box, Button } from "@mui/material";
 
 import { post, get } from "../../../utils/api/apiService";
-import { DropdownInput, NumberInput, TextInput } from "../../../components/common/FormFields";
-import { BARANGAY_OPTIONS, INITIAL_BULK_STATE, INITIAL_ERROR_STATE, INITIAL_FORM_DATA, POSITION_OPTIONS } from "../utils/constants";
+import { DropdownInput, TextInput } from "../../../components/common/FormFields";
+import { BARANGAY_OPTIONS, INITIAL_ERROR_STATE, INITIAL_FORM_DATA, POSITION_OPTIONS } from "../utils/constants";
 import { Notification } from "../../../components/common/Notification";
 
 import { useNotification } from '../hooks/useNotification';
+
 import PageHeader from "../components/PageHeader";
 
+
+
+
 const AddAccount = () => {
-  const navigate = useNavigate(); // Added for goBack function
-  const [tempAccounts, setTempAccounts] = useState([]);
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [errors, setErrors] = useState(INITIAL_ERROR_STATE); 

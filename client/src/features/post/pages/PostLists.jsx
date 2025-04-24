@@ -46,7 +46,6 @@ const POSTS_PER_PAGE = 5;
 const PostLists = () => {
 
   const navigate = useNavigate();
-  const cancelButtonRef = useRef(null);
   
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -273,20 +272,6 @@ const PostLists = () => {
             <IconButton 
               color="primary" 
               size="small"
-              onClick={() => handleViewPost(post.postID)}
-              aria-label="edit post"
-            >
-              <Visibility />
-            </IconButton>
-            <Typography variant="caption" color='primary'>
-              View
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <IconButton 
-              color="primary" 
-              size="small"
               onClick={() => handleEditPost(post.postID)}
               aria-label="edit post"
             >
@@ -294,20 +279,6 @@ const PostLists = () => {
             </IconButton>
             <Typography variant="caption" color='primary'>
               Edit
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <IconButton 
-              color="error" 
-              size="small"
-              onClick={() => handleDeletePost(post.postID)}
-              aria-label="delete post"
-            >
-              <Delete />
-            </IconButton>
-            <Typography variant="caption" color='error'>
-              Delete
             </Typography>
           </Box>
         </Box>
@@ -320,7 +291,7 @@ const PostLists = () => {
       sx = {{ 
         borderRadius: 2, 
         backgroundColor: "#fff", 
-        p: 3, 
+        p: 5, 
         display: 'flex', 
         flexDirection: 'column', 
         gap: 3 

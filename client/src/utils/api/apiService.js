@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// Create a base URL for all API requests
-const API_URL = 'http://localhost:3000/api';
+//const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 // Function to get the auth token
 const getAuthToken = () => localStorage.getItem('authToken');

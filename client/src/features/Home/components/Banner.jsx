@@ -2,11 +2,9 @@ import { Button, Box, Typography, Toolbar, Tooltip,
          useMediaQuery, useTheme, Container } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 
-import bannerImage from "../../../assets/image3.jpg";
+import bannerImage from "../../../assets/etbayat-banner.png";
 import itbayatLogo from "../../../assets/itbayatLogo.png";
-import Logo from '../../../assets/questionnaire.png';
 import mswdoLogo from '../../../assets/MSWDO-Logo.png';
-
 
 
 
@@ -15,8 +13,6 @@ const Banner = ({ onLogin }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-
-
 
   return (
     <Box 
@@ -69,7 +65,7 @@ const Banner = ({ onLogin }) => {
                 marginRight: { xs: '5px', sm: '10px' },
               }}
             />
-            <Typography 
+            {!isMobile && (<Typography 
               variant={isMobile ? "body1" : "h6"}
               sx={{
                 color: '#fff',
@@ -78,7 +74,7 @@ const Banner = ({ onLogin }) => {
               }}
             >
               <span style={{ color: '#FF5733' }}>e</span>-tbayat MSWDO
-            </Typography>
+            </Typography>)}
           </Box>
           
           {/* Login Button */}
@@ -148,7 +144,7 @@ const Banner = ({ onLogin }) => {
                 color: '#FF5733',
                 fontWeight: 'bold',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+                fontSize: { xs: '1.5rem', sm: '2.5rem', md: '3rem' }
               }}
             >
               Municipal Social Welfare and Development Office
@@ -158,7 +154,7 @@ const Banner = ({ onLogin }) => {
               sx={{
                 color: '#fff',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-                fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' }
+                fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' }
               }}
             >
               Local Government of Itbayat

@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Visibility, Edit, Delete } from '@mui/icons-material';
-import { Tooltip, Box, useMediaQuery, useTheme, Snackbar, Alert, 
-         TableRow, TableCell } from '@mui/material';
+import { Tooltip, Box, useMediaQuery, useTheme, TableRow, TableCell, Container,
+         Paper, Typography, Button, Divider, Checkbox } from '@mui/material';
+import { Add, People } from '@mui/icons-material';
 import dayjs from 'dayjs';
 
-import { SearchBar, ActionButton, DeleteDialog, ManageTable } from '../components/others';
+import { SearchBar, ActionButton, DeleteDialog, ManageTable } from '../../../components/common';
 import { MANAGE_TABLE_HEADERS } from '../utils/tableHeaders';
 import { get, del } from '../../../utils/api/apiService';
 import { Notification } from '../../../components/common/Notification'
@@ -12,19 +13,26 @@ import { Notification } from '../../../components/common/Notification'
 import { useNotification } from '../hooks/useNotification';
 
 
+
+
 const ManageSurvey = () => {
-
-  const [surveyData, setSurveyData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(10);
-  
-  const [deleteDialog, setDeleteDialog] = useState({ open: false, survey: null, isDeleting: false });
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [surveyData, setSurveyData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(10);
+  const [selectedSurveys, setSelectedSurveys] = useState([]);
+  
+  const [deleteDialog, setDeleteDialog] = useState({ 
+    open: false, 
+    survey: null, 
+    isDeleting: false,
+    isMultiDelete: false
+  });
 
   const { 
     snackbarOpen, 
@@ -55,7 +63,6 @@ const ManageSurvey = () => {
   }, []);
 
   const updateSearchResults = (searchTerm) => {
-
     if (!searchTerm) {
       setFilteredData(surveyData);
       return;
@@ -79,6 +86,15 @@ const ManageSurvey = () => {
     });
   };
 
+  const openMultiDeleteDialog = () => {
+    setDeleteDialog({
+      open: true,
+      survey: null,
+      isDeleting: false,
+      isMultiDelete: true
+    });
+  };
+
   const closeDeleteDialog = () => {
     setDeleteDialog({
       open: false,
@@ -91,33 +107,127 @@ const ManageSurvey = () => {
     setPage(newPage);
   };
 
-  const deleteSurvey = async () => {
-    const { survey } = deleteDialog;
-
-    if (!survey) return;
-    
-    setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
-    
-    try {
-      const response = await del(`/surveys/delete-survey/${survey.surveyID}/${survey.populationID}`);
-      
-      if (response.success) {
-        const updatedData = surveyData.filter(s => s.surveyID !== survey.surveyID);
-        setSurveyData(updatedData);
-        setFilteredData(updatedData);
-        showNotification('Survey deleted successfully', 'success')
+  const handleSelectSurvey = (surveyID) => {
+    setSelectedSurveys(prev => {
+      if (prev.includes(surveyID)) {
+        return prev.filter(id => id !== surveyID);
       } else {
-        throw new Error('Delete operation failed');
+        return [...prev, surveyID];
       }
-    } catch (err) {
-      showNotification('Error deleting survey. Please try again.', 'error')
-    } finally {
-      closeDeleteDialog();
+    });
+  };
+
+  const handleSelectAllSurveys = () => {
+    const displayedSurveys = filteredData
+      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      .map(survey => survey.surveyID);
+      
+    const allSelected = displayedSurveys.every(id => selectedSurveys.includes(id));
+    
+    if (allSelected) {
+      // Deselect all displayed surveys
+      setSelectedSurveys(prev => prev.filter(id => !displayedSurveys.includes(id)));
+    } else {
+      // Select all displayed surveys
+      const newSelected = [...selectedSurveys];
+      displayedSurveys.forEach(id => {
+        if (!newSelected.includes(id)) {
+          newSelected.push(id);
+        }
+      });
+      setSelectedSurveys(newSelected);
     }
   };
 
+  const currentPageSurveys = filteredData
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map(survey => survey.surveyID);
+
+  const areAllSelected = currentPageSurveys.length > 0 && 
+    currentPageSurveys.every(id => selectedSurveys.includes(id));
+  
+  // Check if some but not all surveys on current page are selected
+  const areSomeSelected = currentPageSurveys.some(id => selectedSurveys.includes(id)) && 
+    !areAllSelected;
+
+  const extendedHeaders = ['', ...MANAGE_TABLE_HEADERS];
+
+  // New function to handle deletion of multiple surveys
+  const deleteMultipleSurveys = async () => {
+  if (selectedSurveys.length === 0) return;
+
+  setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+
+  try {
+    // Find the populationIDs for the selected surveys
+    const surveysToDelete = surveyData.filter(survey => selectedSurveys.includes(survey.surveyID));
+    
+    // Process each deletion
+    const deletePromises = surveysToDelete.map(survey => 
+      del(`/surveys/delete/${survey.surveyID}/${survey.populationID}`)
+    );
+    
+    const results = await Promise.all(deletePromises);
+    
+    // Check if all deletions were successful
+    const allSuccessful = results.every(result => result.success);
+    
+    if (allSuccessful) {
+      // Update the data by removing the deleted surveys
+      const updatedData = surveyData.filter(survey => !selectedSurveys.includes(survey.surveyID));
+      setSurveyData(updatedData);
+      setFilteredData(updatedData);
+      showNotification(`${selectedSurveys.length} surveys deleted successfully`, 'success');
+      setSelectedSurveys([]); // Clear selection after successful deletion
+    } else {
+      throw new Error('Some delete operations failed');
+    }
+  } catch (err) {
+    showNotification('Error deleting surveys. Please try again.', 'error');
+  } finally {
+    closeDeleteDialog();
+  }
+};
+
+const deleteSurvey = async () => {
+  const { survey, isMultiDelete } = deleteDialog;
+
+  if (isMultiDelete) {
+    return deleteMultipleSurveys();
+  }
+
+  if (!survey) return;
+
+  setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
+
+  try {
+    const response = await del(`/surveys/delete-survey/${survey.surveyID}/${survey.populationID}`);
+
+    if (response.success) {
+      const updatedData = surveyData.filter(s => s.surveyID !== survey.surveyID);
+      setSurveyData(updatedData);
+      setFilteredData(updatedData);
+      showNotification('Survey deleted successfully', 'success');
+    } else {
+      throw new Error('Delete operation failed');
+    }
+  } catch (err) {
+    showNotification('Error deleting survey. Please try again.', 'error');
+  } finally {
+    closeDeleteDialog();
+  }
+};
+
+
   const renderSurveyRow = (survey, index) => (
     <TableRow key={survey.surveyID || index}>
+      <TableCell padding="checkbox">
+        <Checkbox
+          checked={selectedSurveys.includes(survey.surveyID)}
+          onChange={() => handleSelectSurvey(survey.surveyID)}
+          color="primary"
+        />
+      </TableCell>
       <TableCell>{survey.surveyID}</TableCell>
       <TableCell>{survey.respondent}</TableCell>
       <TableCell>{survey.interviewer}</TableCell>
@@ -168,16 +278,54 @@ const ManageSurvey = () => {
     </TableRow>
   );
 
+  const renderTableHeader = () => (
+      <TableRow>
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={areSomeSelected}
+            checked={areAllSelected}
+            onChange={handleSelectAllSurveys}
+            color="primary"
+          />
+        </TableCell>
+        {MANAGE_TABLE_HEADERS.map((header, index) => (
+          <TableCell key={index}>{header}</TableCell>
+        ))}
+      </TableRow>
+    );
+
   return (
-    <div className="responsive-container">
-      <div className="responsive-header">SURVEYS</div>
-      <div className='responsive-form details'>
-        <SearchBar 
-          onSearch={updateSearchResults}
-          placeholder="Search by respondent, interviewer or ID"
-          label="Search surveys..." />
+    <Container 
+      component={Paper}
+      sx={{ borderRadius: 2, backgroundColor: "#fff", p: 5, display: 'flex', flexDirection: 'column', gap: 3 }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+          <People/>
+          <Typography variant='h5' fontWeight={'bold'}>SURVEYS</Typography>
+        </Box>
+      </Box>
+
+      <Divider/>
+      <Box mt={2}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+          <SearchBar 
+            onSearch={updateSearchResults}
+            placeholder="Search"
+          />
+          <Button
+            variant="contained"
+            color="error"
+            startIcon={<Delete />}
+            onClick={openMultiDeleteDialog}
+            disabled={selectedSurveys.length === 0}
+            sx={{ fontSize: '0.75rem' }}
+          >
+            DELETE SURVEYS ({selectedSurveys.length})
+          </Button>
+        </Box>
         <ManageTable
-          headers={MANAGE_TABLE_HEADERS}
+          headers={extendedHeaders}
           data={filteredData}
           loading={loading}
           renderRow={renderSurveyRow}
@@ -186,16 +334,21 @@ const ManageSurvey = () => {
           rowsPerPage={rowsPerPage}
           onPageChange={handlePagination}
           count={filteredData.length}
+          customHeaderRow={renderTableHeader}
         />
         <DeleteDialog 
           open={deleteDialog.open}
-          item={deleteDialog.survey}
+          item={deleteDialog.isMultiDelete ? selectedSurveys : deleteDialog.survey}
           onClose={closeDeleteDialog}
           onConfirm={deleteSurvey}
           isDeleting={deleteDialog.isDeleting}
           idField="surveyID"
           nameField="respondent"
-          messageTemplate="Do you want to delete survey #{id} for {name}? This action cannot be undone."
+          messageTemplate={
+            deleteDialog.isMultiDelete 
+              ? `Do you want to delete the selected ${selectedSurveys.length} survey(s)? This action cannot be undone.`
+              : "Do you want to delete the survey? This action cannot be undone."
+          }
         />
         <Notification
           snackbarMessage={snackbarMessage} 
@@ -203,8 +356,8 @@ const ManageSurvey = () => {
           setSnackbarOpen={setSnackbarOpen} 
           severity={severity}
         />
-      </div>
-    </div>
+      </Box>
+    </Container>
   );
 };
 

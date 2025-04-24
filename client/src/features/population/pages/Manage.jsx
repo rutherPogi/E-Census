@@ -13,7 +13,7 @@ export default function Manage() {
 
   const handleExport = async () => {
     try {
-      const { population } = await get('/population/get');
+      const population = await get('/population/get');
       exportPopulation(population);
     } catch (err) {
       console.error("Export failed:", err);

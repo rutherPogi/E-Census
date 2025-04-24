@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Typography, Container, Grid, Paper, Avatar, Box } from '@mui/material';
-import { Assignment, FamilyRestroom, Accessible, EscalatorWarning, Elderly, House, EmojiPeople } from '@mui/icons-material'
+import { Typography, Container, Grid, Paper, Avatar, Box, Divider } from '@mui/material';
+import { Assignment, FamilyRestroom, Accessible, EscalatorWarning, Elderly, House, EmojiPeople, DashboardCustomize } from '@mui/icons-material'
 import { get } from '../../utils/api/apiService';
 import { useAuth } from '../../utils/auth/authContext'
 import { BarChart } from '@mui/x-charts/BarChart';
@@ -20,11 +20,20 @@ export default function Dashboard() {
     registeredHouse: ''
   })
 
+  const philippineDate = new Date().toLocaleString('en-PH', {
+    timeZone: 'Asia/Manila',
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
   const stats = [
     { title: 'Total Surveys', value: values.surveys, icon: <Assignment />, color: '#3f51b5' },
-    { title: 'Total Families', value: values.families, icon: <FamilyRestroom />, color: '#f44336' },
-    { title: 'Total Population', value: values.population, icon: <EmojiPeople />, color: '#0277bd' },
-    { title: 'Registered House', value: values.registeredHouse, icon: <House />, color: '#ec407a' }  ];
+    { title: 'Total Population', value: values.population, icon: <EmojiPeople />, color: '#0277bd' } ];
 
     
 
@@ -58,11 +67,46 @@ export default function Dashboard() {
     getTotalNumber();
   }, []);
 
+  
+
   return (
     <Container component={Paper}
       sx={{ borderRadius: 2, backgroundColor: "#fff", p: 5, display: 'flex', flexDirection: 'column', gap: 3 }}
     > 
       {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+          <DashboardCustomize/>
+          <Typography variant='h5' fontWeight={'bold'}>
+            DASHBOARD
+          </Typography>
+        </Box>
+        <Box sx={{ textAlign: 'right' }}>
+          <Typography 
+            variant="subtitle1"
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '1rem' },
+              fontWeight: 'bold'
+            }}
+          >
+            Philippine Standard Time
+          </Typography>
+          <Typography 
+            variant="subtitle1"
+            sx={{ 
+              fontSize: { xs: '0.8rem', sm: '1rem' }
+            }}
+          >
+            {philippineDate}
+          </Typography>
+        </Box>
+      </Box>
+
+      
+      
+      
+
+      <Divider/>
          
       {/* Stats Cards */}
       <Grid container spacing={3}>
@@ -87,18 +131,12 @@ export default function Dashboard() {
 
       {barangayData.length > 0 && (
         <Box mt={4}>
-          <Typography variant="h6" mb={2}>Surveys and Population per Barangay</Typography>
           <BarChart
             xAxis={[{ 
               scaleType: 'band', 
               data: barangayData.map(row => row.barangay) 
             }]}
             series={[
-              {
-                data: barangayData.map(row => row.totalSurveys),
-                label: 'Surveys',
-                color: '#3f51b5'
-              },
               {
                 data: barangayData.map(row => row.totalPopulation),
                 label: 'Population',

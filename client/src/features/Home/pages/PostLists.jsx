@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Grid, Container, Typography, IconButton } from "@mui/material";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import { ArrowBackIos, ArrowForwardIos, BusinessCenterOutlined, InfoOutlined } from "@mui/icons-material";
 
 import { get } from "../../../utils/api/apiService";
 import Posts from "../components/Posts";
@@ -151,57 +151,82 @@ const PostLists = () => {
 
         <Box 
           sx={{ 
-            px: { xs: 2, md: 4 }, 
+            px: { xs: 4, md: 6 }, 
             mb: 4, 
             position: 'relative'
           }}
         >
-          {/* Navigation arrows for NEWS */}
-          <IconButton 
-            onClick={handleNewsPrev}
-            disabled={newsCurrentPage === 0}
-            sx={{ 
-              position: 'absolute', 
-              left: 0, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-              bgcolor: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
-            }}
-          >
-            <ArrowBackIos />
-          </IconButton>
-          
-          <Grid container spacing={3}>
-            {currentNewsPosts.map((post, index) => (
-              <Grid item xs={12} sm={6} md={3} key={post.postID || index}>
-                <Posts 
-                  title={post.postTitle}
-                  description={post.postDescription}
-                  date={post.postDate}
-                  image={getFirstImageForPost(post.postID)}
-                  onClick={() => viewPost(post.postID)}
-                />
+          {newsPosts.length > 0 ? (
+            <>
+              {/* Navigation arrows for NEWS - positioned outside content */}
+              <IconButton 
+                onClick={handleNewsPrev}
+                disabled={newsCurrentPage === 0}
+                sx={{ 
+                  position: 'absolute', 
+                  left: -20, 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  zIndex: 2,
+                  bgcolor: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                }}
+              >
+                <ArrowBackIos />
+              </IconButton>
+              
+              <Grid container spacing={3}>
+                {currentNewsPosts.map((post, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={post.postID || index}>
+                    <Posts 
+                      title={post.postTitle}
+                      description={post.postDescription}
+                      date={post.postDate}
+                      image={getFirstImageForPost(post.postID)}
+                      onClick={() => viewPost(post.postID)}
+                    />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-          
-          <IconButton 
-            onClick={handleNewsNext}
-            disabled={(newsCurrentPage + 1) * postsPerPage >= newsPosts.length}
-            sx={{ 
-              position: 'absolute', 
-              right: 0, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-              bgcolor: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
-            }}
-          >
-            <ArrowForwardIos />
-          </IconButton>
+              
+              <IconButton 
+                onClick={handleNewsNext}
+                disabled={(newsCurrentPage + 1) * postsPerPage >= newsPosts.length}
+                sx={{ 
+                  position: 'absolute', 
+                  right: -20, 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  zIndex: 2,
+                  bgcolor: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                }}
+              >
+                <ArrowForwardIos />
+              </IconButton>
+            </>
+          ) : (
+            <Box 
+              sx={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 6,
+                backgroundColor: '#f5f5f5',
+                borderRadius: 2,
+                textAlign: 'center'
+              }}
+            >
+              <InfoOutlined sx={{ fontSize: 60, color: '#aaa', mb: 2 }} />
+              <Typography variant="h6" sx={{ color: '#555', mb: 1 }}>
+                No News Available
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#777', maxWidth: 500 }}>
+                There are currently no news or updates to display. Please check back later for the latest information.
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>   
 
@@ -226,83 +251,88 @@ const PostLists = () => {
           >
             SERVICES
           </Typography>
-          <Box sx={{ textAlign: 'right' }}>
-            <Typography 
-              variant="subtitle1"
-              sx={{ 
-                fontSize: { xs: '0.8rem', sm: '1rem' },
-                fontWeight: 'bold'
-              }}
-            >
-              Philippine Standard Time
-            </Typography>
-            <Typography 
-              variant="subtitle1"
-              sx={{ 
-                fontSize: { xs: '0.8rem', sm: '1rem' }
-              }}
-            >
-              {philippineDate}
-            </Typography>
-          </Box>
         </Box>
 
         <Box 
           sx={{ 
-            px: { xs: 2, md: 4 }, 
+            px: { xs: 4, md: 6 }, 
             mb: 4,
             position: 'relative' 
           }}
         >
-          {/* Navigation arrows for SERVICES */}
-          <IconButton 
-            onClick={handleServicesPrev}
-            disabled={servicesCurrentPage === 0}
-            sx={{ 
-              position: 'absolute', 
-              left: 0, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-              bgcolor: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
-            }}
-          >
-            <ArrowBackIos />
-          </IconButton>
-          
-          <Grid container spacing={3}>
-            {currentServicesPosts.map((post, index) => (
-              <Grid item xs={12} sm={6} md={3} key={post.postID || index}>
-                <Posts 
-                  title={post.postTitle}
-                  description={post.postDescription}
-                  date={post.postDate}
-                  image={getFirstImageForPost(post.postID)}
-                  onClick={() => viewPost(post.postID)}
-                />
+          {servicesPosts.length > 0 ? (
+            <>
+              {/* Navigation arrows for SERVICES - positioned outside content */}
+              <IconButton 
+                onClick={handleServicesPrev}
+                disabled={servicesCurrentPage === 0}
+                sx={{ 
+                  position: 'absolute', 
+                  left: -20, 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  zIndex: 2,
+                  bgcolor: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                }}
+              >
+                <ArrowBackIos />
+              </IconButton>
+              
+              <Grid container spacing={3}>
+                {currentServicesPosts.map((post, index) => (
+                  <Grid item xs={12} sm={6} md={3} key={post.postID || index}>
+                    <Posts 
+                      title={post.postTitle}
+                      description={post.postDescription}
+                      date={post.postDate}
+                      image={getFirstImageForPost(post.postID)}
+                      onClick={() => viewPost(post.postID)}
+                    />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-          
-          <IconButton 
-            onClick={handleServicesNext}
-            disabled={(servicesCurrentPage + 1) * postsPerPage >= servicesPosts.length}
-            sx={{ 
-              position: 'absolute', 
-              right: 0, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
-              zIndex: 2,
-              bgcolor: 'rgba(255, 255, 255, 0.7)',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
-            }}
-          >
-            <ArrowForwardIos />
-          </IconButton>
+              
+              <IconButton 
+                onClick={handleServicesNext}
+                disabled={(servicesCurrentPage + 1) * postsPerPage >= servicesPosts.length}
+                sx={{ 
+                  position: 'absolute', 
+                  right: -20, 
+                  top: '50%', 
+                  transform: 'translateY(-50%)',
+                  zIndex: 2,
+                  bgcolor: 'rgba(255, 255, 255, 0.7)',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.9)' }
+                }}
+              >
+                <ArrowForwardIos />
+              </IconButton>
+            </>
+          ) : (
+            <Box 
+              sx={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                py: 6,
+                backgroundColor: '#f5f5f5',
+                borderRadius: 2,
+                textAlign: 'center'
+              }}
+            >
+              <BusinessCenterOutlined sx={{ fontSize: 60, color: '#aaa', mb: 2 }} />
+              <Typography variant="h6" sx={{ color: '#555', mb: 1 }}>
+                No Services Available
+              </Typography>
+              <Typography variant="body1" sx={{ color: '#777', maxWidth: 500 }}>
+                There are currently no services to display. Please check back later for available services.
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
-        
     </Container>
   );
 };

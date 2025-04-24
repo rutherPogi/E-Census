@@ -2,7 +2,7 @@ import { Button, Box, Typography, Toolbar, Tooltip,
          useMediaQuery, useTheme, Container } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 
-import bannerImage from "../../../assets/image3.jpg";
+import bannerImage from "../../../assets/etbayat-banner.png";
 import itbayatLogo from "../../../assets/itbayatLogo.png";
 import mswdoLogo from '../../../assets/MSWDO-Logo.png';
 

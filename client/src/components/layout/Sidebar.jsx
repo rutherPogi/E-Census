@@ -4,14 +4,12 @@ import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse,
          Divider, Box, Tooltip, Container, Avatar, Typography } from '@mui/material';
 import { Home, Assignment, Badge, Map, Person, ExpandLess, ExpandMore, 
          Elderly, Accessible, EscalatorWarning, AccountCircle, Newspaper,
-         Groups, Storage, 
-         Wc,
-         Boy,
-         Female,
-         Hail} from '@mui/icons-material';
+         Groups, Storage, Wc, Boy, Female, Hail} from '@mui/icons-material';
+
+import logo from '../../assets/MSWDO-Logo.png'
 
 import { useAuth } from '../../utils/auth/authContext';
-import logo from '../../assets/MSWDO-Logo.png'
+
 
 
 
@@ -21,7 +19,7 @@ const Logo = () => (
       component="img"
       src={logo}
       alt="eCensus Logo"
-      height={'64px'}
+      height={'54px'}
     />
 
     <Typography 
@@ -30,7 +28,7 @@ const Logo = () => (
       fontSize={'28px'}
       color="#fff"
     > 
-      <span style={{ color: '#FF5733' }}>e</span>Tbayat
+      <span style={{ color: '#FF5733' }}>e</span>-tbayat
     </Typography>
   </Box>
 )
@@ -53,10 +51,14 @@ const Sidebar = ({
 
   const position = userData.position;
 
+  const showHome = position === 'Admin' || position === 'MSWDO';
+  const showNews = position === 'Admin' || position === 'MSWDO';
   const showAccounts = position === 'Admin';
+  const showDataBank = position === 'Admin' || position === 'MSWDO';
+  const showPopulation = position === 'Admin' || position === 'MSWDO';
   const showIdGenerator = position === 'Admin' || position === 'MSWDO';
   const showHazardMap = position === 'Admin' || position === 'MSWDO';
-  
+
   // Track the current selected path
   const [selectedPath, setSelectedPath] = useState(location.pathname);
   
@@ -119,31 +121,35 @@ const Sidebar = ({
 
       <List sx={{ width: '100%', p: 0 }}>
         {/* Home */}
-        <Tooltip title={!open ? "Home" : ""} placement="right">
-          <ListItem 
-            onClick={() => handleItemClick('/main/dashboard')}
-            sx={listItemStyles(isActive('/main/dashboard'))}
-          >
-            <ListItemIcon sx={{ color: isActive('/main/dashboard') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Home />
-            </ListItemIcon>
-            {open && <ListItemText primary="Home" />}
-          </ListItem>
-        </Tooltip>
+        {showHome && (
+          <Tooltip title={!open ? "Home" : ""} placement="right">
+            <ListItem 
+              onClick={() => handleItemClick('/main/dashboard')}
+              sx={listItemStyles(isActive('/main/dashboard'))}
+            >
+              <ListItemIcon sx={{ color: isActive('/main/dashboard') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <Home />
+              </ListItemIcon>
+              {open && <ListItemText primary="Home" />}
+            </ListItem>
+          </Tooltip>
+        )}
 
         {/* News and Updates */}
-        <Tooltip title={!open ? "News and Updates" : ""} placement="right">
-          <ListItem 
-            onClick={() => handleItemClick('/main/updates')}
-            sx={listItemStyles(isActive('/main/updates'))}
-          >
-            <ListItemIcon sx={{ color: isActive('/main/updates') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Newspaper />
-            </ListItemIcon>
-            {open && <ListItemText primary="News and Updates" />}
-          </ListItem>
-        </Tooltip>
-
+        {showNews && (
+          <Tooltip title={!open ? "News and Updates" : ""} placement="right">
+            <ListItem 
+              onClick={() => handleItemClick('/main/updates')}
+              sx={listItemStyles(isActive('/main/updates'))}
+            >
+              <ListItemIcon sx={{ color: isActive('/main/updates') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <Newspaper />
+              </ListItemIcon>
+              {open && <ListItemText primary="News and Updates" />}
+            </ListItem>
+          </Tooltip>
+        )}
+        
         {/* Accounts - Only visible if not a Barangay Official */}
         {showAccounts && (
           <Tooltip title={!open ? "Accounts" : ""} placement="right">
@@ -173,7 +179,7 @@ const Sidebar = ({
         </Tooltip>
 
         {/* Data Bank */}
-        {showIdGenerator && (
+        {showDataBank && (
           <>
             <Tooltip title={!open ? "Data Bank" : ""} placement="right">
               <ListItem 
@@ -300,18 +306,20 @@ const Sidebar = ({
         )}
 
         {/* Population */}
-        <Tooltip title={!open ? "Population" : ""} placement="right">
-          <ListItem 
-            onClick={() => handleItemClick('/main/population')}
-            sx={listItemStyles(isActive('/main/population'))}
-          >
-            <ListItemIcon sx={{ color: isActive('/main/population') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Groups />
-            </ListItemIcon>
-            {open && <ListItemText primary="Population" />}
-          </ListItem>
-        </Tooltip>
-
+        {showPopulation && (
+          <Tooltip title={!open ? "Population" : ""} placement="right">
+            <ListItem 
+              onClick={() => handleItemClick('/main/population')}
+              sx={listItemStyles(isActive('/main/population'))}
+            >
+              <ListItemIcon sx={{ color: isActive('/main/population') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <Groups />
+              </ListItemIcon>
+              {open && <ListItemText primary="Population" />}
+            </ListItem>
+          </Tooltip>
+        )}
+        
         {/* ID Generator with submenu - Only visible if not a Barangay Official */}
         {showIdGenerator && (
           <>
@@ -429,6 +437,9 @@ const Sidebar = ({
           boxSizing: 'border-box', 
           width: drawerWidth,
           bgcolor: '#2A2A3A',
+          marginTop: '55px', // Add this line to create space for the topbar
+
+          zIndex: (theme) => theme.zIndex.appBar - 1, // Place below the AppBar
         },
       }}
     >

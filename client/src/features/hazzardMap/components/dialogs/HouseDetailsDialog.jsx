@@ -69,43 +69,29 @@ const HouseDetailsDialog = ({ open, onClose, selectedHouse }) => {
 
       <DialogContent dividers>
         {tabValue === 0 && (
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h6" component="h2">
-                Survey ID: {selectedHouse.surveyID}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>House Condition:</strong> {selectedHouse.houseCondition}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>House Structure:</strong> {selectedHouse.houseStructure}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Street:</strong> {selectedHouse.houseStreet || "N/A"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Barangay:</strong> {selectedHouse.barangay || "N/A"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1">
-                <strong>Municipality:</strong> {selectedHouse.municipality || "N/A"}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="text.secondary">
-                Location: {selectedHouse.latitude}, {selectedHouse.longitude}
-              </Typography>
-            </Grid>
-          </Grid>
+          <Box sx={{display: 'flex', flexDirection: 'column', gap: 1}} >
+            <Typography variant="h6" component="h2">
+              Survey ID: {selectedHouse.surveyID}
+            </Typography>
+            <Typography variant="body1">
+              <strong>House Condition:</strong> {selectedHouse.houseCondition}
+            </Typography>
+            <Typography variant="body1">
+              <strong>House Structure:</strong> {selectedHouse.houseStructure}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Street:</strong> {selectedHouse.houseStreet || "N/A"}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Barangay:</strong> {selectedHouse.barangay || "N/A"}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Municipality:</strong> {selectedHouse.municipality || "N/A"}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Location: {selectedHouse.latitude}, {selectedHouse.longitude}
+            </Typography>
+          </Box>
         )}
 
         {tabValue === 1 && (

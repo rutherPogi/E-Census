@@ -57,7 +57,7 @@ export default function PWDForm({ hasPWDID = false, isRegistered = false }) {
     <FormProvider>
       <div className='form-container'>
         
-        {currentPage === 1 && 
+        {currentPage === 0 && 
           <PersonalInfo 
             handleNext={handleNext} 
             handleBack={handleBack} 
@@ -78,7 +78,7 @@ export default function PWDForm({ hasPWDID = false, isRegistered = false }) {
 
           />
         }
-        {currentPage === 6 && <PrintID handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack} handleEdit={handleEdit}/>}
 
         <div className='form-pagination'>
           {Array.from({ length: 6 }, (_, index) => (

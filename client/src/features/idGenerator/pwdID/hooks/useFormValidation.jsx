@@ -72,6 +72,7 @@ export const useFormValidation = (
     } else {
       // For regular text inputs
       value = e.target.value;
+      if(value > 50) return;
     }
     
     setValues(prev => ({ ...prev, [field]: value }));
@@ -89,40 +90,56 @@ export const useFormValidation = (
 
   // Handle date changes with age calculation
   const handleDateChange = (field, calculateAge = false) => (dateValue) => {
-
     const parsedDate = dayjs(dateValue);
-
-    if (!parsedDate) {
+  
+    if (!parsedDate || !parsedDate.isValid()) {
       setValues(prev => ({ 
         ...prev, 
         [field]: null,
-        ...(calculateAge && { age: '' })
+        ...(calculateAge && { age: '', formattedAge: '' })
       }));
       return;
     }
-
+  
     if (calculateAge && parsedDate.isAfter(dayjs())) {
       setErrors(prev => ({ ...prev, [field]: 'Date cannot be in the future' }));
-      setValues(prev => ({ ...prev, [field]: parsedDate, age: '' }));
+      setValues(prev => ({ ...prev, [field]: parsedDate, age: '', formattedAge: '' }));
       return;
     }
-
+  
     setErrors(prev => ({ ...prev, [field]: false }));
-
+  
     if (calculateAge) {
       const birthdate = parsedDate.toDate();
       const today = new Date();
+  
       let age = today.getFullYear() - birthdate.getFullYear();
-      
       const monthDiff = today.getMonth() - birthdate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
         age--;
       }
-    
+  
+      // Handle formattedAge for <1 year
+      let formattedAge = '';
+      if (age < 1) {
+        const months = dayjs().diff(parsedDate, 'month');
+        if (months === 0) {
+          const weeks = dayjs().diff(parsedDate, 'week');
+          formattedAge = weeks === 0 
+            ? `${dayjs().diff(parsedDate, 'day')} day(s)` 
+            : `${weeks} week(s)`;
+        } else {
+          formattedAge = `${months} month(s)`;
+        }
+      } else {
+        formattedAge = `${age} year(s)`;
+      }
+  
       setValues(prev => ({ 
         ...prev, 
         [field]: parsedDate,
-        age: age >= 0 ? age : '' 
+        age: age >= 0 ? age : '',
+        formattedAge
       }));
     } else {
       setValues(prev => ({ ...prev, [field]: parsedDate }));

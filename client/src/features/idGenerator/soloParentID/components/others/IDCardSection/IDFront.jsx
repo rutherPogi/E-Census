@@ -29,8 +29,8 @@ const IDFront = () => {
           </Box>
         </Box>
 
-        <Box sx={{ padding: 0.5, textAlign: "center", fontWeight: "bold", bgcolor: "#ccc" }}>
-          <Typography sx={{ fontSize: '9px' }}>SOLO PARENT IDENTIFICATION CARD</Typography>
+        <Box sx={{ padding: 0.5, textAlign: "center", fontWeight: "bold", bgcolor: "#F6402D" }}>
+          <Typography sx={{ fontSize: '10px', color: 'white' }}>SOLO PARENT IDENTIFICATION CARD</Typography>
         </Box>
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', width: '100%' }}>
@@ -128,7 +128,7 @@ const IDFront = () => {
         <Box sx={{ display: 'flex', padding: '0 0.5em', justifyContent: 'space-between', mt: 1 }}>
           <Box mt={1}>
             <Typography sx={{ fontSize: '7px'}}>
-              THIS CARD IS NON-TRANSFERABLE
+              THIS CARD IS NON-TRANSFERRABLE
             </Typography>
             <Typography sx={{ fontSize: '7px'}}>
               AND VALID UNTIL {formData?.validUntil || ''}

@@ -20,7 +20,6 @@ export const PersonalDetails = ({
         onChange={handleChange('firstName')}
         error={errors.firstName}
         helperText={errors.firstName || 'e.g., Juan'}
-        placeholder='Enter First Name'
         required
       />
       <TextInput
@@ -29,7 +28,6 @@ export const PersonalDetails = ({
         onChange={handleChange('middleName')}
         error={errors.middleName}
         helperText={errors.middleName || 'e.g., Santos'}
-        placeholder='Enter Middle Name'
       />
       <TextInput
         label='Last Name'
@@ -37,7 +35,6 @@ export const PersonalDetails = ({
         onChange={handleChange('lastName')}
         error={errors.lastName}
         helperText={errors.lastName || 'e.g, Dela Cruz'}
-        placeholder='Enter Last Name'
         required
       />
       <DropdownInput
@@ -47,7 +44,6 @@ export const PersonalDetails = ({
         onChange={(e, newValue) => handleChange('suffix')(e, newValue)}
         error={errors.suffix} 
         helperText={errors.suffix || 'e.g., Jr - Junior'}
-        placeholder='Enter your suffix'
       />
       <DateInput 
         label="Birthdate"
@@ -69,7 +65,6 @@ export const PersonalDetails = ({
         onChange={(e, newValue) => handleChange('sex')(e, newValue)}
         error={errors.sex} 
         helperText={errors.sex || 'e.g., Male'}
-        placeholder='Enter your sex'
         required
       />
       <TextInput
@@ -77,9 +72,7 @@ export const PersonalDetails = ({
         value={values.birthplace}
         onChange={handleChange('birthplace')}
         error={errors.birthplace}
-        helperText={errors.birthplace || 'e.g, Dela Cruz'}
-        placeholder='Enter Last Name'
-        required
+        helperText={errors.birthplace || 'e.g, Itbayat, Batanes'}
       />
       <DropdownInput
         label='Civil Status'

@@ -1,9 +1,10 @@
 import { useReactToPrint } from "react-to-print";
 import { useRef, useState } from "react";
-import { Button, Box, Typography, TextField } from "@mui/material";
+import { Button, Box, Typography, TextField, Divider } from "@mui/material";
 
 import IDFront from "../others/IDCardSection/IDFront";
 import IDBack from "../others/IDCardSection/IDBack";
+import { Print } from "@mui/icons-material";
 
 
 
@@ -18,9 +19,18 @@ export default function PrintID({ handleBack }) {
   return (
     <div className="responsive-container">
       <div className="responsive-form details">
-        <Box sx={{ mb: 3, display: 'flex', gap: 2, flexDirection: 'column', width: '100%', maxWidth: '400px' }}>
+        <Box 
+          sx={{ 
+            mb: 3, 
+            display: 'flex', 
+            gap: 2, 
+            flexDirection: 'column', 
+            width: '100%', 
+            boxSizing: 'border-box' 
+          }}
+        >
           <Typography variant="h6">Additional Information</Typography>
-          {/* Mayor Text Input */}
+          <Divider/>
           <TextField
             label="OSCA Head"
             value={oscaHead}
@@ -36,20 +46,40 @@ export default function PrintID({ handleBack }) {
             fullWidth
           />
         </Box>
-        <div ref={contentRef}>
-          <Box sx={{display: 'flex', flexDirection: 'column', gap: '2em', alignItems: 'center'}}>
-          <IDFront/>
-          <IDBack oscaHead={oscaHead} mayor={mayor}/>
-          </Box>
-          
-        </div>
-        <div className='form-buttons'>
+        <Box 
+          sx={{ border: '1px solid #ccc', padding: 2, borderRadius: 1 }}>
+          <div ref={contentRef}>
+            <Box 
+              sx={{
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '2em', 
+                alignItems: 'center', 
+                padding: 2
+              }}
+            >  
+              <IDFront/>
+              <IDBack oscaHead={oscaHead} mayor={mayor}/>
+            </Box>
+          </div>
+
+        </Box>
+        
+        
+      </div>
+      <div className='form-buttons'>
           <div className='form-buttons-right'>
             <Button variant='outlined' onClick={handleBack} sx={{ width: '100%' }}>Cancel</Button>
-            <Button variant='contained' onClick={() => reactToPrintFn()} sx={{ width: '100%' }}>Print</Button>
+            <Button 
+              variant='contained' 
+              onClick={() => reactToPrintFn()} 
+              sx={{ width: '100%' }}
+              startIcon={<Print/>}
+            >
+              Print
+            </Button>
           </div> 
         </div>
-      </div>
     </div>
   );
 }

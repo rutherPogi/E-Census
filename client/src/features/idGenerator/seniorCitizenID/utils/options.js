@@ -11,6 +11,10 @@ export const MUNICIPALITY_OPTIONS = [
   { value: 'Itbayat', label: 'Itbayat' }
 ];
 
+export const PROVINCE_OPTIONS = [
+  { value: 'Batanes', label: 'Batanes' }
+];
+
 export const SUFFIX_OPTIONS = [
   { value: 'Jr', label: 'Jr - Junior' },
   { value: 'Sr', label: 'Sr - Senior' },
@@ -106,7 +110,6 @@ export const INCOME_EMPLOYMENT_OPTIONS = [
 ];
 
 export const RELATIONSHIP_OPTIONS = [
-  { value: 'Family Head', label: 'Family Head' },
   { value: 'Husband', label: 'Husband' },
   { value: 'Wife', label: 'Wife' },
   { value: 'Father', label: 'Father' },

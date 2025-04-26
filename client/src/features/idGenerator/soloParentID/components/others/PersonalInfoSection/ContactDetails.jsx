@@ -1,4 +1,4 @@
-import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from '../../../utils/options';
+import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS, PROVINCE_OPTIONS } from '../../../utils/options';
 import { TextInput, DropdownInput, ContactNumberInput } from "../../../../../../components/common/FormFields";
 
 
@@ -27,7 +27,7 @@ export const ContactDetails = ({
         value = {values.barangay}
         onChange = {(e, newValue) => handleChange('barangay')(e, newValue)}
         error = {errors.barangay} 
-        helperText = {errors.barangay || 'e.g. Barangay 1'}
+        helperText = {errors.barangay || 'e.g. Barangay Sta. Rosa'}
         required
       />
       <DropdownInput
@@ -36,17 +36,17 @@ export const ContactDetails = ({
         value = {values.municipality}
         onChange = {(e, newValue) => handleChange('municipality')(e, newValue)}
         error = {errors.municipality} 
-        helperText = {errors.municipality || 'e.g. Municipality 1'}
-        required
+        helperText = {errors.municipality}
+        disabled
       />
       <DropdownInput
         label = 'Province'
-        options = {BARANGAY_OPTIONS}
+        options = {PROVINCE_OPTIONS}
         value = {values.province}
         onChange = {(e, newValue) => handleChange('province')(e, newValue)}
         error = {errors.province} 
-        helperText = {errors.province || 'e.g. ---'}
-        required
+        helperText = {errors.province}
+        disabled
       />
       <ContactNumberInput
         label = 'Mobile Number'
@@ -64,7 +64,6 @@ export const ContactDetails = ({
         onChange={handleChange('emailAddress')}
         error={errors.emailAddress}
         helperText = {errors.emailAddress || 'e.g. sample@gmail.com'}
-        required
       />
     </>
   );

@@ -87,12 +87,10 @@ export default function DisplaySurvey({ handleBack, handleEdit, isEditing = fals
 
       if(isUpdating) {
         console.log('SURVEY DATA:', processedFormData);
-        formDataToSend.append('surveyData', JSON.stringify(processedFormData));
         await put('/surveys/update', formDataToSend, true);
         showNotification('Survey updated successfully!', 'success');
       } else {
         console.log('SURVEY DATA:', processedFormData);
-        formDataToSend.append('surveyData', JSON.stringify(processedFormData));
         await post('/surveys/submit', formDataToSend, true);
         showNotification('Survey submitted successfully!', 'success');
       }

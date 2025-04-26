@@ -80,8 +80,9 @@ export default function DispalySCInfo ({
         showNotification('Application SUBMITTED successfully!', 'success');
       }
 
-      clearFormData();
-      setTimeout(() => navigate('/main/generate-id/senior-citizen'), 1000);
+      handleNext();
+      //clearFormData();
+      //setTimeout(() => navigate('/main/generate-id/senior-citizen'), 1000);
     } catch (error) {
       console.error('Error submitting application:', error);
         

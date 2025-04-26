@@ -8,8 +8,9 @@ export const FP_INITIAL_VALUES = () => ({
   sex: ''
 })
 
-export const PI_INITIAL_VALUES = (seniorCitizenApplicationID) => ({
+export const PI_INITIAL_VALUES = (seniorCitizenApplicationID, populationID, barangay) => ({
   seniorCitizenApplicationID: seniorCitizenApplicationID,
+  populationID: populationID,
   seniorCitizenIDNumber: '',
 
   firstName: '',
@@ -18,14 +19,15 @@ export const PI_INITIAL_VALUES = (seniorCitizenApplicationID) => ({
   suffix: '',
   birthdate: null,
   age: '',
+  formattedAge: '',
   sex: '',
   civilStatus: '',
   birthplace: '',
 
   street: '',
-  barangay: '',
-  municipality: '',
-  province: '',
+  barangay: barangay,
+  municipality: 'Itbayat',
+  province: 'Batanes',
   mobileNumber: '',
 
   occupation: '',
@@ -46,6 +48,7 @@ export const FC_INITIAL_VALUES = () => ({
   relationship: '',
   birthdate: null,
   age: '',
+  formattedAge: '',
   civilStatus: '',
   occupation: '',
   annualIncome: ''

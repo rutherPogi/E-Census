@@ -12,11 +12,11 @@ const FamilyMemberTableRow = ({ member, index, handleEdit, handleDelete }) => {
     <TableRow>
       <TableCell>
         {`${member.firstName} 
-          ${member.middleName === 'N/A' ? '' : member.middleName} 
+          ${member.middleName ? member.middleName : '' } 
           ${member.lastName} 
-          ${member.suffix === 'N/A' ? '' : member.suffix}`}
+          ${member.suffix ? member.suffix : '' }`}
       </TableCell>
-      <TableCell>{member.age}</TableCell>
+      <TableCell>{member.age || member.formattedAge}</TableCell>
       <TableCell>
         {
           member.birthdate 
@@ -26,13 +26,13 @@ const FamilyMemberTableRow = ({ member, index, handleEdit, handleDelete }) => {
       </TableCell>
       <TableCell>{member.civilStatus}</TableCell>
       <TableCell>{member.relationToFamilyHead}</TableCell>
-      <TableCell>{member.occupation}</TableCell>
-      <TableCell>{member.skills}</TableCell>
-      <TableCell>{member.employmentType}</TableCell>
-      <TableCell>{member.philhealthNumber}</TableCell>
+      <TableCell>{member.occupation || 'N/A'}</TableCell>
+      <TableCell>{member.skills || 'N/A'}</TableCell>
+      <TableCell>{member.employmentType || 'N/A'}</TableCell>
+      <TableCell>{member.philhealthNumber || 'N/A'}</TableCell>
       <TableCell>{`₱${member.monthlyIncome}`}</TableCell>
-      <TableCell>{member.healthStatus}</TableCell>
-      <TableCell>{member.remarks}</TableCell>
+      <TableCell>{member.healthStatus || 'N/A'}</TableCell>
+      <TableCell>{member.remarks || 'N/A'}</TableCell>
 
       <TableCell>{Boolean(member.outOfTown) ? 'YES' : 'NO' }</TableCell>
       <TableCell>{Boolean(member.isOFW) ? 'YES' : 'NO' }</TableCell>
@@ -44,37 +44,37 @@ const FamilyMemberTableRow = ({ member, index, handleEdit, handleDelete }) => {
       <TableCell>{Boolean(member.isSoloParent) ? 'YES' : 'NO'}</TableCell>
 
       <TableCell>{Boolean(member.isIpula) ? 'YES' : 'NO'}</TableCell>
-      <TableCell>{member.settlementDetails}</TableCell>
-      <TableCell>{member.ethnicity}</TableCell>
-      <TableCell>{member.placeOfOrigin}</TableCell>
+      <TableCell>{member.settlementDetails || 'N/A'}</TableCell>
+      <TableCell>{member.ethnicity || 'N/A'}</TableCell>
+      <TableCell>{member.placeOfOrigin || 'N/A'}</TableCell>
 
       <TableCell>{Boolean(member.isTransient) ? 'YES' : 'NO'}</TableCell>
-      <TableCell>{member.houseOwner}</TableCell>
+      <TableCell>{member.houseOwner || 'N/A'}</TableCell>
       <TableCell>{Boolean(member.isRegistered) ? 'YES' : 'NO'}</TableCell>
       <TableCell>
         {
-          member.dateRegistered === 'N/A' || member.dateRegistered === null
-          ? 'N/A'
-          : dayjs(member.dateRegistered).format('MM/DD/YYYY') 
+          member.dateRegistered
+          ? dayjs(member.dateRegistered).format('MM/DD/YYYY') 
+          : 'N/A'
         }
       </TableCell>
 
       <TableCell>{Boolean(member.isAffiliated) ? 'YES' : 'NO'}</TableCell>
       <TableCell>
         {
-          member.asOfficer === 'N/A' || member.asOfficer === null
-          ? 'N/A'
-          : dayjs(member.asOfficer).format('MM/DD/YYYY') 
+          member.asOfficer
+          ? dayjs(member.asOfficer).format('MM/DD/YYYY') 
+          : 'N/A'
         }
       </TableCell>
       <TableCell>
         {
-          member.asMember === 'N/A' || member.asMember === null
-          ? 'N/A'
-          : dayjs(member.asMember).format('MM/DD/YYYY') 
+          member.asMember
+          ? dayjs(member.asMember).format('MM/DD/YYYY') 
+          : 'N/A'
         }
       </TableCell>
-      <TableCell>{member.organizationAffiliated}</TableCell>
+      <TableCell>{member.organizationAffiliated || 'N/A'}</TableCell>
       
       <TableCell>
         <IconButton 

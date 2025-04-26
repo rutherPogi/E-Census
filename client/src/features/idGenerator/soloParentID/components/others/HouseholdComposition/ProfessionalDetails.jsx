@@ -26,6 +26,7 @@ export const ProfessionalDetails = ({
         onChange = {(e, newValue) => handleChange('educationalAttainment')(e, newValue)}
         error = {errors.educationalAttainment} 
         helperText = {errors.educationalAttainment || 'e.g. College Graduate'}
+        required
       />
       <OccupationSection 
         values = {values}
@@ -38,8 +39,7 @@ export const ProfessionalDetails = ({
         value={values.company}
         onChange={handleChange('company')}
         error={errors.company}
-        helperText = {errors.company || 'e.g. ---'}
-        required
+        helperText = {errors.company || 'e.g. STI'}
       />
       <DropdownInput
         label = 'Employment Status'
@@ -47,7 +47,7 @@ export const ProfessionalDetails = ({
         value = {values.employmentStatus}
         onChange = {(e, newValue) => handleChange('employmentStatus')(e, newValue)}
         error = {errors.employmentStatus} 
-        helperText = {errors.employmentStatus || 'e.g. College Graduate'}
+        helperText = {errors.employmentStatus || 'e.g. Employed'}
       />
       <CurrencyInput
         label = 'Monthly Income'
@@ -57,6 +57,7 @@ export const ProfessionalDetails = ({
         helperText =  {errors.monthlyIncome}
         placeholder= '0.00'
         variant = 'outlined'
+        required
       />
     </>
   );

@@ -50,7 +50,7 @@ const PersonalInfo = ({ values, handleChange, handleDateChange, handleContactCha
       />
       <TextInput
         label='Age'
-        value={values.age}
+        value={values.age || values.formattedAge}
         disabled
       />
       <DropdownInput
@@ -85,7 +85,7 @@ const PersonalInfo = ({ values, handleChange, handleDateChange, handleContactCha
         value={values.birthplace}
         onChange={handleChange('birthplace')}
         error={errors.birthplace}
-        helperText={errors.birthplace || 'e.g, ---'}
+        helperText={errors.birthplace || 'e.g, Raele, Itbayat'}
       />
        <DropdownInput
         label='Religion'

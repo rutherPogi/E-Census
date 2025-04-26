@@ -18,8 +18,7 @@ export const OscaDetails = ({
         value={values.associationName}
         onChange={handleChange('associationName')}
         error={errors.associationName}
-        helperText = {errors.associationName || 'e.g. ---'}
-        required
+        helperText = {errors.associationName}
       />
       <DateInput
         label =  'Date elected as officer'
@@ -27,15 +26,13 @@ export const OscaDetails = ({
         onChange={handleDateChange('asOfficer')}
         error = {errors.asOfficer}  
         helperText =  {errors.asOfficer || 'If an officer, date elected'}
-        required
       />
       <TextInput
         label='Position'
         value={values.position}
         onChange={handleChange('position')}
         error={errors.position}
-        helperText = {errors.position || 'e.g. ---'}
-        required
+        helperText = {errors.position}
       />
     </>
   );

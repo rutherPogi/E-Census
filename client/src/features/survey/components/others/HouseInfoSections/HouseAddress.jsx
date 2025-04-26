@@ -25,14 +25,6 @@ export default function HouseAddress({ values, handleChange, errors }) {
         placeholder = 'Enter your barangay'
         required
       />
-      <DropdownInput
-        label = 'Municipality'
-        options = {MUNICIPALITY_OPTIONS}
-        value = {values.municipality}
-        placeholder = 'Enter your municipality'
-        disabled
-        required
-      />
     </>
   );
 }

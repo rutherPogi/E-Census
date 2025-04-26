@@ -18,15 +18,8 @@ export const PI_REQUIRED_FIELDS = [
 
   'street',
   'barangay',
-  'municipality',
-  'province',
-  'region',
 
-  'educationalAttainment',
-  'employmentStatus',
-  'employmentType',
-  'employmentCategory',
-  'occupation'
+  'educationalAttainment'
 ]
 
 export const AFFILIATION_REQUIRED_FIELDS = [

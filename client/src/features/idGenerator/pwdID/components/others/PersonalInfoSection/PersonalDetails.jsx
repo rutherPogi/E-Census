@@ -59,7 +59,7 @@ export const PersonalDetails = ({
       />
       <TextInput
         label='Age'
-        value={values.age}
+        value={values.age || values.formattedAge}
         disabled
       />
       <DropdownInput
@@ -90,7 +90,6 @@ export const PersonalDetails = ({
         error={errors.bloodType} 
         helperText={errors.bloodType || 'e.g, A+'}
         placeholder='ex. A+'
-        required
       />
       <TextInput
         label='PWD ID Number'

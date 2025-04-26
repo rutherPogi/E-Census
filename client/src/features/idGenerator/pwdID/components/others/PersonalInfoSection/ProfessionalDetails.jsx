@@ -35,7 +35,7 @@ export const ProfessionalDetails = ({
           value = {values.employmentStatus}
           onChange = {(e, newValue) => handleChange('employmentStatus')(e, newValue)}
           error = {errors.employmentStatus} 
-          helperText = {errors.employmentStatus || 'e.g. Employment Status'}
+          helperText = {errors.employmentStatus || 'e.g. Employed'}
         />
         <DropdownInput
           label = 'Type of Employment'
@@ -43,7 +43,7 @@ export const ProfessionalDetails = ({
           value = {values.employmentType}
           onChange = {(e, newValue) => handleChange('employmentType')(e, newValue)}
           error = {errors.employmentType} 
-          helperText = {errors.employmentType || 'e.g. Employment Type'}
+          helperText = {errors.employmentType || 'e.g. Permanent'}
         />
         <DropdownInput
           label = 'Category of Employment'
@@ -51,7 +51,7 @@ export const ProfessionalDetails = ({
           value = {values.employmentCategory}
           onChange = {(e, newValue) => handleChange('employmentCategory')(e, newValue)}
           error = {errors.employmentCategory} 
-          helperText = {errors.employmentCategory || 'e.g. Employment Category'}
+          helperText = {errors.employmentCategory || 'e.g. Private'}
         />
         <OccupationSection 
           values = {values}

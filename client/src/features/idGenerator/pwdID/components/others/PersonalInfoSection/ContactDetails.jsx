@@ -1,4 +1,4 @@
-import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from '../../../utils/options';
+import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS, PROVINCE_OPTIONS } from '../../../utils/options';
 import { TextInput, DropdownInput, ContactNumberInput } from "../../../../../../components/common/FormFields";
 
 
@@ -40,27 +40,17 @@ export const ContactDetails = ({
         error = {errors.municipality} 
         helperText = {errors.municipality || ''}
         placeholder = 'Enter your municipality'
-        required
+        disabled
       />
       <DropdownInput
         label = 'Province'
-        options = {BARANGAY_OPTIONS}
+        options = {PROVINCE_OPTIONS}
         value = {values.province}
         onChange = {(e, newValue) => handleChange('province')(e, newValue)}
         error = {errors.province} 
         helperText = {errors.province || ''}
         placeholder = 'Enter your province'
-        required
-      />
-      <DropdownInput
-        label = 'Region'
-        options = {BARANGAY_OPTIONS}
-        value = {values.region}
-        onChange = {(e, newValue) => handleChange('region')(e, newValue)}
-        error = {errors.region} 
-        helperText = {errors.region || ''}
-        placeholder = 'Enter your region'
-        required
+        disabled
       />
       <ContactNumberInput
         label = 'Landline Number'

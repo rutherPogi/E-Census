@@ -94,6 +94,8 @@ export const useFormValidation = (
     } else {
       // For regular text inputs
       value = e.target.value;
+      if (value.length > 50) return;
+
     }
     
     setValues(prev => ({ ...prev, [field]: value }));
@@ -109,48 +111,84 @@ export const useFormValidation = (
     setErrors(prev => ({ ...prev, [field]: false }));
   };
 
+  const handleIDChange = (field) => (e) => {
+    let value = e.target.value;
+  
+    if (field === 'philhealthNumber') {
+      // Remove non-numeric characters
+      value = value.replace(/\D/g, '');
+  
+      // Limit to max 12 digits
+      if (value.length > 12) value = value.slice(0, 12);
+  
+      // Format: 123-456-789-000
+      const parts = value.match(/.{1,3}/g);
+      value = parts ? parts.join('-') : value;
+    }
+  
+    setValues(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: false }));
+  };
+  
+
   // Handle date changes with age calculation
   const handleDateChange = (field, calculateAge = false) => (dateValue) => {
-
     const parsedDate = dayjs(dateValue);
-
-    if (!parsedDate) {
+  
+    if (!parsedDate || !parsedDate.isValid()) {
       setValues(prev => ({ 
         ...prev, 
         [field]: null,
-        ...(calculateAge && { age: '' })
+        ...(calculateAge && { age: '', formattedAge: '' })
       }));
       return;
     }
-
+  
     if (calculateAge && parsedDate.isAfter(dayjs())) {
       setErrors(prev => ({ ...prev, [field]: 'Date cannot be in the future' }));
-      setValues(prev => ({ ...prev, [field]: parsedDate, age: '' }));
+      setValues(prev => ({ ...prev, [field]: parsedDate, age: '', formattedAge: '' }));
       return;
     }
-
+  
     setErrors(prev => ({ ...prev, [field]: false }));
-
+  
     if (calculateAge) {
       const birthdate = parsedDate.toDate();
       const today = new Date();
+  
       let age = today.getFullYear() - birthdate.getFullYear();
-      
       const monthDiff = today.getMonth() - birthdate.getMonth();
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
         age--;
       }
-    
+  
+      // Handle formattedAge for <1 year
+      let formattedAge = '';
+      if (age < 1) {
+        const months = dayjs().diff(parsedDate, 'month');
+        if (months === 0) {
+          const weeks = dayjs().diff(parsedDate, 'week');
+          formattedAge = weeks === 0 
+            ? `${dayjs().diff(parsedDate, 'day')} day(s)` 
+            : `${weeks} week(s)`;
+        } else {
+          formattedAge = `${months} month(s)`;
+        }
+      } else {
+        formattedAge = `${age} year(s)`;
+      }
+  
       setValues(prev => ({ 
         ...prev, 
         [field]: parsedDate,
-        age: age >= 0 ? age : '' 
+        age: age >= 0 ? age : '',
+        formattedAge
       }));
     } else {
       setValues(prev => ({ ...prev, [field]: parsedDate }));
     }
   };
-
+  
   // Handle currency/income fields
   const handleIncomeChange = (field) => (e) => {
     const value = e.target.value;
@@ -218,6 +256,7 @@ export const useFormValidation = (
     validateForm,
     handleChange,
     handleContactChange,
+    handleIDChange,
     handleDateChange,
     handleIncomeChange,
     handleNumChange,

@@ -18,10 +18,7 @@ export default function CommunityIssue({ handleBack, handleNext }) {
     errors,
     validateForm,
     handleChange
-  } = useFormValidation(
-    CI_INITIAL_VALUES, 
-    true, 
-    ['issues']);
+  } = useFormValidation(CI_INITIAL_VALUES);
 
   const { 
     snackbarOpen, 

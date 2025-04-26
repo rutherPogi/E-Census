@@ -4,7 +4,7 @@ import { CheckboxInput } from '../../../../../components/common/FormFields';
 
 const Checkbox = ({ values, handleChange, errors }) => {
 
-  const showYouthOptions = values.age >= 18 && values.age <= 24;
+  const showYouthOptions = values.age >= 15 && values.age <= 24;
 
   return (
     <div className="checkbox-group">

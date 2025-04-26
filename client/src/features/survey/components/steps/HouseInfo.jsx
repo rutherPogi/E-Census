@@ -15,6 +15,7 @@ import { HousingCondition, HousingStructure, HouseImages } from "../others/House
 
 export default function HouseInfo({ handleBack, handleNext}) {
 
+  
   const { formData, updateFormData } = useFormContext();
 
   const {

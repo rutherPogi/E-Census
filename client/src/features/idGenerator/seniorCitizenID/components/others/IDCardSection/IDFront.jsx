@@ -38,7 +38,11 @@ const IDFront = () => {
         </Box>
       </Box>
 
-      <Box sx={{ textAlign: "center", fontWeight: "bold", bgcolor: "#F6402D", height: '18px' }}/>
+      <Box sx={{ textAlign: "center", fontWeight: "bold", bgcolor: "#F6402D", height: '18px' }}>
+        <Typography sx={{ fontSize: '10px', color: 'white' }}>
+          SENIOR CITIZEN ID
+        </Typography>
+      </Box>
 
       <Box sx={{ display: "flex", gap: 1.5, mt: 1, p: 0.5, width: '100%', boxSizing: 'border-box'}}>
         <Box sx={{width: '100%'}}>
@@ -46,9 +50,9 @@ const IDFront = () => {
             <Typography sx={{ fontSize: '9px' }}>Name: </Typography>
             <Typography sx={{ borderBottom: '1px solid black', width: '100%', fontWeight: '500', fontSize: '9px' }}>
               {`${personalInfo.firstName}
-                ${personalInfo.middleName === 'N/A' ? '' : personalInfo.middleName}
+                ${personalInfo.middleName || ''}
                 ${personalInfo.lastName}
-                ${personalInfo.suffix === 'N/A' ? '' : personalInfo.suffix}` || ''}
+                ${personalInfo.suffix || ''}` }
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 0.5, mb: 0.5 }}>
@@ -117,7 +121,7 @@ const IDFront = () => {
       <Box sx={{ display: 'flex', padding: '0 0.6em', justifyContent: 'space-between', mt: 0.5 }}>
         <Box>
           <Typography sx={{ fontSize: '8px'}}>
-            THIS CARD IS NON-TRANSFERABLE
+            THIS CARD IS NON-TRANSFERRABLE
           </Typography>
           <Typography sx={{ fontSize: '8px'}}>
             AND VALID UNTIL {formData?.validUntil}

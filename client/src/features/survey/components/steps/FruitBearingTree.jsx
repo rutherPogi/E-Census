@@ -56,6 +56,11 @@ export default function FruitBearingTree({ handleBack, handleNext }) {
 
     handleNext();
   };
+
+  const isAllEmpty = Object.values(values).every(
+    (val) => val === '' || val === null || val === undefined
+  );
+  
   
   return (
     <div className='responsive-container'>
@@ -76,7 +81,7 @@ export default function FruitBearingTree({ handleBack, handleNext }) {
         onBack={handleBack}
         onNext={handleSubmit}
         backLabel="Back"
-        nextLabel="Next"
+        nextLabel={isAllEmpty ? "Skip" : "Next"}
       />
     </div>
   );

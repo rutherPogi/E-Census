@@ -55,7 +55,7 @@ export const PersonalDetails = ({
       />
       <TextInput
         label='Age'
-        value={values.age}
+        value={values.age || values.formattedAge}
         disabled
       />
       <DropdownInput
@@ -72,8 +72,7 @@ export const PersonalDetails = ({
         value={values.birthplace}
         onChange={handleChange('birthplace')}
         error={errors.birthplace}
-        helperText = {errors.birthplace || 'e.g. ---'}
-        required
+        helperText = {errors.birthplace || 'e.g. Sta. Rosa, Itbayat'}
       />
       <DropdownInput
         label = 'Civil Status'
@@ -91,7 +90,6 @@ export const PersonalDetails = ({
         onChange = {(e, newValue) => handleChange('religion')(e, newValue)}
         error = {errors.religion} 
         helperText = {errors.religion || 'e.g. Catholic'}
-        required
       />
       <TextInput
         label='Phylsis Card Number'
@@ -99,7 +97,6 @@ export const PersonalDetails = ({
         onChange={handleChange('phylsisNumber')}
         error={errors.phylsisNumber}
         helperText = {errors.phylsisNumber || 'e.g. ---'}
-        required
       />
     </>
   );

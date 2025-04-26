@@ -46,6 +46,11 @@ export default function Farmlots({ handleBack, handleNext }) {
     handleNext();
   };
 
+  const isAllEmpty = Object.values(values).every(
+    (val) => val === '' || val === null || val === undefined
+  );
+  
+
   return(
     <div className='responsive-container'>
       <div className='responsive-header'>NO. OF FARM LOTS</div>
@@ -79,7 +84,7 @@ export default function Farmlots({ handleBack, handleNext }) {
         onBack={handleBack}
         onNext={handleSubmit}
         backLabel="Back"
-        nextLabel="Next"
+        nextLabel={isAllEmpty ? "Skip" : "Next"}
       />
     </div>
   )

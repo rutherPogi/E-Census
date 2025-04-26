@@ -55,7 +55,7 @@ export const PersonalDetails = ({
       />
       <TextInput
         label='Age'
-        value={values.age}
+        value={values.age || values.formattedAge}
         disabled
       />
       <DropdownInput

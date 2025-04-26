@@ -56,7 +56,7 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 1 && 
+        {currentPage === 0 && 
           <PersonalInfo 
             handleNext={handleNext}
             handleBack={handleBack} 
@@ -83,7 +83,7 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
           />
         } 
 
-        {currentPage === 8 && <PrintID handleNext={handleNext} handleBack={handleBack} />} 
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack} />} 
 
       <div className='form-pagination'>
           {Array.from({ length: 8 }, (_, index) => (

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 import { Notification, FormButtons } from "../../../../../components/common";
-import { RELATIONSHIP_OPTIONS, BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from "../../utils/options";
+import { RELATIONSHIP_OPTIONS, BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS, PROVINCE_OPTIONS } from "../../utils/options";
 import { EC_INITIAL_VALUES } from "../../utils/initialValues";
 import { EC_REQUIRED_FIELDS } from "../../utils/requiredFields";
 import { TextInput, DropdownInput, ContactNumberInput } from '../../../../../components/common/FormFields'
@@ -9,12 +9,13 @@ import { TextInput, DropdownInput, ContactNumberInput } from '../../../../../com
 import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useFormValidation } from '../../hooks/useFormValidation';
-
+import { useAuth } from '../../../../../utils/auth/authContext';
 
 
 
 export default function EmergencyContact({ handleBack, handleNext}) {
 
+  const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
 
   const {
@@ -23,8 +24,9 @@ export default function EmergencyContact({ handleBack, handleNext}) {
     errors,
     validateForm,
     handleChange,
+    handleContactChange
   } = useFormValidation(
-    EC_INITIAL_VALUES,
+    EC_INITIAL_VALUES(userData.barangay),
     true, 
     EC_REQUIRED_FIELDS
   );
@@ -94,7 +96,7 @@ export default function EmergencyContact({ handleBack, handleNext}) {
         <ContactNumberInput
           label = 'Mobile Number'
           value = {values.mobileNumber}
-          onChange = {handleChange('mobileNumber')}
+          onChange = {handleContactChange('mobileNumber')}
           error = {errors.mobileNumber}
           helperText = '+63 XXXXXXXXXX'
           placeholder = 'Enter mobile number'
@@ -124,17 +126,17 @@ export default function EmergencyContact({ handleBack, handleNext}) {
           value = {values.municipality}
           onChange = {(e, newValue) => handleChange('municipality')(e, newValue)}
           error = {errors.municipality} 
-          helperText = {errors.municipality || 'e.g. Municipality 1'}
-          required
+          helperText = {errors.municipality}
+          disabled
         />
         <DropdownInput
           label = 'Province'
-          options = {BARANGAY_OPTIONS}
+          options = {PROVINCE_OPTIONS}
           value = {values.province}
           onChange = {(e, newValue) => handleChange('province')(e, newValue)}
           error = {errors.province} 
-          helperText = {errors.province || 'e.g. ---'}
-          required
+          helperText = {errors.province}
+          disabled
         />
       </div>
       <FormButtons

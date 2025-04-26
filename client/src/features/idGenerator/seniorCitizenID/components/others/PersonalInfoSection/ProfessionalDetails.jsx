@@ -34,8 +34,7 @@ export const ProfessionalDetails = ({
           value = {values.skills}
           onChange = {(e, newValue) => handleChange('skills')(e, newValue)}
           error = {errors.skills} 
-          helperText = {errors.skills || 'e.g. College Graduate'}
-          required
+          helperText = {errors.skills || 'e.g. Driving'}
         />
         <CurrencyInput
           label = 'Annual Income'
@@ -45,6 +44,7 @@ export const ProfessionalDetails = ({
           helperText =  {errors.annualIncome}
           placeholder= '0.00'
           variant = 'outlined'
+          required
         />
         <OccupationSection 
           values = {values}

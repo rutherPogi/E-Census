@@ -9,6 +9,7 @@ import { HI2_REQUIRED_FIELDS } from "../../utils/requiredFields";
 
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useNotification } from '../../hooks/useNotification';
+import { useAuth } from '../../../../utils/auth/authContext'
 
 import LocationMap from "../others/HouseInfoSections/HouseMap/LocationMap";
 import CoordinatesDisplay from "../others/HouseInfoSections/HouseMap/CoordinatesDisplay";
@@ -21,6 +22,7 @@ export default function HouseLocation({ handleBack, handleNext }) {
 
   const [position, setPosition] = useState(null);
 
+  const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
 
   const {
@@ -30,7 +32,7 @@ export default function HouseLocation({ handleBack, handleNext }) {
     validateForm,
     handleChange
   } = useFormValidation(
-    HI2_INITIAL_VALUES,
+    HI2_INITIAL_VALUES(userData.barangay),
     true, 
     HI2_REQUIRED_FIELDS
   );

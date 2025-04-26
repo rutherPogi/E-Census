@@ -1,15 +1,15 @@
-import { TextInput, DropdownInput } from '../../../../../components/common/FormFields';
+import { TextInput, NumberInput } from '../../../../../components/common/FormFields';
 
 
 
-const OtherInfo = ({ values, handleChange, errors }) => {
+const OtherInfo = ({ values, handleChange, handleIDChange, errors }) => {
   return (
     <>
       <div className="section-title field-full">Other Information</div>     
       <TextInput
         label='Philhealth Number'
         value={values.philhealthNumber}
-        onChange={handleChange('philhealthNumber')}
+        onChange={handleIDChange('philhealthNumber')}
         error={errors.philhealthNumber}
         helperText={errors.philhealthNumber || '123-456-789-000'}
       />

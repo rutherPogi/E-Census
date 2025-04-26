@@ -1,4 +1,4 @@
-import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS } from '../../../utils/options';
+import { BARANGAY_OPTIONS, MUNICIPALITY_OPTIONS, PROVINCE_OPTIONS } from '../../../utils/options';
 import { TextInput, DropdownInput, ContactNumberInput } from "../../../../../../components/common/FormFields";
 
 
@@ -19,7 +19,6 @@ export const ContactDetails = ({
         onChange={handleChange('street')}
         error={errors.street}
         helperText = {errors.street}
-        placeholder = 'e.g. 123 Rizal St. '
         required
       />
       <DropdownInput
@@ -28,8 +27,7 @@ export const ContactDetails = ({
         value = {values.barangay}
         onChange = {(e, newValue) => handleChange('barangay')(e, newValue)}
         error = {errors.barangay} 
-        helperText = {errors.barangay || ''}
-        placeholder = 'Enter your barangay'
+        helperText = {errors.barangay || 'e.g. Barangay Sta. Rosa'}
         required
       />
       <DropdownInput
@@ -38,19 +36,17 @@ export const ContactDetails = ({
         value = {values.municipality}
         onChange = {(e, newValue) => handleChange('municipality')(e, newValue)}
         error = {errors.municipality} 
-        helperText = {errors.municipality || ''}
-        placeholder = 'Enter your municipality'
-        required
+        helperText = {errors.municipality}
+        disabled
       />
       <DropdownInput
         label = 'Province'
-        options = {BARANGAY_OPTIONS}
+        options = {PROVINCE_OPTIONS}
         value = {values.province}
         onChange = {(e, newValue) => handleChange('province')(e, newValue)}
         error = {errors.province} 
-        helperText = {errors.province || ''}
-        placeholder = 'Enter your province'
-        required
+        helperText = {errors.province}
+        disabled
       />
       <ContactNumberInput
         label = 'Mobile Number'

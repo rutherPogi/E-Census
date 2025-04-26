@@ -45,7 +45,6 @@ export const OccupationSection = ({
         onChange={handleDropdownChange}
         error={errors.occupation && !showOtherInput} 
         helperText={!showOtherInput && errors.occupation ? errors.occupation : ""}
-        required
       />
       
       {showOtherInput && (

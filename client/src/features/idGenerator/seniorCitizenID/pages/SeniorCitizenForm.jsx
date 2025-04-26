@@ -58,7 +58,7 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
     <FormProvider>
       <div className='form-container'>
 
-        {currentPage === 1 && 
+        {currentPage === 0 && 
           <PersonalInfo
             handleNext={handleNext} 
             handleBack={handleBack} 
@@ -81,7 +81,7 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
           />
         }
 
-        {currentPage === 6 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
 
       <div className='form-pagination'>
           {Array.from({ length: 6 }, (_, index) => (

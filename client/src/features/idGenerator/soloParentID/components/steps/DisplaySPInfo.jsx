@@ -80,8 +80,9 @@ export default function DisplaySPInfo ({
         showNotification('Application SUBMITTED successfully!', 'success');
       }
 
-      clearFormData();
-      setTimeout(() => navigate('/main/generate-id/solo-parent'), 1000);
+      //clearFormData();
+      handleNext();
+      //setTimeout(() => navigate('/main/generate-id/solo-parent'), 1000);
     } catch (error) {
       console.error('Error submitting application:', error);
         

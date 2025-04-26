@@ -25,7 +25,7 @@ export default function SurveyDetails({ handleNext }) {
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
 
-  // Use custom hooks
+
   const {
     values,
     setValues,
@@ -34,7 +34,7 @@ export default function SurveyDetails({ handleNext }) {
     handleChange,
     handleIncomeChange,
   } = useFormValidation(
-    SD_INITIAL_VALUES(surveyNumber, userData.accountName),
+    SD_INITIAL_VALUES(surveyNumber, userData.accountName, userData.barangay),
     true, 
     SD_REQUIRED_FIELDS
   );
@@ -103,7 +103,6 @@ export default function SurveyDetails({ handleNext }) {
           error = {errors.familyClass} 
           helperText = {errors.familyClass}
           placeholder = 'Enter family class'
-          required
         />
         <div className="section-title field-full">Location Information</div>
         <DropdownInput
@@ -122,7 +121,6 @@ export default function SurveyDetails({ handleNext }) {
           value = {values.municipality}
           placeholder = 'Enter your municipality'
           disabled
-          required
         />
         <div className="section-title field-full">Financial Information</div>
         <CurrencyInput

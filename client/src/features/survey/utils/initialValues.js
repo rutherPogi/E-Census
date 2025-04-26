@@ -1,10 +1,10 @@
 // SURVEY DETAILS
-export const SD_INITIAL_VALUES = (surveyNumber, accountName) => {
+export const SD_INITIAL_VALUES = (surveyNumber, accountName, barangay) => {
   return {
     surveyID: surveyNumber,
     respondent: '',
     interviewer: accountName,
-    barangay: '',
+    barangay: barangay,
     municipality: 'Itbayat',
     monthlyIncome: '',
     irregularIncome: '',
@@ -24,6 +24,7 @@ export const FP_INITIAL_VALUES = () => {
     suffix: '',
     birthdate: null,
     age: '',
+    formattedAge: '',
     sex: '',
     birthplace: '',
     religion: '',
@@ -92,12 +93,12 @@ export const HI_INITIAL_VALUES = () => {
   };
 };
 
-export const HI2_INITIAL_VALUES = () => {
+export const HI2_INITIAL_VALUES = (barangay) => {
   return {
     latitude: '',
     longitude: '',
     houseStreet: '',
-    barangay: '',
+    barangay: barangay,
     municipality: 'Itbayat'
   };
 };

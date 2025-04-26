@@ -18,8 +18,7 @@ export const PI_REQUIRED_FIELDS = [
   'province',
 
   'educationalAttainment',
-  'employmentStatus',
-  'occupation',
+  'monthlyIncome',
 
   'soloParentCategory'
 ]

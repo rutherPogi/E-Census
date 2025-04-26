@@ -71,11 +71,11 @@ export default function HouseholdComposition2({ handleBack, handleNext }) {
                   <TableCell>{member.sex}</TableCell>
                   <TableCell>{member.relationship}</TableCell>
                   <TableCell>{formatters.date(member.birthdate)}</TableCell>
-                  <TableCell>{member.age}</TableCell>
+                  <TableCell>{member.age || member.formattedAge}</TableCell>
                   <TableCell>{member.civilStatus}</TableCell>
                   <TableCell>{member.educationalAttainment}</TableCell>
                   <TableCell>{member.occupation || 'N/A'}</TableCell>
-                  <TableCell>{`₱${member.monthlyIncome === 'N/A' ? '0.00' : member.monthlyIncome}`}</TableCell>
+                  <TableCell>{`₱${member.monthlyIncome ? member.monthlyIncome : '0.00'}`}</TableCell>
                   <TableCell>
                     <Tooltip title='Edit'>
                       <IconButton color="primary" onClick={() => handleEdit(index)}>

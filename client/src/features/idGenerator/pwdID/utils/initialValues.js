@@ -8,7 +8,7 @@ export const FP_INITIAL_VALUES = () => ({
   sex: ''
 })
 
-export const PI_INITIAL_VALUES = (pwdApplicationID) => ({
+export const PI_INITIAL_VALUES = (pwdApplicationID, barangay) => ({
   pwdApplicationID: pwdApplicationID,
   pwdIDNumber: '',
 
@@ -18,6 +18,7 @@ export const PI_INITIAL_VALUES = (pwdApplicationID) => ({
   suffix: '',
   birthdate: null,
   age: '',
+  formattedAge: '',
   sex: '',
   civilStatus: '',
 
@@ -28,10 +29,9 @@ export const PI_INITIAL_VALUES = (pwdApplicationID) => ({
   bloodType: '',
 
   street: '',
-  barangay: '',
-  municipality: '',
-  province: '',
-  region: '',
+  barangay: barangay,
+  municipality: 'Itbayat',
+  province: 'Batanes',
   landlineNumber: '',
   mobileNumber: '',
   emailAddress: '',

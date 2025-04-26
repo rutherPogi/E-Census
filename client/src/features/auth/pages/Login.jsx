@@ -67,7 +67,8 @@ const Login = () => {
         username: res.username,
         accountName: res.accountName,
         userID: res.userID,
-        position: res.position
+        position: res.position,
+        barangay: res.barangay
       };
 
       localStorage.setItem('authToken', res.token);

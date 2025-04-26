@@ -29,6 +29,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
     validateForm,
     handleChange,
     handleContactChange,
+    handleIDChange,
     handleDateChange,
     handleIncomeChange,
   } = useFormValidation(
@@ -45,7 +46,6 @@ export default function FamilyProfile({ handleBack, handleNext }) {
   } = useNotification();
 
   useEffect(() => { 
-    console.log('FORMDATA', formData)
     const storedEditIndex = sessionStorage.getItem('editingMemberIndex');
 
     if (storedEditIndex !== null) {
@@ -161,6 +161,7 @@ export default function FamilyProfile({ handleBack, handleNext }) {
           <OtherInfo
             values={values}
             handleChange={handleChange}
+            handleIDChange={handleIDChange}
             errors={errors}
           />
           <Checkbox

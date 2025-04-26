@@ -9,6 +9,7 @@ import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useFormValidation } from '../../hooks/useFormValidation';
 import { useTransformData } from "../../hooks/useTransformData";
+import { useAuth } from "../../../../../utils/auth/authContext";
 
 import { 
   PersonalDetails,
@@ -27,7 +28,7 @@ import {
 export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
 
   const { pwdApplicationID, populationID } = useParams();
-
+  const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(pwdApplicationID, populationID);
 
@@ -42,7 +43,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     handleDateChange,
     handleContactChange
   } = useFormValidation(
-    PI_INITIAL_VALUES(pwdApplicationID),
+    PI_INITIAL_VALUES(pwdApplicationID, userData.barangay),
     true, 
     PI_REQUIRED_FIELDS
   );

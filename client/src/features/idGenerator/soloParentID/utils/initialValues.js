@@ -8,7 +8,7 @@ export const FP_INITIAL_VALUES = () => ({
   sex: ''
 })
 
-export const PI_INITIAL_VALUES = (spApplicationID, populationID) => ({
+export const PI_INITIAL_VALUES = (spApplicationID, populationID, barangay) => ({
   spApplicationID: spApplicationID,
   populationID: populationID,
   soloParentIDNumber: '',
@@ -20,6 +20,7 @@ export const PI_INITIAL_VALUES = (spApplicationID, populationID) => ({
   suffix: '',
   birthdate: null,
   age: '',
+  formattedAge: '',
   sex: '',
   birthplace: '',
   civilStatus: '',
@@ -28,9 +29,9 @@ export const PI_INITIAL_VALUES = (spApplicationID, populationID) => ({
   phylsisNumber: '',
 
   street: '',
-  barangay: '',
-  municipality: '',
-  province: '',
+  barangay: barangay,
+  municipality: 'Itbayat',
+  province: 'Batanes',
   mobileNumber: '',
   emailAddress: '',
 
@@ -57,6 +58,7 @@ export const HC_INITIAL_VALUES = () => ({
   suffix: '',
   birthdate: null,
   age: '',
+  formattedAge: '',
   sex: '',
   relationship: '',
   civilStatus: '',
@@ -71,13 +73,13 @@ export const PN_INITIAL_VALUES = () => ({
   needsSoloParent: ''
 })
 
-export const EC_INITIAL_VALUES = () => ({
+export const EC_INITIAL_VALUES = (barangay) => ({
   contactName: '',
   relationship: '',
   street: '',
-  barangay: '',
-  municipality: '',
-  province: '',
+  barangay: barangay,
+  municipality: 'Itbayat',
+  province: 'Batanes',
   mobileNumber: ''
 })
     

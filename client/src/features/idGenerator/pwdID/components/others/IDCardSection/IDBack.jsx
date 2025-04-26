@@ -69,18 +69,18 @@ const IDBack = ({ mayor }) => {
       <Box sx={{ display: 'flex', gap: 0.5 }}>
         <Typography sx={{ fontSize: '8px' }}>ADDRESS: </Typography>
         <Typography sx={{ borderBottom: '1px solid black', flex: 1, fontSize: '7px' }}>
-          {`${formData.personalInfo.street === 'N/A' ? '' : formData.personalInfo.street}
-            ${formData.personalInfo.barangay === 'N/A' ? '' : formData.personalInfo.barangay}
-            ${formData.personalInfo.municipality === 'N/A' ? '' : formData.personalInfo.municipality}
-            ${formData.personalInfo.province === 'N/A' ? '' : formData.personalInfo.province}
-            ${formData.personalInfo.region === 'N/A' ? '' : formData.personalInfo.region}`}
+          {`${formData.personalInfo.street ? formData.personalInfo.street : ''}
+            ${formData.personalInfo.barangay ? formData.personalInfo.barangay : ''}
+            ${formData.personalInfo.municipality ? formData.personalInfo.municipality : ''}
+            ${formData.personalInfo.province ? formData.personalInfo.province : ''}
+            ${formData.personalInfo.region ? formData.personalInfo.region : ''}`}
         </Typography>
       </Box>
 
       <Box sx={{ display: 'flex', gap: 0.5 }}>
         <Typography sx={{ fontSize: '8px' }}>CONTACT NO.: </Typography>
         <Typography sx={{ borderBottom: '1px solid black', flex: 1, fontSize: '8px' }}>
-          {formData.personalInfo.mobileNumber}
+          {formData.personalInfo.mobileNumber || ''}
         </Typography>
       </Box>
 

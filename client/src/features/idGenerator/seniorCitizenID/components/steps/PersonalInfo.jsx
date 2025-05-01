@@ -20,11 +20,11 @@ import OscaDetails from "../others/PersonalInfoSection/OscaDetails";
 
 export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
 
-  const { scApplicationID, populationID } = useParams();
+  const { seniorCitizenIDNumber, populationID } = useParams();
 
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData();
+  const { fetchPersonData } = useTransformData(seniorCitizenIDNumber, populationID);
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
@@ -38,7 +38,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     handleContactChange,
     handleIncomeChange
   } = useFormValidation(
-    PI_INITIAL_VALUES(scApplicationID, populationID, userData.barangay),
+    PI_INITIAL_VALUES(seniorCitizenIDNumber, populationID, userData.barangay),
     true, 
     PI_REQUIRED_FIELDS
   );
@@ -71,22 +71,20 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     if (isRegistered && initialFetchDone && formData.personalInfo) {
       setValues(prev => ({
         ...prev,
-        ...formData.personalInfo,
-        scApplicationID: scApplicationID,
+        ...formData.personalInfo
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, scApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo]);
 
   useEffect(() => {
     // Once data is fetched and available, set the form values only once
     if (formData.personalInfo) {
       setValues(prev => ({
         ...prev,
-        ...formData.personalInfo,
-        scApplicationID: scApplicationID,
+        ...formData.personalInfo
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, scApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo]);
 
 
   const handleSubmit = async (e) => {

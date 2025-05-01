@@ -12,7 +12,7 @@ import PrintID from "../components/steps/PrintID";
 
 
 
-export default function SoloParentForm({ hasSPID = false, isRegistered = false }) {
+export default function SoloParentForm({ hasSPID = false, isRegistered = false, isViewing = false}) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
@@ -21,6 +21,7 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
   const [editing, setEditing] = useState(false);
   const [update, setUpdate] = useState(false);
   const [mount, setMount] = useState(false);
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (isRegistered) {
@@ -29,6 +30,10 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
       setCurrentPage(7);
       setEditing(true);
       setMount(true);
+    } else if (isViewing) {
+      setCurrentPage(7);
+      setEditing(true);
+      setView(true);
     }
   }, [ isRegistered, hasSPID ]);
 
@@ -56,7 +61,7 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
   return(
     <FormProvider>
       <div className='form-container'>
-        {currentPage === 0 && 
+        {currentPage === 1 && 
           <PersonalInfo 
             handleNext={handleNext}
             handleBack={handleBack} 
@@ -80,10 +85,11 @@ export default function SoloParentForm({ hasSPID = false, isRegistered = false }
             isEditing={editing}
             isUpdating={update}
             firstMount={mount}
+            isViewing={view}
           />
         } 
 
-        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack} />} 
+        {currentPage === 8 && <PrintID handleNext={handleNext} handleBack={handleBack} />} 
 
       <div className='form-pagination'>
           {Array.from({ length: 8 }, (_, index) => (

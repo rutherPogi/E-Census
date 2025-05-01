@@ -4,7 +4,10 @@ import { Drawer, List, ListItem, ListItemIcon, ListItemText, Collapse,
          Divider, Box, Tooltip, Container, Avatar, Typography } from '@mui/material';
 import { Home, Assignment, Badge, Map, Person, ExpandLess, ExpandMore, 
          Elderly, Accessible, EscalatorWarning, AccountCircle, Newspaper,
-         Groups, Storage, Wc, Boy, Female, Hail} from '@mui/icons-material';
+         Groups, Storage, Wc, Boy, Female, Hail,
+         Add,
+         Pending,
+         ListAlt} from '@mui/icons-material';
 
 import logo from '../../assets/MSWDO-Logo.png'
 
@@ -44,6 +47,7 @@ const Sidebar = ({
 
   const [idGeneratorOpen, setIdGeneratorOpen] = useState(false);
   const [dataBankOpen, setDataBankOpen] = useState(false);
+  const [censusOpen, setCensusOpen] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -55,7 +59,6 @@ const Sidebar = ({
   const showNews = position === 'Admin' || position === 'MSWDO';
   const showAccounts = position === 'Admin';
   const showDataBank = position === 'Admin' || position === 'MSWDO';
-  const showPopulation = position === 'Admin' || position === 'MSWDO';
   const showIdGenerator = position === 'Admin' || position === 'MSWDO';
   const showHazardMap = position === 'Admin' || position === 'MSWDO';
 
@@ -73,6 +76,10 @@ const Sidebar = ({
 
   const handleDataBankClick = () => {
     setDataBankOpen(!dataBankOpen);
+  };
+
+  const handleCensusClick = () => {
+    setCensusOpen(!censusOpen);
   };
 
   const handleItemClick = (href) => {
@@ -166,17 +173,73 @@ const Sidebar = ({
         )}
 
         {/* Census */}
-        <Tooltip title={!open ? "Census" : ""} placement="right">
-          <ListItem 
-            onClick={() => handleItemClick('/main/survey')}
-            sx={listItemStyles(isActive('/main/survey') || isActive('/main/manage-survey'))}
-          >
-            <ListItemIcon sx={{ color: isActive('/main/survey') || isActive('/main/manage-survey') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-              <Assignment />
-            </ListItemIcon>
-            {open && <ListItemText primary="Census" />}
-          </ListItem>
-        </Tooltip>
+        <>
+          <Tooltip title={!open ? "Census" : ""} placement="right">
+            <ListItem 
+              onClick={open ? handleCensusClick : onToggle}
+              sx={listItemStyles(selectedPath.includes('/main/survey'))}
+            >
+              <ListItemIcon sx={{ color: selectedPath.includes('/main/survey') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
+                <Assignment />
+              </ListItemIcon>
+              {open && (
+                <>
+                  <ListItemText primary="Census" />
+                  {censusOpen ? <ExpandLess /> : <ExpandMore />}
+                </>
+              )}
+            </ListItem>
+          </Tooltip>
+          
+          {/* Census Submenu - only show when sidebar is open */}
+          {open && (
+            <Collapse in={censusOpen} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {/* Add New Survey */}
+                <ListItem 
+                  sx={{ 
+                    pl: 4, 
+                    ...listItemStyles(isActive('/main/survey/add'))
+                  }} 
+                  onClick={() => handleItemClick('/main/survey/add')}
+                >
+                  <ListItemIcon sx={{ color: isActive('/main/survey/add') ? '#FF5733' : 'inherit' }}>
+                    <Add />
+                  </ListItemIcon>
+                  <ListItemText primary="Add New Survey" />
+                </ListItem>
+
+                {/* Manage Survey */}
+                <ListItem 
+                  sx={{ 
+                    pl: 4, 
+                    ...listItemStyles(isActive('/main/survey/manage'))
+                  }} 
+                  onClick={() => handleItemClick('/main/survey/manage')}
+                >
+                  <ListItemIcon sx={{ color: isActive('/main/survey/manage') ? '#FF5733' : 'inherit' }}>
+                    <ListAlt />
+                  </ListItemIcon>
+                  <ListItemText primary="Manage Survey" />
+                </ListItem>
+
+                {/* Pending Survey */}
+                <ListItem 
+                  sx={{ 
+                    pl: 4, 
+                    ...listItemStyles(isActive('/main/survey/pending'))
+                  }} 
+                  onClick={() => handleItemClick('/main/survey/pending')}
+                >
+                  <ListItemIcon sx={{ color: isActive('/main/survey/pending') ? '#FF5733' : 'inherit' }}>
+                    <Pending />
+                  </ListItemIcon>
+                  <ListItemText primary="Pending Survey" />
+                </ListItem>
+              </List>
+            </Collapse>
+          )}
+        </>
 
         {/* Data Bank */}
         {showDataBank && (
@@ -202,6 +265,20 @@ const Sidebar = ({
             {open && (
               <Collapse in={dataBankOpen} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
+                  {/* Population */}
+                  <ListItem 
+                    sx={{ 
+                      pl: 4, 
+                      ...listItemStyles(isActive('/main/databank/population'))
+                    }} 
+                    onClick={() => handleItemClick('/main/databank/population')}
+                  >
+                    <ListItemIcon sx={{ color: isActive('/main/databank/population') ? '#FF5733' : 'inherit' }}>
+                      <Wc />
+                    </ListItemIcon>
+                    <ListItemText primary="Population" />
+                  </ListItem>
+
                   {/* Segregation */}
                   <ListItem 
                     sx={{ 
@@ -303,21 +380,6 @@ const Sidebar = ({
               </Collapse>
             )}
           </>
-        )}
-
-        {/* Population */}
-        {showPopulation && (
-          <Tooltip title={!open ? "Population" : ""} placement="right">
-            <ListItem 
-              onClick={() => handleItemClick('/main/population')}
-              sx={listItemStyles(isActive('/main/population'))}
-            >
-              <ListItemIcon sx={{ color: isActive('/main/population') ? '#FF5733' : 'inherit', minWidth: open ? 56 : 'auto', ml: open ? 0 : 0.5 }}>
-                <Groups />
-              </ListItemIcon>
-              {open && <ListItemText primary="Population" />}
-            </ListItem>
-          </Tooltip>
         )}
         
         {/* ID Generator with submenu - Only visible if not a Barangay Official */}

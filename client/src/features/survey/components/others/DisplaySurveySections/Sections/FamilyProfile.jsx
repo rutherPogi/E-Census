@@ -1,225 +1,248 @@
-import { Box, Typography, Paper, Chip, Grid, Divider } from "@mui/material";
+import { 
+  Box, 
+  Typography, 
+  Paper, 
+  Chip, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TableRow,
+  Collapse,
+  IconButton
+} from "@mui/material";
+import { useState } from "react";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { formatters } from "../../../../utils/formatter";
 
-export const FamilyProfileSection = (members) => {
-  if (!members || members.length === 0) return null;
+// Row component to handle expandable details
+const FamilyMemberRow = ({ member }) => {
+  const [open, setOpen] = useState(false);
+
+  // Format the full name
+  const fullName = `${member.firstName} 
+                    ${member.middleName 
+                      ? member.middleName
+                      : '' } 
+                    ${member.lastName} 
+                    ${member.suffix
+                      ? member.suffix
+                      : '' }`.trim();
+
+  return (
+    <>
+      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell>
+          <IconButton
+            size="small"
+            onClick={() => setOpen(!open)}
+            aria-label="expand row"
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell component="th" scope="row">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {fullName}
+            <Chip size="small" label={member.relationToFamilyHead} color="primary" />
+          </Box>
+        </TableCell>
+        <TableCell>{member.age || member.formattedAge}</TableCell>
+        <TableCell>{member.sex}</TableCell>
+        <TableCell>{member.civilStatus || 'N/A'}</TableCell>
+        <TableCell>{member.occupation || 'N/A'}</TableCell>
+        <TableCell>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+            {Boolean(member.isPWD) && <Chip size="small" label="PWD" color="info" />}
+            {Boolean(member.outOfTown) && <Chip size="small" label="OFW" color="info" />}
+            {Boolean(member.isOFW) && <Chip size="small" label="OFW" color="info" />}
+            {Boolean(member.isSoloParent) && <Chip size="small" label="Solo Parent" color="info" />}
+            {Boolean(member.inSchool) && <Chip size="small" label="In School" color="success" />}
+            {Boolean(member.isOSY) && <Chip size="small" label="OSY" color="warning" />}
+          </Box>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ margin: 2 }}>
+              {/* Personal Information */}
+              <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 'medium', mt: 2, mb: 1 }}>
+                Personal Information
+              </Typography>
+              <Table size="small" aria-label="personal information">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Birthdate</TableCell>
+                    <TableCell>Contact</TableCell>
+                    <TableCell>Birthplace</TableCell>
+                    <TableCell>Religion</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{formatters.date(member.birthdate)}</TableCell>
+                    <TableCell>{member.contactNumber || 'N/A'}</TableCell>
+                    <TableCell>{member.birthplace || 'N/A'}</TableCell>
+                    <TableCell>{member.religion || 'N/A'}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+
+              {/* Professional Information */}
+              <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 'medium', mt: 2, mb: 1 }}>
+                Professional Information
+              </Typography>
+              <Table size="small" aria-label="professional information">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Education</TableCell>
+                    <TableCell>Skills</TableCell>
+                    <TableCell>Employment Type</TableCell>
+                    <TableCell>Monthly Income</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{member.educationalAttainment || 'N/A'}</TableCell>
+                    <TableCell>{member.skills || 'N/A'}</TableCell>
+                    <TableCell>{member.employmentType || 'N/A'}</TableCell>
+                    <TableCell>{
+                      member.monthlyIncome 
+                        ? formatters.currency 
+                          ? formatters.currency(member.monthlyIncome) 
+                          : member.monthlyIncome 
+                        : 'N/A'
+                    }</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+
+              {/* Health Information */}
+              <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 'medium', mt: 2, mb: 1 }}>
+                Health Information
+              </Typography>
+              <Table size="small" aria-label="health information">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Philhealth No.</TableCell>
+                    <TableCell>Health Status</TableCell>
+                    <TableCell>Remarks</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>{member.philhealthNumber || 'N/A'}</TableCell>
+                    <TableCell>{member.healthStatus || 'N/A'}</TableCell>
+                    <TableCell>{member.remarks || 'N/A'}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+
+              {/* IPULA Details (conditional) */}
+              {Boolean(member.isIpula) && (
+                <>
+                  <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 'medium', mt: 2, mb: 1 }}>
+                    IPULA Details
+                  </Typography>
+                  <Table size="small" aria-label="ipula details">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Details of Settlement</TableCell>
+                        <TableCell>Ethnicity</TableCell>
+                        <TableCell>Place of Origin</TableCell>
+                        <TableCell>House Owner</TableCell>
+                        <TableCell>Date Registered</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>{member.settlementDetails || 'N/A'}</TableCell>
+                        <TableCell>{member.ethnicity || 'N/A'}</TableCell>
+                        <TableCell>{member.placeOfOrigin || 'N/A'}</TableCell>
+                        <TableCell>{member.houseOwner || 'N/A'}</TableCell>
+                        <TableCell>
+                          {Boolean(member.isRegistered) 
+                            ? (formatters.date 
+                              ? formatters.date(member.transientDateRegistered) 
+                              : member.transientDateRegistered) 
+                            : "Not registered"}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </>
+              )}
+
+              {/* Affiliation Details (conditional) */}
+              {Boolean(member.isAffiliated) && (
+                <>
+                  <Typography variant="subtitle1" color="primary" sx={{ fontWeight: 'medium', mt: 2, mb: 1 }}>
+                    Affiliation Details
+                  </Typography>
+                  <Table size="small" aria-label="affiliation details">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>As Officer</TableCell>
+                        <TableCell>As Member</TableCell>
+                        <TableCell>Organization Affiliated</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>{formatters.date(member.asOfficer) || 'N/A'}</TableCell>
+                        <TableCell>{formatters.date(member.asMember) || 'N/A'}</TableCell>
+                        <TableCell>{member.organizationAffiliated || 'N/A'}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </>
+              )}
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </>
+  );
+};
+
+export const FamilyProfileSection = ({ members }) => {
+
+  if (!members) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Family members added</Typography>
+      </Box>
+    );
+  }
   
   return (
-    <Box sx={{ mb: 4 }}>
-      {members.map((member, index) => (
-        <Paper key={index} elevation={1} sx={{ p: 3, mb: 3, borderRadius: '12px' }}>
-          {/* HEADER WITH NAME AND FAMILY HEAD STATUS */}
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            flexDirection: { xs: 'column', sm: 'row' }, 
-            mb: 2 
-          }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {`${member.firstName} 
-                ${member.middleName === 'N/A' ? '' : member.middleName} 
-                ${member.lastName} 
-                ${member.suffix === 'N/A' ? '' : member.suffix}`.trim()}
-            </Typography>
-            {member.relationToFamilyHead === 'Family Head' && (
-              <Chip 
-                size="small" 
-                label="Family Head" 
-                color="primary" 
-                sx={{ 
-                  ml: { xs: 0, sm: 1 },
-                  mt: { xs: 0.5, sm: 0 }
-                }} 
-              />
-            )}
-          </Box>
-
-          {/* PERSONAL INFORMATION SECTION */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Personal Information
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Age</Typography>
-                <Typography variant="body2">{member.age || member.formattedAge}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Sex</Typography>
-                <Typography variant="body2">{member.sex}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Birthdate</Typography>
-                <Typography variant="body2">{formatters.date(member.birthdate)}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Civil Status</Typography>
-                <Typography variant="body2">{member.civilStatus || 'N/A'}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Contact</Typography>
-                <Typography variant="body2">{member.contactNumber || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Birthplace</Typography>
-                <Typography variant="body2">{member.birthplace || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Religion</Typography>
-                <Typography variant="body2">{member.religion || 'N/A'}</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {/* PROFESSIONAL INFORMATION SECTION */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Professional Information
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Education</Typography>
-                <Typography variant="body2">{member.educationalAttainment || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Skills</Typography>
-                <Typography variant="body2">{member.skills || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Occupation</Typography>
-                <Typography variant="body2">{member.occupation || 'N/A'}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Employment Type</Typography>
-                <Typography variant="body2">{member.employmentType || 'N/A'}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Monthly Income</Typography>
-                <Typography variant="body2">{
-                  member.monthlyIncome ? formatters.currency ? formatters.currency(member.monthlyIncome) : member.monthlyIncome : 'N/A'
-                }</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {/* HEALTH INFORMATION SECTION */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Health Information
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Philhealth No.</Typography>
-                <Typography variant="body2">{member.philhealthNumber || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Health Status</Typography>
-                <Typography variant="body2">{member.healthStatus || 'N/A'}</Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Remarks</Typography>
-                <Typography variant="body2">{member.remarks || 'N/A'}</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-
-          {/* IPULA DETAILS SECTION (CONDITIONAL) */}
-          {Boolean(member.isIpula) && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-                IPULA Details
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">Details of Settlement</Typography>
-                  <Typography variant="body2">{member.settlementDetails || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">Ethnicity</Typography>
-                  <Typography variant="body2">{member.ethnicity || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">Place of Origin</Typography>
-                  <Typography variant="body2">{member.placeOfOrigin || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">House Owner</Typography>
-                  <Typography variant="body2">{member.houseOwner || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Date Registered</Typography>
-                <Typography variant="body2">
-                  {Boolean(member.isRegistered) ? 
-                    (formatters.date ? formatters.date(member.transientDateRegistered) : member.transientDateRegistered) : 
-                    "Not registered"}
-                </Typography>
-              </Grid>
-              </Grid>
-            </Box>
-          )}
-
-          {/* AFFILIATION DETAILS SECTION (CONDITIONAL) */}
-          {Boolean(member.isAffiliated) && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-                Affiliation Details
-              </Typography>
-              <Divider sx={{ mb: 2 }} />
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">As Officer</Typography>
-                  <Typography variant="body2">{formatters.date(member.asOfficer) || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">As Member</Typography>
-                  <Typography variant="body2">{formatters.date(member.asMember) || 'N/A'}</Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6} md={3}>
-                  <Typography variant="subtitle2" color="text.secondary">Organization Affiliated</Typography>
-                  <Typography variant="body2">{member.organizationAffiliated || 'N/A'}</Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          )}
-
-          {/* TAGS/STATUS INDICATORS */}
-          <Box sx={{ mt: 2 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Status
-            </Typography>
-            <Grid container spacing={1}>
-              {Boolean(member.isPWD) && <Grid item><Chip size="small" label="PWD" color="info" /></Grid>}
-              {Boolean(member.outOfTown) && <Grid item><Chip size="small" label="OFW" color="info" /></Grid>}
-              {Boolean(member.isOFW) && <Grid item><Chip size="small" label="OFW" color="info" /></Grid>}
-              {Boolean(member.isSoloParent) && <Grid item><Chip size="small" label="Solo Parent" color="info" /></Grid>}
-              {Boolean(member.inSchool) && <Grid item><Chip size="small" label="In School" color="success" /></Grid>}
-              {Boolean(member.isOSY) && <Grid item><Chip size="small" label="Out of School Youth" color="warning" /></Grid>}
-            </Grid>
-          </Box>
-        </Paper>
-      ))}
-    </Box>
+    <Paper elevation={1} sx={{ mb: 4, borderRadius: '12px', overflow: 'hidden' }}>
+      <Typography variant="h6" sx={{ p: 2, borderBottom: '1px solid rgba(224, 224, 224, 1)' }}>
+        Family Members
+      </Typography>
+      <TableContainer>
+        <Table aria-label="collapsible family members table">
+          <TableHead>
+            <TableRow>
+              <TableCell width="50px" />
+              <TableCell>Name</TableCell>
+              <TableCell>Age</TableCell>
+              <TableCell>Sex</TableCell>
+              <TableCell>Civil Status</TableCell>
+              <TableCell>Occupation</TableCell>
+              <TableCell>Status</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {members.map((member, index) => (
+              <FamilyMemberRow key={index} member={member} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Paper>
   );
 };

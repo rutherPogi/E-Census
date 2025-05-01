@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Visibility, Edit, Delete } from '@mui/icons-material';
-import { Tooltip, Box, useMediaQuery, useTheme, TableRow, TableCell, Container,
+import { Delete, UploadFile, Pending } from '@mui/icons-material';
+import { Box, useMediaQuery, useTheme, TableRow, TableCell, Container,
          Paper, Typography, Button, Divider, Checkbox } from '@mui/material';
-import { Add, People } from '@mui/icons-material';
 import dayjs from 'dayjs';
 
-import { SearchBar, ActionButton, DeleteDialog, ManageTable } from '../../../components/common';
-import { MANAGE_TABLE_HEADERS } from '../utils/tableHeaders';
-import { get, del } from '../../../utils/api/apiService';
+import { getAllSurveysFromDB, deleteSurveyFromDB } from '../../../utils/surveyStorage';
+import { DeleteDialog, ManageTable } from '../../../components/common';
+import { TEMP_TABLE_HEADERS } from '../utils/tableHeaders';
+import { get, del, post } from '../../../utils/api/apiService';
 import { Notification } from '../../../components/common/Notification'
 
 import { useNotification } from '../hooks/useNotification';
@@ -15,11 +15,11 @@ import { useNotification } from '../hooks/useNotification';
 
 
 
-const ManageSurvey = () => {
+const TempSurvey = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const extendedHeaders = ['', ...MANAGE_TABLE_HEADERS];
+  const extendedHeaders = ['', ...TEMP_TABLE_HEADERS];
   
   const [surveyData, setSurveyData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -43,41 +43,18 @@ const ManageSurvey = () => {
     setSnackbarOpen 
   } = useNotification();
 
-  const fetchSurveyData = async () => {
-    setLoading(true);
-    try {
-      const response = await get('/surveys/list');
-      setSurveyData(response);
-      setFilteredData(response);
-    } catch (err) {
-      console.error('Error details:', err.response?.data || err.message);
-      showNotification(err.response?.data?.error || 'Failed to load surveys. Please try again later.', 'error' )
-      setSurveyData([]);
-      setFilteredData([]);
-    } finally {
-      setLoading(false);
-    }
+  const loadLocalSurveys = async () => {
+    const localSurveys = await getAllSurveysFromDB();
+
+    setSurveyData(localSurveys);
+    setFilteredData(localSurveys);
+    setLoading(false);
   };
+  
 
   useEffect(() => {
-    fetchSurveyData();
+    loadLocalSurveys();
   }, []);
-
-  const updateSearchResults = (searchTerm) => {
-    if (!searchTerm) {
-      setFilteredData(surveyData);
-      return;
-    }
-
-    const filtered = surveyData.filter(survey => 
-      survey.respondent.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      survey.interviewer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      survey.surveyID.toString().includes(searchTerm)
-    );
-    
-    setFilteredData(filtered);
-    setPage(0);
-  };
 
   const openMultiDeleteDialog = () => {
     setDeleteDialog({
@@ -149,84 +126,74 @@ const ManageSurvey = () => {
     setDeleteDialog(prev => ({ ...prev, isDeleting: true }));
 
     try {
-      // Find the populationIDs for the selected surveys
-      const surveysToDelete = surveyData.filter(survey => selectedSurveys.includes(survey.surveyID));
-      
-      // Process each deletion
-      const deletePromises = surveysToDelete.map(survey => 
-        del(`/surveys/delete/${survey.surveyID}`)
-      );
-      
-      const results = await Promise.all(deletePromises);
-      
-      // Check if all deletions were successful
-      const allSuccessful = results.every(result => result.success);
-      
-      if (allSuccessful) {
-        // Update the data by removing the deleted surveys
-        const updatedData = surveyData.filter(survey => !selectedSurveys.includes(survey.surveyID));
-        setSurveyData(updatedData);
-        setFilteredData(updatedData);
-        showNotification(`${selectedSurveys.length} surveys deleted successfully`, 'success');
-        setSelectedSurveys([]); // Clear selection after successful deletion
-      } else {
-        throw new Error('Some delete operations failed');
-      }
+      // Delete from IndexedDB
+      await Promise.all(selectedSurveys.map(id => deleteSurveyFromDB(id)));
+
+      // Update the table state
+      const updatedData = surveyData.filter(survey => !selectedSurveys.includes(survey.surveyID));
+      setSurveyData(updatedData);
+      setFilteredData(updatedData);
+      showNotification(`${selectedSurveys.length} survey(s) deleted successfully`, 'success');
+      setSelectedSurveys([]);
+      loadLocalSurveys();
     } catch (err) {
+      console.error('Error deleting surveys from local DB:', err);
       showNotification('Error deleting surveys. Please try again.', 'error');
     } finally {
       closeDeleteDialog();
     }
   };
 
+  const handleSubmitSurveys = async () => {
+
+    const localSurveys = await getAllSurveysFromDB();
+
+    for (const survey of localSurveys) {
+      try {
+
+        const formDataToSend = new FormData();
+        
+        // Reconstruct images if needed
+        if (survey.data?.houseInfo?.houseImages) {
+          survey.data.houseInfo.houseImages.forEach(img => {
+            if (img.file) {
+              formDataToSend.append('houseImages', img.file);
+            }
+          });
+        }
+  
+        formDataToSend.append('surveyData', JSON.stringify(survey.data));
+  
+        // Send to server
+        await post('/surveys/submit', formDataToSend, true);
+  
+        // On success, delete local copy
+        await deleteSurveyFromDB(survey.id);
+        showNotification(`Synced survey ${survey.id}`, 'success');
+        loadLocalSurveys();
+      } catch (err) {
+        console.error(`Failed to sync ${survey.id}`, err);
+        showNotification(`Failed to sync ${survey.id}`, 'error');
+      }
+    }
+
+  }
+
   const renderSurveyRow = (survey, index) => (
-    <TableRow key={survey.surveyID || index}>
+    <TableRow key={survey.id || index}>
       <TableCell padding="checkbox">
         <Checkbox
-          checked={selectedSurveys.includes(survey.surveyID)}
-          onChange={() => handleSelectSurvey(survey.surveyID)}
+          checked={selectedSurveys.includes(survey.id)}
+          onChange={() => handleSelectSurvey(survey.id)}
           color="primary"
         />
       </TableCell>
-      <TableCell>{survey.surveyID}</TableCell>
-      <TableCell>{survey.respondent}</TableCell>
-      <TableCell>{survey.interviewer}</TableCell>
-      <TableCell>
-        {survey.surveyDate 
-         ? dayjs(survey.surveyDate).format('MM/DD/YYYY') 
-         : 'N/A'}
-      </TableCell>
-      <TableCell>{survey.barangay}</TableCell>
-      <TableCell>
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: 2
-        }}>
-          <Tooltip title="View Survey Details">
-            <Box>
-              <ActionButton 
-                icon={<Visibility />}
-                label="View"
-                color="#0d47a1"
-                to={`/main/view-survey/${survey.surveyID}`}
-              />
-            </Box>
-          </Tooltip>
-          <Tooltip title="Edit Survey Details">
-            <Box>
-              <ActionButton   
-                icon={<Edit />}
-                label="Edit"
-                color="#ff9800"
-                to={`/main/edit-survey/${survey.surveyID}`}
-              />
-            </Box>
-          </Tooltip>
-        </Box>
-      </TableCell>
+      <TableCell>{survey.id}</TableCell>
+      <TableCell>{survey.data.surveyData.respondent}</TableCell>
+      <TableCell>{survey.data.surveyData.barangay}</TableCell>
     </TableRow>
   );
+  
 
   const renderTableHeader = () => (
     <TableRow>
@@ -238,7 +205,7 @@ const ManageSurvey = () => {
           color="primary"
         />
       </TableCell>
-      {MANAGE_TABLE_HEADERS.map((header, index) => (
+      {TEMP_TABLE_HEADERS.map((header, index) => (
         <TableCell key={index}>{header}</TableCell>
       ))}
     </TableRow>
@@ -251,18 +218,24 @@ const ManageSurvey = () => {
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
-          <People/>
-          <Typography variant='h5' fontWeight={'bold'}>SURVEYS</Typography>
+          <Pending/>
+          <Typography variant='h5' fontWeight={'bold'}>PENDING SURVEYS</Typography>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Button 
+            variant="contained" 
+            endIcon={<UploadFile />}
+            onClick={handleSubmitSurveys}
+            sx={{ fontSize: '0.75rem' }}
+          >
+            SUBMIT
+          </Button>
         </Box>
       </Box>
 
       <Divider/>
       <Box mt={2}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-          <SearchBar 
-            onSearch={updateSearchResults}
-            placeholder="Search"
-          />
+        <Box sx={{ display: 'flex', justifyContent: 'end', mb: 2 }}>
           <Button
             variant="contained"
             color="error"
@@ -311,4 +284,4 @@ const ManageSurvey = () => {
   );
 };
 
-export default ManageSurvey;
+export default TempSurvey;

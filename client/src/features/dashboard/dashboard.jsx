@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Typography, Container, Grid, Paper, Avatar, Box, Divider } from '@mui/material';
-import { Assignment, FamilyRestroom, Accessible, EscalatorWarning, Elderly, House, EmojiPeople, DashboardCustomize } from '@mui/icons-material'
+import { Assignment, Accessibility, Person, AccessibilityNew, Group, EmojiPeople, DashboardCustomize } from '@mui/icons-material'
 import { get } from '../../utils/api/apiService';
 import { useAuth } from '../../utils/auth/authContext'
 import { BarChart } from '@mui/x-charts/BarChart';
@@ -8,17 +8,16 @@ import { BarChart } from '@mui/x-charts/BarChart';
 
 export default function Dashboard() {
 
-  const { userData } = useAuth();
   const [barangayData, setBarangayData] = useState([]);
   const [values, setValues] = useState({
     surveys: '',
-    families: '',
     population: '',
-    pwdApplications: '',
-    soloParentApplications: '',
-    seniorCitizenApplications: '',
-    registeredHouse: ''
-  })
+    male: '',
+    female: '',
+    pwd: '',
+    soloParent: '',
+    youth: ''
+  });
 
   const philippineDate = new Date().toLocaleString('en-PH', {
     timeZone: 'Asia/Manila',
@@ -33,9 +32,13 @@ export default function Dashboard() {
 
   const stats = [
     { title: 'Total Surveys', value: values.surveys, icon: <Assignment />, color: '#3f51b5' },
-    { title: 'Total Population', value: values.population, icon: <EmojiPeople />, color: '#0277bd' } ];
-
-    
+    { title: 'Total Population', value: values.population, icon: <EmojiPeople />, color: '#0277bd' },
+    { title: 'Total Men', value: values.male, icon: <Person />, color: '#2196f3' },  // Men: Blue
+    { title: 'Total Women', value: values.female, icon: <EmojiPeople />, color: '#e91e63' },  // Women: Pink
+    { title: 'Total PWD', value: values.pwd, icon: <Accessibility />, color: '#ff9800' },  // PWD: Orange
+    { title: 'Total Solo Parent', value: values.soloParent, icon: <AccessibilityNew />, color: '#9c27b0' },  // Solo Parent: Purple
+    { title: 'Total Youth', value: values.youth, icon: <Group />, color: '#4caf50' }  // Youth: Green
+  ];
 
   useEffect(() => {
     const fetchBarangayStats = async () => {
@@ -56,8 +59,13 @@ export default function Dashboard() {
       try {
         const response = await get('/dashboard/getTotal');
         setValues({
-          surveys: response.TotalSurvey,
-          population: response.TotalPopulation
+          surveys: response.totalSurveys,
+          population: response.totalPopulation,
+          male: response.totalMale,
+          female: response.totalFemale,
+          pwd: response.totalPWD,
+          soloParent: response.totalSoloParent,
+          youth: response.totalYouth
         });
       } catch (err) {
         console.error('Error fetching posts:', err);
@@ -67,7 +75,6 @@ export default function Dashboard() {
     getTotalNumber();
   }, []);
 
-  
 
   return (
     <Container component={Paper}
@@ -102,10 +109,6 @@ export default function Dashboard() {
         </Box>
       </Box>
 
-      
-      
-      
-
       <Divider/>
          
       {/* Stats Cards */}
@@ -129,6 +132,7 @@ export default function Dashboard() {
         ))}
       </Grid>
 
+      {/* Barangay Data */}
       {barangayData.length > 0 && (
         <Box mt={4}>
           <BarChart
@@ -138,16 +142,49 @@ export default function Dashboard() {
             }]}
             series={[
               {
-                data: barangayData.map(row => row.totalPopulation),
+                data: barangayData.map(row => row.Surveys),
+                label: 'Survey',
+                color: '#2196f3' // Blue
+              },
+              {
+                data: barangayData.map(row => row.Population),
                 label: 'Population',
-                color: '#f44336'
-              }
+                color: '#f44336' // Red
+              },
+              {
+                data: barangayData.map(row => row.Men),
+                label: 'Men',
+                color: '#4caf50' // Green
+              },
+              {
+                data: barangayData.map(row => row.Women),
+                label: 'Women',
+                color: '#e91e63' // Pink
+              },
+              {
+                data: barangayData.map(row => row.PWD),
+                label: 'PWD',
+                color: '#ff9800' // Orange
+              },
+              {
+                data: barangayData.map(row => row.SoloParent),
+                label: 'Solo Parent',
+                color: '#9c27b0' // Purple
+              },
+              {
+                data: barangayData.map(row => row.Youth),
+                label: 'Youth',
+                color: '#009688' // Teal
+              },              
+
             ]}
             width={600}
             height={400}
           />
         </Box>
       )}
+
+
     </Container>
   );
 }

@@ -45,18 +45,6 @@ export default function DisplaySurvey({ handleBack, handleEdit, isEditing = fals
     }
   }, [isEditing, initialFetchDone, fetchSurveyData]);
 
-  useEffect(() => {
-    const loadSavedData = async () => {
-      const saved = await getSurveyFromDB(surveyID);
-      if (saved?.data) {
-        console.log('Restoring unsaved survey from local DB:', saved.data);
-        setEntireFormData(saved.data); // Restore the form data from IndexedDB
-      }
-    };
-  
-    loadSavedData();
-  }, [surveyID]);
-  
   
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,8 +54,8 @@ export default function DisplaySurvey({ handleBack, handleEdit, isEditing = fals
       
       const processedFormData = { ...formData };
 
-      // Save to IndexedDB before submitting
-      await saveSurveyToDB(formData?.surveyInfo?.surveyID || 'temp', processedFormData);
+     
+      await saveSurveyToDB(`local-${Date.now()}`, processedFormData);
       
       if (formData.houseInfo?.houseImages && formData.houseInfo.houseImages.length > 0) {
 
@@ -96,11 +84,10 @@ export default function DisplaySurvey({ handleBack, handleEdit, isEditing = fals
       }
 
       // Delete local data only if server confirms
-      await deleteSurveyFromDB(formData?.surveyInfo?.surveyID || 'temp');
+      await deleteSurveyFromDB(`local-${Date.now()}`);
 
       clearFormData();
-      setTimeout(() => navigate('/main/survey'), 1000);
-    
+      setTimeout(() => navigate('/main/survey/add'), 1000);
     } catch (error) {
       console.error('Error submitting survey:', error);
       showNotification('Survey submission failed. Data saved for retry.', 'error');

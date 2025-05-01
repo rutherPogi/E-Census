@@ -1,18 +1,45 @@
-import { useReactToPrint } from "react-to-print";
 import { useRef, useState } from "react";
-import { Button, Box, TextField, Typography, Divider } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+
+import { Button, Box, Typography, TextField, Divider } from "@mui/material";
+import { Print, FileUpload } from "@mui/icons-material";
+
+import { useFormContext } from '../others/FormContext';
 
 import IDFront from "../others/IDCardSection/IDFront";
 import IDBack from "../others/IDCardSection/IDBack";
-import { Print } from "@mui/icons-material";
+
+
 
 
 export default function PrintID({ handleBack }) {
 
+  const navigate = useNavigate();
+  const { clearFormData } = useFormContext();
+
   const [mayor, setMayor] = useState('');
+  const [mayorSignature, setMayorSignature] = useState(null);
 
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
+  const mayorFileInputRef = useRef(null);
+
+  const handleFinish = () => {  
+    clearFormData();
+    navigate('/main/generate-id/pwd')
+  };
+
+  const handleMayorSignatureUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMayorSignature(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="responsive-container">
@@ -27,15 +54,44 @@ export default function PrintID({ handleBack }) {
             boxSizing: 'border-box' 
           }}
         >
-          <Typography variant="h6">Additional Information</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="h6">Additional Information</Typography>
+            <Button 
+              variant="contained" 
+              color="success"
+              onClick={handleFinish}
+              sx={{ fontSize: '0.75rem' }}
+            >
+              FINISH
+            </Button>
+          </Box>
           <Divider/>
-          <TextField
-            label="Mayor"
-            value={mayor}
-            onChange={(e) => setMayor(e.target.value)}
-            placeholder="Enter mayor's name"
-            fullWidth
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              label="Mayor"
+              value={mayor}
+              onChange={(e) => setMayor(e.target.value)}
+              placeholder="Enter mayor's name"
+              fullWidth
+            />
+            <input 
+              type="file" 
+              accept="image/*" 
+              style={{ display: 'none' }} 
+              ref={mayorFileInputRef}
+              onChange={handleMayorSignatureUpload}
+            />
+            <Button
+              variant="outlined"
+              startIcon={<FileUpload />}
+              onClick={() => mayorFileInputRef.current.click()}
+              sx={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}
+            >
+              Add Signature
+            </Button>
+          </Box>
+          
+          
         </Box>
         <Box 
           sx={{ border: '1px solid #ccc', padding: 2, borderRadius: 1 }}
@@ -43,7 +99,7 @@ export default function PrintID({ handleBack }) {
           <div ref={contentRef}>
             <Box sx={{display: 'flex', flexDirection: 'column', gap: '2em', alignItems: 'center'}}>
               <IDFront />
-              <IDBack mayor={mayor} />
+              <IDBack mayor={mayor} mayorSignature={mayorSignature} />
             </Box>
           </div>
         </Box>

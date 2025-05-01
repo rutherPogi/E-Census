@@ -22,7 +22,7 @@ export const OscaDetails = ({
       />
       <DateInput
         label =  'Date elected as officer'
-        value =  {values.asOfficer}
+        value =  {values.asOfficer ? dayjs(values.asOfficer) : null}
         onChange={handleDateChange('asOfficer')}
         error = {errors.asOfficer}  
         helperText =  {errors.asOfficer || 'If an officer, date elected'}

@@ -62,25 +62,19 @@ const PWDMasterlistTable = ({ barangay }) => {
     });
   };
 
-  const getFullName = (person) => {
-    const middleInitial = person.middleName ? `${person.middleName.charAt(0)}. ` : '';
-    const suffixText = person.suffix ? ` ${person.suffix}` : '';
-    return `${person.lastName}, ${person.firstName} ${middleInitial}${suffixText}`;
-  };
-
   const renderRow = (item) => {
     return (
       <TableRow key={item.ID}>
         <TableCell>{item.ID}</TableCell>
         <TableCell>{item.Name}</TableCell>
-        <TableCell>{formatDate(item['Date of Birth'])}</TableCell>
+        <TableCell>{formatDate(item.Birthdate)}</TableCell>
         <TableCell>{item.Age}</TableCell>
         <TableCell>{item.Sex}</TableCell>
         <TableCell>{item['Educational Attainment']}</TableCell>
         <TableCell>{item.Skills}</TableCell>
+        <TableCell>{item.Occupation}</TableCell>
         <TableCell>{item['Disability Type']}</TableCell>
         <TableCell>{item['PWD ID Number']}</TableCell>
-        <TableCell>{item['Contact Number']}</TableCell>
         <TableCell>{item['Family Class']}</TableCell>
       </TableRow>
     );

@@ -16,24 +16,6 @@ export default function AddSurvey() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const generateNewSurveyId = async () => {
-    try {
-      setIsLoading(true);
-      const response = await get('/surveys/generate');
-      const newSurveyNumber = response.surveyId;
-      
-      navigate(`/main/survey/${newSurveyNumber}`, { 
-        state: { surveyNumber: newSurveyNumber } 
-      });
-    } catch (err) {
-      console.error('Error fetching survey ID:', err);
-      setError(err.response?.data?.message || err.message || 'Error getting survey ID');
-      alert('Failed to generate survey ID. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
 
   return(
     <Container
@@ -106,7 +88,7 @@ export default function AddSurvey() {
           
           <Button 
             variant="contained" 
-            onClick={generateNewSurveyId}
+            onClick={() => navigate(`/main/survey/form`)}
             startIcon={<Add/>}
             fullWidth
             size={isMobile ? "medium" : "large"}

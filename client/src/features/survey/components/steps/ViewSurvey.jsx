@@ -21,6 +21,9 @@ export default function ViewSurvey() {
     console.log('Fetching survey data...');
     fetchSurveyData();
   }, []);
+
+  console.log('Form data:', formData);
+  console.log('Viewing:', viewing);
   
 
   return (

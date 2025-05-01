@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import AddID from '../../components/AddID';
-import seniorCitizenID from '../../../../assets/seniorCitizenID.png'
+import seniorCitizenID from '../../../../assets/seniorCitizenID.svg'
 import '../../../../styles/components/style';
 
 

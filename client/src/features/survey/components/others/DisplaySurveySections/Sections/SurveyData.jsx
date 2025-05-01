@@ -3,7 +3,15 @@ import { Box, Typography, Paper, Grid, Divider } from "@mui/material";
 
 export const SurveyDataSection = (surveyData) => {
 
-  if (!surveyData) return null;
+  console.log('SurveyData', surveyData);
+
+  if (!surveyData || Object.keys(surveyData).length === 0) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No survey data available.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>

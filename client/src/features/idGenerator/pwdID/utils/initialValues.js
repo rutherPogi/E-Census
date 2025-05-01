@@ -8,9 +8,9 @@ export const FP_INITIAL_VALUES = () => ({
   sex: ''
 })
 
-export const PI_INITIAL_VALUES = (pwdApplicationID, barangay) => ({
-  pwdApplicationID: pwdApplicationID,
-  pwdIDNumber: '',
+export const PI_INITIAL_VALUES = (pwdIDNumber, populationID, barangay) => ({
+  populationID: populationID,
+  pwdIDNumber: pwdIDNumber,
 
   firstName: '',
   middleName: '',

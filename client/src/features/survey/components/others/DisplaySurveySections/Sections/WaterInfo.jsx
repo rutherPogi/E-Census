@@ -3,7 +3,13 @@ import { Box, Typography, Paper, Grid, Divider } from "@mui/material";
 
 export const WaterInfoSection = (waterInfo) => {
 
-  if (!waterInfo) return null;
+  if (!waterInfo) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Water Information added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>

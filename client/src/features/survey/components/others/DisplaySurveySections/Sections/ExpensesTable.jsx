@@ -1,4 +1,4 @@
-import { Box, TableContainer, TableHead, TableRow, TableCell, TableBody, Table } from "@mui/material";
+import { Box, TableContainer, TableHead, TableRow, TableCell, TableBody, Table, Typography } from "@mui/material";
 
 
 
@@ -6,8 +6,14 @@ export const renderExpensesTable = (formData, expenseType) => {
 
   const expenses = formData?.[expenseType]?.expenses;
   const total = formData?.[expenseType]?.[`${expenseType.replace('Expenses', '')}Total`];
-  
-  if (!expenses) return null;
+
+  if (!expenses || !total) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No expenses added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

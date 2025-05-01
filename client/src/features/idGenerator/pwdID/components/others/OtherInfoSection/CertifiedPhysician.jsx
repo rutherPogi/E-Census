@@ -1,6 +1,6 @@
 import { NameFields } from "../Namefield";
 import { TextInput } from "../../../../../../components/common/FormFields";
-import { Box, Container, Card, CardContent, Typography, Grid } from "@mui/material";
+
 
 export const CertifiedPhysician = ({ values, handleChange, errors }) => {
   return (
@@ -17,7 +17,7 @@ export const CertifiedPhysician = ({ values, handleChange, errors }) => {
         value={values.licenseNumber}
         onChange={handleChange(`licenseNumber`)}
         helperText='e.g. --'
-        errors={errors}
+        error={errors.licenseNumber}
       />
 
       <div className="section-title field-full">Processing Officer</div>

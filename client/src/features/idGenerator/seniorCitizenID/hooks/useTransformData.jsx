@@ -4,7 +4,7 @@ import { useNotification } from "./useNotification";
 import { get } from '../../../../utils/api/apiService';
 
 
-export const useTransformData = (scApplicationID, populationID, renewal = false) => {
+export const useTransformData = (seniorCitizenIDNumber, populationID, renewal = false) => {
   
   const { setEntireFormData } = useFormContext();
   const { showNotification } = useNotification();
@@ -37,11 +37,11 @@ export const useTransformData = (scApplicationID, populationID, renewal = false)
         console.error('Error fetching data', err);
         showNotification('Failed to load data. Please try again later.', 'error');
       }
-    } else if (scApplicationID && renewal) {
+    } else if (seniorCitizenIDNumber && renewal) {
       console.log('RENEWAL');
       try {
-        const response = await get(`/seniorCitizenID/view/${scApplicationID}`, {
-          params: { scApplicationID },
+        const response = await get(`/seniorCitizenID/view/${seniorCitizenIDNumber}`, {
+          params: { seniorCitizenIDNumber },
         });
     
         if (response) {

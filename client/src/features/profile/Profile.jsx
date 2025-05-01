@@ -24,6 +24,7 @@ export default function Profile() {
     accountName: userData.accountName,
     username: userData.username
   });
+
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -43,6 +44,8 @@ export default function Profile() {
   const handleSaveChanges = async () => {
     try {
       await updateUserProfile(userData.userID, formData);
+      console.log("Profile updated successfully", formData);
+      // Update the local state and localStorage with the new data
       updateUserData(formData);
       setSnackbar({
         open: true,

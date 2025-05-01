@@ -38,7 +38,7 @@ const IDFront = () => {
             ID No.
           </Typography>
           <Typography sx={{ borderBottom: '1px solid black', textAlign: 'center', fontSize: '8px', mr: 1, minWidth: '40px' }}>
-            {personalInfo.soloParentID || ''}
+            {personalInfo.soloParentIDNumber || ''}
           </Typography>
         </Box>
 

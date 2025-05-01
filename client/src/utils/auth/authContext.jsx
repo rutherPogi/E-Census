@@ -50,8 +50,17 @@ export const AuthProvider = ({ children }) => {
         return userData;
     };
 
+    const updateUserData = (updatedData) => {
+        // Merge the updated data with existing user data
+        const newUserData = { ...userData, ...updatedData };
+        // Update localStorage
+        localStorage.setItem('userData', JSON.stringify(newUserData));
+        // Update state
+        setUserData(newUserData);
+    };
+
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userData, login, logout, getToken, getUserData }}>
+        <AuthContext.Provider value={{ isAuthenticated, userData, login, logout, getToken, getUserData, updateUserData }}>
             {children}
         </AuthContext.Provider>
     );

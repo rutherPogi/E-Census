@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Typography, Divider, useTheme, useMediaQuery } from '@mui/material';
-import { Edit } from "@mui/icons-material";
+import { useState } from "react";
+import { Box, Typography, useTheme, useMediaQuery,  Tabs, Tab, Button } from '@mui/material';
+import { Edit, Info } from "@mui/icons-material";
 
 import { 
   SurveyDataSection, 
@@ -24,153 +24,202 @@ const DisplaySurveySections = ({ formData, handleEdit, isViewing }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
+  const [tabValue, setTabValue] = useState(0);
   
-  // Determine responsive variant based on screen size
-  const getTitleVariant = () => {
-    if (isMobile) return "h7";
-    if (isTablet) return "h6";
-    return "h5";
-  };
-  
-  const titleVariant = getTitleVariant();
-  
-  // Common style for all section headers
-  const titleStyle = { 
-    fontWeight: 'bold', 
-    color: '#1976d2' 
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
   // Helper function to render section headers with conditional edit button
   const renderSectionHeader = (title, sectionIndex) => (
-    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
-      <Typography variant={titleVariant} sx={titleStyle}>
-        {title}
-      </Typography>
+    <Box sx={{ 
+      display: 'flex', 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      mb: 2,
+      pb: 1,
+      borderBottom: '1px solid',
+      borderColor: 'divider'
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Typography variant="body2" color="text.secondary" sx={{ mr: 1 }}>
+          {/* Show the parent section name */}
+          {getTabName(tabValue)}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mx: 1 }}>
+          &gt;
+        </Typography>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'primary.main' }}>
+          {title}
+        </Typography>
+      </Box>
       {!isViewing && (
-        <Edit 
+        <Button 
+          startIcon={<Edit />}
+          size="small"
           onClick={() => handleEdit(sectionIndex)}
-          sx={{ fontSize: 18, color: 'primary.main', cursor: 'pointer' }} 
-        />
+          variant="outlined"
+          color="primary"
+        >
+          Edit
+        </Button>
+      )}
+    </Box>
+  );
+  
+  // Function to get the current tab name
+  const getTabName = (tabIndex) => {
+    const tabNames = [
+      "Survey Information",
+      "Family Profile",
+      "Expenses",
+      "House Details",
+      "Farm & Livestock",
+      "Family Resources",
+      "Community & Services"
+    ];
+    return tabNames[tabIndex] || "";
+  };
+
+  // New function to render simple sections without repetitive titles (Option 4)
+  const renderSimpleSection = (sectionIndex, content) => (
+    <Box>
+      {!isViewing && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <Button 
+            startIcon={<Edit />}
+            size="small"
+            onClick={() => handleEdit(sectionIndex)}
+            variant="outlined"
+            color="primary"
+          >
+            Edit
+          </Button>
+        </Box>
+      )}
+      {content || (
+        <Box sx={{ textAlign: 'center', py: 2 }}>
+          <Typography color="text.secondary">No data available</Typography>
+        </Box>
       )}
     </Box>
   );
 
   return (
-    <>
-      {/* SURVEY INFORMATION SECTION */}
-      <Box>
-        {renderSectionHeader('Survey Information', 1)}
-        <Divider sx={{ mb: 2 }} />
-        {SurveyDataSection(formData?.surveyData)}
-      </Box>
+    <Box sx={{ width: '100%' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+          <Tabs 
+            value={tabValue} 
+            onChange={handleTabChange} 
+            variant="scrollable" 
+            scrollButtons="auto"
+            indicatorColor="primary"
+            aria-label="section tabs"
+          >
+            <Tab label="Survey Information" />
+            <Tab label="Family Profile" />
+            <Tab label="Expenses" />
+            <Tab label="House Details" />
+            <Tab label="Farm & Livestock" />
+            <Tab label="Family Resources" />
+            <Tab label="Community & Services" />
+          </Tabs>
+        </Box>
 
-      {/* FAMILY PROFILE SECTION */}
-      <Box>
-        {renderSectionHeader('Family Profile', 3)}
-        <Divider sx={{ mb: 2 }} />
-        {FamilyProfileSection(formData?.familyMembers)}
-      </Box>
+        {/* Survey Information Tab - Using Option 4 */}
+        {tabValue === 0 && (
+          <Box>
+            {renderSimpleSection(1, SurveyDataSection(formData?.surveyData))}
+          </Box>
+        )}
 
-      {/* EXPENSES SECTION */}
-      <Box>
-        {renderSectionHeader('Food Expenses', 4)}
-        <Divider sx={{ mb: 2 }} />
-        {renderExpensesTable(formData, 'foodExpenses')}
-        {renderSectionHeader('Education Expenses', 5)}
-        <Divider sx={{ mb: 2 }} />
-        {renderExpensesTable(formData, 'educationExpenses')}
-        {renderSectionHeader('Family Expenses', 6)}
-        <Divider sx={{ mb: 2 }} />
-        {renderExpensesTable(formData, 'familyExpenses')}
-        {renderSectionHeader('Monthly Expenses', 7)}
-        <Divider sx={{ mb: 2 }} />
-        {renderExpensesTable(formData, 'monthlyExpenses')}
-      </Box>
+        {/* Family Profile Tab */}
+        {tabValue === 1 && (
+          <Box>
+          {renderSectionHeader('Family Profile', 3)}
+          <FamilyProfileSection members={formData.familyMembers}/>
+        </Box>
+        )}
 
-      {/* HOUSE INFORMATION SECTION */}
-      <Box>
-        {renderSectionHeader('House Information', 8)}
-        <Divider sx={{ mb: 2 }} />
-        {HouseInfoSection(formData?.houseInfo)}
-      </Box>
+        {/* Expenses Tab */}
+        {tabValue === 2 && (
+          <Box>
+            {renderSectionHeader('Food Expenses', 4)}
+            {renderExpensesTable(formData, 'foodExpenses')}
+            
+            {renderSectionHeader('Education Expenses', 5)}
+            {renderExpensesTable(formData, 'educationExpenses')}
+            
+            {renderSectionHeader('Family Expenses', 6)}
+            {renderExpensesTable(formData, 'familyExpenses')}
+            
+            {renderSectionHeader('Monthly Expenses', 7)}
+            {renderExpensesTable(formData, 'monthlyExpenses')}
+          </Box>
+        )}
+        
+        {/* House Details Tab */}
+        {tabValue === 3 && (
+          <Box>
+            {renderSectionHeader('House Information', 8)}
+            {HouseInfoSection(formData?.houseInfo)}
+            
+            {renderSectionHeader('House Location', 9)}
+            {HouseLocationSection(formData?.houseLocation)}
 
-      {/* HOUSE LOCATION SECTION */}
-      <Box>
-        {renderSectionHeader('House Location', 9)}
-        <Divider sx={{ mb: 2 }} />
-        {HouseLocationSection(formData?.houseLocation)}
-      </Box>
+            {renderSectionHeader('Water Information', 10)}
+            {WaterInfoSection(formData?.waterInfo)}
+          </Box>
+        )}
+        
 
-      {/* WATER INFORMATION SECTION */}
-      <Box>
-        {renderSectionHeader('Water Information', 10)}
-        <Divider sx={{ mb: 2 }} />
-        {WaterInfoSection(formData?.waterInfo)}
-      </Box>
+        {/* Farm & Livestock Tab */}
+        {tabValue === 4 && (
+          <Box>
+            {renderSectionHeader('Livestock / Animals', 11)}
+            {renderLivestockTable(formData?.livestock)}
+            
+            {renderSectionHeader('No. of Farmlots', 12)}
+            {FarmlotsSection(formData?.farmlots)}
+            
+            {renderSectionHeader('Crops Planted (sq. meter)', 13)}
+            {CropsPlantedSection(formData?.cropsPlanted)}
+            
+            {renderSectionHeader('Fruit Bearing Tree (trees planted)', 14)}
+            {FruitBearingTreeSection(formData?.fruitBearingTree)}
+          </Box>
+        )}
 
-      {/* LIVESTOCK SECTION */}
-      <Box>
-        {renderSectionHeader('Livestock / Animals', 11)}
-        <Divider sx={{ mb: 2 }} />
-        {renderLivestockTable(formData?.livestock)}
-      </Box>
+        {/* Family Resources Tab */}
+        {tabValue === 5 && (
+          <Box>
+            {renderSectionHeader('Family Resources', 15)}
+            {FamilyResourcesSection(formData?.familyResources)}
+            
+            {renderSectionHeader('Appliances Own', 16)}
+            {AppliancesSection(formData?.appliancesOwn)}
+            
+            {renderSectionHeader('Amenities', 17)}
+            {AmenitiesSection(formData?.amenitiesOwn)}
+          </Box>
+        )}
+        
+        {/* Community & Services Tab */}
+        {tabValue === 6 && (
+          <Box>
+          {renderSectionHeader('Community Issues', 18)}
+          {formData.issues ? formData.issues : (
+            <Box sx={{ textAlign: 'center', py: 3 }}>
+              <Typography color="text.secondary">No Community Issues added.</Typography>
+            </Box>
+          )}
 
-      {/* FARMLOTS SECTION */}
-      <Box>
-        {renderSectionHeader('No. of Farmlots', 12)}
-        <Divider sx={{ mb: 2 }} />
-        {FarmlotsSection(formData?.farmlots)}
-      </Box>
-
-      {/* CROPS PLANTED SECTION */}
-      <Box>
-        {renderSectionHeader('Crops Planted (sq. meter)', 13)}
-        <Divider sx={{ mb: 2 }} />
-        {CropsPlantedSection(formData?.cropsPlanted)}
-      </Box>
-
-      {/* FRUIT BEARING TREE SECTION */}
-      <Box>
-        {renderSectionHeader('Fruit Bearing Tree (trees planted)', 14)}
-        <Divider sx={{ mb: 2 }} />
-        {FruitBearingTreeSection(formData?.fruitBearingTree)}
-      </Box>
-
-      {/* FAMILY RESOURCES SECTION */}
-      <Box>
-        {renderSectionHeader('Family Resources', 15)}
-        <Divider sx={{ mb: 2 }} />
-        {FamilyResourcesSection(formData?.familyResources)}
-      </Box>
-
-      {/* APPLIANCES OWN SECTION */}
-      <Box>
-        {renderSectionHeader('Appliances Own', 16)}
-        <Divider sx={{ mb: 2 }} />
-        {AppliancesSection(formData?.appliancesOwn)}
-      </Box>
-
-      {/* AMENITIES SECTION */}
-      <Box>
-        {renderSectionHeader('Amenities', 17)}
-        <Divider sx={{ mb: 2 }} />
-        {AmenitiesSection(formData?.amenitiesOwn)}
-      </Box>
-
-      {/* COMMUNITY ISSUES SECTION */}
-      <Box>
-        {renderSectionHeader('Community Issues', 18)}
-        <Divider sx={{ mb: 2 }} />
-        {formData?.communityIssues?.communityIssues || formData?.communityIssues?.issues || ''}
-      </Box>
-
-      {/* SERVICE AVAILED SECTION */}
-      <Box>
-        {renderSectionHeader('Services Availed', 20)}
-        <Divider sx={{ mb: 2 }} />
-        {renderServiceAvailed(formData?.serviceAvailed)}
-      </Box>
-    </>
+          {renderSectionHeader('Services Availed', 20)}
+          {renderServiceAvailed(formData?.serviceAvailed)}
+        </Box>
+        )}
+    </Box>
   );
 };
 

@@ -3,7 +3,13 @@ import { Box, TableContainer, Table, TableHead, TableRow, TableCell, TableBody }
 
 export const FruitBearingTreeSection = (fruitBearingTree) => {
 
-  if (!fruitBearingTree) return null;
+  if (!fruitBearingTree) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Fruit Bearing Tree added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

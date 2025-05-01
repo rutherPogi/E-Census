@@ -70,18 +70,13 @@ export default function SCFindPerson() {
     
     setLoading(true);
     try {
-      const formattedDate = values.birthdate
-        ? new Date(new Date(values.birthdate).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .split('T')[0]
-        : null;
 
-      const response = await post('/seniorCitizen/find', {
+      const response = await post('/seniorCitizenID/find', {
         firstName: values.firstName,
         middleName: values.middleName || '',
         lastName: values.lastName,
         suffix: values.suffix || '',
-        birthdate: formattedDate,
+        birthdate: values.birthdate,
         sex: values.sex
       });
       
@@ -103,18 +98,12 @@ export default function SCFindPerson() {
   };
 
   const handleSelectPerson = (person, uniqueKey) => {
-    
-    const id = person.populationID || person.scApplicationID || null;
-    
-    console.log('Selected ID:', id);
-    console.log('Application NUMBER:', person.scApplicationID || 'None');
 
-    // Set the IDs to state variables
     setPopulationID(person.populationID || null);
-    setApplicationID(person.applicationID || null);
+    setApplicationID(person.seniorCitizenIDNumber || null);
 
-    console.log('Population ID:', populationID);
-    console.log('Application ID:', applicationID);
+    console.log('Population ID:', person.populationID);
+    console.log('Application ID:', person.seniorCitizenIDNumber);
     
     // Toggle selection logic
     setSelectedPerson(uniqueKey === selectedPerson ? null : uniqueKey);
@@ -130,21 +119,14 @@ export default function SCFindPerson() {
     } else if (populationID) {
 
       console.log('REGISTERED RESIDENT');
-      const newApplicantID = await generateNewSurveyId();
-
-      console.log('NEW APPLICANT ID:', newApplicantID);
       console.log('POPULATION ID:', populationID);
-      navigate(`/main/generate-id/senior-citizen/resident/${newApplicantID}/${populationID}`);
+      
+      navigate(`/main/generate-id/senior-citizen/resident/${populationID}`);
 
     } else {
 
       console.log('NEW APPLICANT');
-      const newApplicantID = await generateNewSurveyId();
-
-      console.log('NEW APPLICANT ID:', newApplicantID);
-      navigate(`/main/generate-id/senior-citizen/new/${newApplicantID}`, { 
-        state: { scApplicationNumber: newApplicantID } 
-      });
+      navigate(`/main/generate-id/senior-citizen/new`);
     }
     
   };

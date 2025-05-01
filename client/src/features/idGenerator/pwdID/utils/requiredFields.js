@@ -11,7 +11,6 @@ export const PI_REQUIRED_FIELDS = [
   'birthdate',
   'sex',
   'civilStatus',
-  'pwdIDNumber',
 
   'disabilityType', 
   'disabilityCause',

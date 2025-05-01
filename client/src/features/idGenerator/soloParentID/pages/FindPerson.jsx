@@ -50,16 +50,6 @@ export default function SPFindPerson() {
     setSnackbarOpen 
   } = useNotification();
 
-  const generateNewSurveyId = async () => {
-    try {
-      const response = await get('/soloParentID/generate');
-      return response.soloParentID;
-    } catch (err) {
-      console.error('Error fetching Application ID:', err);
-      showNotification('Failed to generate Application ID. Please try again.', 'error');
-    } 
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
         
@@ -70,18 +60,12 @@ export default function SPFindPerson() {
     
     setLoading(true);
     try {
-      const formattedDate = values.birthdate
-        ? new Date(new Date(values.birthdate).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .split('T')[0]
-        : null;
-
       const response = await post('/soloParentID/find', {
         firstName: values.firstName,
         middleName: values.middleName || '',
         lastName: values.lastName,
         suffix: values.suffix || '',
-        birthdate: formattedDate,
+        birthdate: values.birthdate,
         sex: values.sex
       });
       
@@ -103,18 +87,14 @@ export default function SPFindPerson() {
   };
 
   const handleSelectPerson = (person, uniqueKey) => {
-    
-    const id = person.populationID || person.spApplicationID || null;
-    
-    console.log('Selected ID:', id);
-    console.log('Application NUMBER:', person.spApplicationID || 'None');
 
-    // Set the IDs to state variables
+    console.log('PERSON:', person);
+
     setPopulationID(person.populationID || null);
-    setApplicationID(person.applicationID || null);
+    setApplicationID(person.soloParentIDNumber || null);
 
-    console.log('Population ID:', populationID);
-    console.log('Application ID:', applicationID);
+    console.log('Population ID:', person.populationID || 'Not a Resident');
+    console.log('Application ID:', person.soloParentIDNumber || 'Not Yet Registered');
     
     // Toggle selection logic
     setSelectedPerson(uniqueKey === selectedPerson ? null : uniqueKey);
@@ -130,21 +110,12 @@ export default function SPFindPerson() {
     } else if (populationID) {
 
       console.log('REGISTERED RESIDENT');
-      const newApplicantID = await generateNewSurveyId();
-
-      console.log('NEW APPLICANT ID:', newApplicantID);
-      console.log('POPULATION ID:', populationID);
-      navigate(`/main/generate-id/solo-parent/resident/${newApplicantID}/${populationID}`);
+      navigate(`/main/generate-id/solo-parent/resident/${populationID}`);
 
     } else {
 
       console.log('NEW APPLICANT');
-      const newApplicantID = await generateNewSurveyId();
-
-      console.log('NEW APPLICANT ID:', newApplicantID);
-      navigate(`/main/generate-id/solo-parent/new/${newApplicantID}`, { 
-        state: { spApplicationNumber: newApplicantID } 
-      });
+      navigate(`/main/generate-id/solo-parent/new/`);
     }
     
   };
@@ -168,7 +139,6 @@ export default function SPFindPerson() {
         </Button>
       </Box>
 
-      
       <PersonSearchForm
         values={values}
         errors={errors}

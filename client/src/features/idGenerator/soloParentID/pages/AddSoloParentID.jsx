@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import AddID from '../../components/AddID';
-import soloParentID from '../../../../assets/soloParentID.png'
+import soloParentID from '../../../../assets/soloParentID.svg';
 import '../../../../styles/components/style';
 
 

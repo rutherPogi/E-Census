@@ -10,7 +10,7 @@ export const generateSoloParentId = async (connection) => {
   try {
     // Get the current sequence for today
     const [rows] = await connection.query(
-      `SELECT MAX(spApplicationID) as maxId FROM soloParentApplication 
+      `SELECT MAX(spApplicationID) as maxId FROM SoloParentApplication 
        WHERE spApplicationID LIKE ?`,
       [`SP${datePrefix}%`]
     );
@@ -28,7 +28,7 @@ export const generateSoloParentId = async (connection) => {
     
     // Verify this ID doesn't already exist (double-check)
     const [existingCheck] = await connection.query(
-      `SELECT COUNT(*) as count FROM soloParentApplication WHERE spApplicationID = ?`,
+      `SELECT COUNT(*) as count FROM SoloParentApplication WHERE spApplicationID = ?`,
       [soloParentID]
     );
     
@@ -36,7 +36,8 @@ export const generateSoloParentId = async (connection) => {
       // In the unlikely event of a collision, recursively try again
       return generateSoloParentId(connection);
     }
-    return soloParentID;
+
+    return { spApplicationID: soloParentID };
   } catch (error) {
     console.error('Error generating Solo Parent ID:', error);
     throw error;
@@ -55,7 +56,7 @@ export const createSoloParentApplicant = async (spApplicationID, photoID, signat
     const applicantID = applicantResult.insertId;
     
     await connection.query(
-      `INSERT INTO soloParentApplication (
+      `INSERT INTO SoloParentApplication (
         spApplicationID,
         applicantID, 
         caseNumber,
@@ -83,7 +84,7 @@ export const createSoloParentApplicant = async (spApplicationID, photoID, signat
   
 };
 
-export const addPersonalInfo = async (applicantID, personalInfo, connection) => {
+export const addPersonalInfo = async (applicantID, spApplicationID, personalInfo, connection) => {
 
   await connection.beginTransaction();
 
@@ -102,8 +103,9 @@ export const addPersonalInfo = async (applicantID, personalInfo, connection) => 
         civilStatus, 
         birthplace,
         religion,
-        soloParentIDNumber )
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        soloParentIDNumber,
+        isSoloParent )
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [ applicantID, 
         personalInfo.firstName,  
         personalInfo.middleName,
@@ -115,7 +117,8 @@ export const addPersonalInfo = async (applicantID, personalInfo, connection) => 
         personalInfo.civilStatus,
         personalInfo.birthplace,
         personalInfo.religion,
-        personalInfo.soloParentIDNumber ]
+        spApplicationID,
+        1 ]
     );
 
     await connection.query(

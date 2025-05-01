@@ -3,7 +3,13 @@ import { Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, Tabl
 
 export const FamilyResourcesSection = (familyResources) => {
 
-  if (!familyResources) return null;
+  if (!familyResources) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Family Resources added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

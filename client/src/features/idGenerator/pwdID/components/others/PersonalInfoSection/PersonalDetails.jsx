@@ -91,15 +91,6 @@ export const PersonalDetails = ({
         helperText={errors.bloodType || 'e.g, A+'}
         placeholder='ex. A+'
       />
-      <TextInput
-        label='PWD ID Number'
-        value={values.pwdIDNumber}
-        onChange={handleChange('pwdIDNumber')}
-        error={errors.pwdIDNumber}
-        helperText={errors.pwdIDNumber || 'RR-PPMM-BBB-NNNNNNN'}
-        placeholder='Enter First Name'
-        required
-      />
     </>
   );
 };

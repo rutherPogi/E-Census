@@ -3,8 +3,14 @@ export const MANAGE_TABLE_HEADERS = [
   "Respondent", 
   "Interviewer", 
   "Date of Survey", 
-  "Brangay",
+  "Barangay",
   "Actions"
+];
+
+export const TEMP_TABLE_HEADERS = [
+  "Temp ID", 
+  "Respondent",
+  "Barangay"
 ];
 
 export const FAMILY_PROFILE_TABLE_HEADERS = [

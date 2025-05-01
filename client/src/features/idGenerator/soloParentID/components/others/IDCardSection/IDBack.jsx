@@ -1,23 +1,15 @@
 import { Card, Box, Typography } from "@mui/material";
 import { useFormContext } from "../FormContext";
 
-
-
-
-const IDBack = ({mayor, mswdoOfficer}) => {
-
+const IDBack = ({mayor, mswdoOfficer, mayorSignature, mswdoSignature}) => {
   const { formData } = useFormContext();
 
   const personalInfo = formData?.personalInfo;
   const householdComposition = formData?.householdComposition;
   const emergencyContact = formData?.emergencyContact;
 
-  console.log('HOUSEHOLD', householdComposition);
-
-
   return (
       <Card sx={{ border: "1px solid #ccc", width: 324, height: 204, padding: 1, boxSizing: 'border-box' }}>
-
         <Typography sx={{ fontSize: '11px', fontWeight: '500' }}>CHILD/REN/DEPENDENT/S:</Typography>
 
         <Box
@@ -30,7 +22,7 @@ const IDBack = ({mayor, mswdoOfficer}) => {
             padding: "0.5em"
           }}
         >
-          {formData?.householdComposition?.map((member, index) => (
+          {householdComposition.map((member, index) => (
             <div key={index}>
               {`${member.firstName || ''} 
               ${member.middleName || ''} 
@@ -39,7 +31,6 @@ const IDBack = ({mayor, mswdoOfficer}) => {
             </div>
           ))}
         </Box>
-
 
         <Box sx={{ display: 'flex', flexDirection: 'column', mt: 1}}>
           <Typography sx={{ fontSize: '11px', fontWeight: '500' }}>
@@ -68,7 +59,6 @@ const IDBack = ({mayor, mswdoOfficer}) => {
                 ${personalInfo.province}` || ''}
             </Typography>
           </Box>
-          
         </Box>
 
         <Box sx={{ 
@@ -78,6 +68,26 @@ const IDBack = ({mayor, mswdoOfficer}) => {
           marginTop: "0.5em" 
         }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            {mayorSignature && (
+              <Box sx={{ 
+                height: "10px", 
+                width: "100px", 
+                mb: 0.5, 
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <img 
+                  src={mayorSignature} 
+                  alt="Mayor's signature" 
+                  style={{ 
+                    maxHeight: '100%', 
+                    maxWidth: '100%', 
+                    objectFit: 'contain'
+                  }} 
+                />
+              </Box>
+            )}
             <Typography sx={{ textAlign: 'center', fontWeight: '500', fontSize: '9px' }}>
               {mayor || '?'}
             </Typography>
@@ -86,6 +96,26 @@ const IDBack = ({mayor, mswdoOfficer}) => {
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+            {mswdoSignature && (
+              <Box sx={{ 
+                height: "25px", 
+                width: "70%", 
+                mb: 0.5, 
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <img 
+                  src={mswdoSignature} 
+                  alt="MSWDO Officer's signature" 
+                  style={{ 
+                    maxHeight: '100%', 
+                    maxWidth: '100%', 
+                    objectFit: 'contain'
+                  }} 
+                />
+              </Box>
+            )}
             <Typography sx={{ textAlign: 'center', fontWeight: '500', fontSize: '9px' }}>
               {mswdoOfficer || '?'}
             </Typography>

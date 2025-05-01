@@ -3,11 +3,15 @@ import { Box, Typography, Paper, Grid, Divider } from "@mui/material";
 
 export const FarmlotsSection = (farmlots) => {
 
-  if (!farmlots || 
-      !farmlots.cultivation ||
-      !farmlots.pastureland || 
-      !farmlots.forestland
-    ) return null;
+  if (!farmlots) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Farm lots added.</Typography>
+      </Box>
+    );
+  }
+
+  
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4, mb: 4 }}>

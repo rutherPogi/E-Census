@@ -42,11 +42,10 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
             <TableRow>
               <TableCell padding="checkbox"></TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>Application ID</TableCell>
+              <TableCell>PWD ID Number</TableCell>
               <TableCell>Population ID</TableCell>
               <TableCell>Birthdate</TableCell>
               <TableCell>Sex</TableCell>
-              <TableCell>PWD?</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -82,8 +81,8 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
                     ].filter(Boolean).join(' ')}
                   </TableCell>
                   <TableCell>
-                    {person.pwdApplicationID 
-                      ? ( person.pwdApplicationID ) 
+                    {person.pwdIDNumber 
+                      ? ( person.pwdIDNumber ) 
                       : (<Chip label="Not Yet Applied" color="error" size="small" />)
                     }
                   </TableCell>
@@ -97,10 +96,6 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
                     {person.birthdate ? new Date(person.birthdate).toLocaleDateString() : 'N/A'}
                   </TableCell>
                   <TableCell>{person.sex}</TableCell> 
-                  <TableCell>
-                    {person.isPWD 
-                      ? 'YES' : 'NO'}
-                  </TableCell>
                 </TableRow>
               );
             })}

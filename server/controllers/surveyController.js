@@ -33,15 +33,17 @@ export const submitSurvey = async (req, res) => {
 
     await connection.beginTransaction();
 
+    const surveyID = await surveyModel.generateSurveyId(connection);
+    console.log('SURVEY ID:', surveyID);
+
     const surveyData = JSON.parse(req.body.surveyData);
-    const surveyID = surveyData.surveyData.surveyID;
     const populationID = `P${surveyID}`;
     
     console.log("Inserting Survey Details");
-    await surveyModel.createSurvey(surveyData.surveyData, connection);
+    await surveyModel.createSurvey(surveyID, surveyData.surveyData, connection);
 
     console.log("Inserting Household");
-    await surveyModel.addHousehold(surveyData.surveyData, connection);
+    await surveyModel.addHousehold(surveyID, surveyData.surveyData, connection);
     
 
     // POPULATION
@@ -55,7 +57,7 @@ export const submitSurvey = async (req, res) => {
     await surveyModel.addProfessionalInfo(populationID, surveyData.familyMembers, connection);
 
     console.log("Inserting Contact Info");
-    await surveyModel.addContactInfo(populationID, surveyData.familyMembers, connection);
+    await surveyModel.addContactInfo(populationID, surveyData.familyMembers, surveyData.houseLocation, connection);
 
     console.log("Inserting Government IDs");
     await surveyModel.addGovernmentID(populationID, surveyData.familyMembers, connection);
@@ -232,10 +234,10 @@ export const updateSurvey = async (req, res) => {
 
     if(isCreating('contactInfoID', 'familyMembers')) {
       console.log("Creating Contact Info");
-      await surveyModel.addContactInfo(populationID, surveyData.familyMembers, connection);
+      await surveyModel.addContactInfo(populationID, surveyData.familyMembers, surveyData.houseLocation, connection);
     } else {
       console.log("Updating Contact Info");
-      await updateSurveyModel.updateContactInfo(surveyData.familyMembers, connection);
+      await updateSurveyModel.updateContactInfo(surveyData.familyMembers, surveyData.houseLocation, connection);
     }
 
     if(isCreating('governmentID', 'familyMembers')) {
@@ -504,12 +506,12 @@ export const viewSurvey = async (req, res) => {
         p.surveyID,
         p.healthStatus,
         p.remarks,
-        p.isOSY,
-        p.inSchool,
-        p.outOfTown,
-        p.isOFW,
-        p.isPWD,
-        p.isSoloParent,
+        pi.isOSY,
+        pi.inSchool,
+        pi.outOfTown,
+        pi.isOFW,
+        pi.isPWD,
+        pi.isSoloParent,
 
         pi.personalInfoID,
         pi.firstName,

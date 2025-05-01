@@ -19,8 +19,12 @@ export default function DispalySCInfo ({
   handleEdit, 
   isEditing = false, 
   isUpdating = false,
-  firstMount = false
+  firstMount = false,
+  isViewing = false
 }) {
+
+  console.log('isEditing:', isEditing);
+  console.log('mount:', firstMount);
 
   const navigate = useNavigate();
 
@@ -28,7 +32,7 @@ export default function DispalySCInfo ({
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const { formData, clearFormData } = useFormContext();
+  const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(scApplicationID, null, true);
 
   const { 
@@ -66,23 +70,30 @@ export default function DispalySCInfo ({
 
       //delete formData.pwdMedia.photoIDPreview;
 
-      if(isUpdating) {
+      let res;
+
+      if(isUpdating && !firstMount) {
         console.log('UPDATING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await put('/seniorCitizenID/update', formDataToSend, true);
+        res = await put('/seniorCitizenID/update', formDataToSend, true);
         showNotification('Application UPDATED successfully!', 'success');
       } else {
         console.log('SUBMITING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await post('/seniorCitizenID/submit', formDataToSend, true);
+        res = await post('/seniorCitizenID/submit', formDataToSend, true);
         showNotification('Application SUBMITTED successfully!', 'success');
       }
 
-      handleNext();
-      //clearFormData();
-      //setTimeout(() => navigate('/main/generate-id/senior-citizen'), 1000);
+      console.log('Response:', res);
+
+      updateFormData('personalInfo', {
+        ...formData.personalInfo,
+        seniorCitizenIDNumber: res.scApplicationID
+      });
+
+      setTimeout(() => handleNext(), 1000);
     } catch (error) {
       console.error('Error submitting application:', error);
         
@@ -107,16 +118,16 @@ export default function DispalySCInfo ({
           padding: '1em'
       }}>
         
-        <DisplayInfoSections formData={formData} handleEdit={handleEdit}/>
+        <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
         
       </Box>
-      <FormButtons
+      {!isViewing && (<FormButtons
         onBack = {handleBack} 
         onNext = {handleSubmit} 
         backLabel = 'Back' 
-        nextLabel = {isUpdating ? 'Update' : 'Submit'}
+        nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
         nextDisabled = { firstMount } 
-      />
+      />)}
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

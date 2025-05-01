@@ -2,8 +2,14 @@ import { Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, Tabl
 
 
 export const AmenitiesSection = (amenitiesOwn) => {
-
-  if (!amenitiesOwn) return null;
+  
+  if (!amenitiesOwn) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Amenities added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

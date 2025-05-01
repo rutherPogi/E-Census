@@ -26,10 +26,11 @@ import {
 
 export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
 
-  const { spApplicationID, populationID } = useParams();
+  const { soloParentIDNumber, populationID } = useParams();
+
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData();
+  const { fetchPersonData } = useTransformData(soloParentIDNumber, populationID, soloParentIDNumber);
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
@@ -43,7 +44,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     handleContactChange,
     handleIncomeChange
   } = useFormValidation(
-    PI_INITIAL_VALUES(spApplicationID, populationID, userData.barangay),
+    PI_INITIAL_VALUES(soloParentIDNumber, populationID, userData.barangay),
     true, 
     PI_REQUIRED_FIELDS
   );
@@ -74,21 +75,19 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     if (isRegistered && initialFetchDone && formData.personalInfo) {
       setValues(prev => ({
         ...prev,
-        ...formData.personalInfo,
-        spApplicationID: spApplicationID,
+        ...formData.personalInfo
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, spApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo]);
 
   useEffect(() => {
     if (formData.personalInfo) {
       setValues(prev => ({
         ...prev,
-        ...formData.personalInfo,
-        spApplicationID: spApplicationID,
+        ...formData.personalInfo
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, spApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo]);
 
 
   const handleSubmit = async (e) => {
@@ -148,7 +147,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
           errors={errors}
         />
 
-        {values.isBeneficiary && (
+        {Boolean(values.isBeneficiary) && (
           <Beneficiary
             values={values}
             handleChange={handleChange}
@@ -156,7 +155,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
           />
         )}
 
-        {values.isIndigenous && (
+        {Boolean(values.isIndigenous )&& (
           <Indigenous
             values={values}
             handleChange={handleChange}

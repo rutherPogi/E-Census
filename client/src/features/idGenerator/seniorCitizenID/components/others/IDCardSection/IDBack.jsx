@@ -1,7 +1,7 @@
 import { Card, Box, Typography } from "@mui/material";
-import { useFormContext } from "../FormContext";
 
-const IDBack = ({oscaHead, mayor}) => {
+
+const IDBack = ({oscaHead, mayor, mayorSignature, oscaHeadSignature}) => {
 
   return (
     <Card sx={{ border: "1px solid #ccc", width: 324, height: 204, p: 1, boxSizing: 'border-box' }}>
@@ -34,6 +34,26 @@ const IDBack = ({oscaHead, mayor}) => {
         
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', mt: 0.5 }}>
+            {oscaHeadSignature && (
+              <Box sx={{ 
+                height: "10px", 
+                width: "100px", 
+                mb: 0.5, 
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <img 
+                  src={oscaHeadSignature} 
+                  alt="OSCA Head's signature" 
+                  style={{ 
+                    maxHeight: '100%', 
+                    maxWidth: '100%', 
+                    objectFit: 'contain'
+                  }} 
+                />
+              </Box>
+            )}
             <Typography sx={{ textAlign: 'center', fontWeight: '500', fontSize: '6px' }}>
               {oscaHead}
             </Typography>
@@ -43,6 +63,26 @@ const IDBack = ({oscaHead, mayor}) => {
           </Box>
 
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', mt: 0.5 }}>
+            {mayorSignature && (
+              <Box sx={{ 
+                height: "10px", 
+                width: "100px", 
+                mb: 0.5, 
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+                <img 
+                  src={mayorSignature} 
+                  alt="Mayor's signature" 
+                  style={{ 
+                    maxHeight: '100%', 
+                    maxWidth: '100%', 
+                    objectFit: 'contain'
+                  }} 
+                />
+              </Box>
+            )}
             <Typography sx={{ textAlign: 'center', fontWeight: '500', fontSize: '6px' }}>
               {mayor}
             </Typography>

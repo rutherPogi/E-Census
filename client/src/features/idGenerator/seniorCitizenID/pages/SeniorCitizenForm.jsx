@@ -13,7 +13,7 @@ import {
 
 
       
-export default function SeniorCitizenForm({ hasSCID = false, isRegistered = false }) {
+export default function SeniorCitizenForm({ hasSCID = false, isRegistered = false, isViewing = false }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
@@ -22,6 +22,7 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
   const [editing, setEditing] = useState(false);
   const [update, setUpdate] = useState(false);
   const [mount, setMount] = useState(false);
+  const [view, setView] = useState(false);
 
   useEffect(() => {
     if (isRegistered) {
@@ -30,6 +31,10 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
       setCurrentPage(5);
       setEditing(true);
       setMount(true);
+    } else if (isViewing) {
+      setCurrentPage(5);
+      setEditing(true);
+      setView(true);
     }
   }, [ isRegistered, hasSCID ]);
 
@@ -58,7 +63,7 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
     <FormProvider>
       <div className='form-container'>
 
-        {currentPage === 0 && 
+        {currentPage === 1 && 
           <PersonalInfo
             handleNext={handleNext} 
             handleBack={handleBack} 
@@ -78,10 +83,11 @@ export default function SeniorCitizenForm({ hasSCID = false, isRegistered = fals
             isEditing={editing}
             isUpdating={update}
             firstMount={mount}
+            isViewing={view}
           />
         }
 
-        {currentPage === 1 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
+        {currentPage === 6 && <PrintID handleNext={handleNext} handleBack={handleBack}/>}
 
       <div className='form-pagination'>
           {Array.from({ length: 6 }, (_, index) => (

@@ -72,7 +72,9 @@ export const useFormValidation = (
     } else {
       // For regular text inputs
       value = e.target.value;
-      if(value > 50) return;
+      if (value.length > 50) {
+        value = value.slice(0, 50); // ✂️ Limit to 50 characters
+      }
     }
     
     setValues(prev => ({ ...prev, [field]: value }));
@@ -135,9 +137,10 @@ export const useFormValidation = (
         formattedAge = `${age} year(s)`;
       }
   
+      const formattedDate = parsedDate.format('YYYY-MM-DD'); 
       setValues(prev => ({ 
         ...prev, 
-        [field]: parsedDate,
+        [field]: formattedDate,
         age: age >= 0 ? age : '',
         formattedAge
       }));

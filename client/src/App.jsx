@@ -43,6 +43,7 @@ import WomenMasterlist from './features/dataBank/pages/WomenMasterlist.jsx';
 import PWDMasterlist from './features/dataBank/pages/PWDMasterlist.jsx';
 import SoloParentMasterlist from './features/dataBank/pages/SoloParentMasterlist.jsx';
 import NonIvatan from './features/dataBank/pages/NonIvatan.jsx';
+import TempSurvey from './features/survey/pages/tEMPsURVEYS.JSX';
 
 export default function App() {
   return (
@@ -64,12 +65,12 @@ export default function App() {
               <Route path='accounts/addMultipleAccounts' element={<AddMultipleAccounts/>}/>
 
               <Route path='survey' element={<AddSurvey/>}/>
-              <Route path='survey/:id' element={<SurveyForm/>}/>
+              <Route path='survey/add' element={<SurveyForm/>}/>
+              <Route path='survey/manage' element={<ManageSurvey/>}/>
+              <Route path='survey/pending' element={<TempSurvey/>}/>
+
               <Route path='view-survey/:id' element={<SurveyForm isViewing={true}/>}/>
               <Route path='edit-survey/:id' element={<SurveyForm isEditing={true}/>}/>
-              <Route path='manage-survey' element={<ManageSurvey />}/>
-
-              <Route path='population' element={<Manage/>}/>
 
               <Route path="manage-pwdID" element={<ManagePwdID />} />
               <Route path="manage-soloParentID" element={<ManageSoloParentID />} />
@@ -77,6 +78,7 @@ export default function App() {
 
               <Route path='databank'>
                 <Route index element={<Manage />} />
+                <Route path='population' element={<Manage/>}/>
                 <Route path='segregation' element={<Segregation/>}/>
                 <Route path='youth-masterlist' element={<YouthMasterlist/>}/>
                 <Route path='osy' element={<OSY/>}/>
@@ -86,7 +88,6 @@ export default function App() {
                 <Route path='non-ivatan' element={<NonIvatan/>}/>
               </Route>
               
-
               <Route path="generate-id">
                 <Route index element={<AddSoloParentID />} />
 
@@ -94,25 +95,28 @@ export default function App() {
                 <Route path='solo-parent' element={<AddSoloParentID/>}/>
                 <Route path='solo-parent/find-person' element={<SPFindPerson/>}/>
 
-                <Route path='solo-parent/new/:spApplicationID' element={<SoloParentForm/>}/>
-                <Route path='solo-parent/resident/:spApplicationID/:populationID' element={<SoloParentForm isRegistered={true}/>}/>
+                <Route path='solo-parent/new/' element={<SoloParentForm/>}/>
+                <Route path='solo-parent/resident/:populationID' element={<SoloParentForm isRegistered={true}/>}/>
                 <Route path='solo-parent/renewal/:spApplicationID' element={<SoloParentForm hasSPID={true}/>}/>
+                <Route path='solo-parent/view/:spApplicationID' element={<SoloParentForm isViewing={true}/>}/>
 
                 {/* SENIOR CITIZEN ROUTES */}
                 <Route path='senior-citizen' element={<AddSeniorCitizenID/>}/>
                 <Route path='senior-citizen/find-person' element={<SCFindPerson/>}/>
 
-                <Route path='senior-citizen/new/:scApplicationID' element={<SeniorCitizenForm/>}/>
-                <Route path='senior-citizen/resident/:scApplicationID/:populationID' element={<SeniorCitizenForm isRegistered={true}/>}/>
+                <Route path='senior-citizen/new/' element={<SeniorCitizenForm/>}/>
+                <Route path='senior-citizen/resident/:populationID' element={<SeniorCitizenForm isRegistered={true}/>}/>
                 <Route path='senior-citizen/renewal/:scApplicationID' element={<SeniorCitizenForm hasSCID={true}/>}/>
+                <Route path='senior-citizen/view/:scApplicationID' element={<SeniorCitizenForm isViewing={true}/>}/>
 
                 {/* PWD ROUTES */}
                 <Route path='pwd' element={<AddPwdID/>}/>
                 <Route path='pwd/find-person' element={<PWDFindPerson/>}/>
                 
-                <Route path='pwd/new/:pwdApplicationID' element={<PWDForm/>}/>
-                <Route path='pwd/resident/:pwdApplicationID/:populationID' element={<PWDForm isRegistered={true}/>}/>
+                <Route path='pwd/new/' element={<PWDForm/>}/>
+                <Route path='pwd/resident/:populationID' element={<PWDForm isRegistered={true}/>}/>
                 <Route path='pwd/renewal/:pwdApplicationID' element={<PWDForm hasPWDID={true}/>}/>
+                <Route path='pwd/view/:pwdApplicationID' element={<PWDForm isViewing={true}/>}/>
               </Route>      
               <Route path='hazard-map' element={<HazzardMap/>}/>
               <Route path='profile' element={<Profile/>}/>

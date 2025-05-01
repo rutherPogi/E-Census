@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme, useMediaQuery, Paper } from '@mui/material';
 import { TextInput, DropdownInput, DateInput } from '../../../../../../components/common/FormFields';
 import { SUFFIX_OPTIONS, SEX_OPTIONS } from '../../../utils/options';
-
+import dayjs from 'dayjs';
 
 
 const PersonSearchForm = ({
@@ -78,7 +78,7 @@ const PersonSearchForm = ({
         />
         <DateInput
           label='Birthdate'
-          value={values.birthdate}
+          value={values.birthdate ? dayjs(values.birthdate) : null}
           onChange={handleDateChange('birthdate', true)}
           error={!!errors.birthdate}  
           helperText={errors.birthdate || 'MM/DD/YYYY'}

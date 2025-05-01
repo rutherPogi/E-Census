@@ -31,16 +31,16 @@ const IDFront = () => {
           }}  
         />
         <Box sx={{ textAlign: "center" }}>
-          <Typography sx={{ fontSize: '8px'}}>Republic of the Philippines</Typography>
-          <Typography sx={{ fontSize: '8px'}}>Province of Batanes</Typography>
-          <Typography sx={{ fontSize: '8px'}}>Municipality of Itbayat</Typography>
-          <Typography sx={{ fontSize: '10px'}}>OFFICE OF THE SENIOR CITIZEN AFFAIRS</Typography>
+          <Typography sx={{ fontSize: '7px'}}>Republic of the Philippines</Typography>
+          <Typography sx={{ fontSize: '7px'}}>Province of Batanes</Typography>
+          <Typography sx={{ fontSize: '7px'}}>Municipality of Itbayat</Typography>
+          <Typography sx={{ fontSize: '9px'}}>OFFICE OF THE SENIOR CITIZEN AFFAIRS</Typography>
         </Box>
       </Box>
 
-      <Box sx={{ textAlign: "center", fontWeight: "bold", bgcolor: "#F6402D", height: '18px' }}>
-        <Typography sx={{ fontSize: '10px', color: 'white' }}>
-          SENIOR CITIZEN ID
+      <Box sx={{ textAlign: "center", fontWeight: "bold", bgcolor: "#F6402D", height: '16px' }}>
+        <Typography sx={{ fontSize: '9px', color: 'white' }}>
+          SENIOR CITIZEN IDENTIFICATION CARD
         </Typography>
       </Box>
 
@@ -94,42 +94,39 @@ const IDFront = () => {
           </Box>
         </Box>
       
-        {/* PHOTO ID */}
-        <Box
-          sx={{
-            width: '90px',
-            height: '75px',
-            border: "1px solid #ddd",
-            mr: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: '8px'
-          }}
-        >
-          {formData?.scMedia?.photoIDPreview ? (
-            <img 
-              src={formData.scMedia.photoIDPreview} 
-              alt="ID Photo" 
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          ) : (
-            "Photo ID"
-          )}
+        <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+          {/* PHOTO ID */}
+          <Box
+            sx={{
+              width: '75px',
+              height: '65px',
+              border: "1px solid #ddd",
+              mr: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: '8px'
+            }}
+          >
+            {formData?.scMedia?.photoIDPreview ? (
+              <img 
+                src={formData.scMedia.photoIDPreview} 
+                alt="ID Photo" 
+                style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              "Photo ID"
+            )}
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Typography sx={{ fontSize: '7px', fontWeight: "bold" }}>
+              ID No. {formData.personalInfo.seniorCitizenIDNumber || '...'}
+            </Typography>
+          </Box>
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', padding: '0 0.6em', justifyContent: 'space-between', mt: 0.5 }}>
-        <Box>
-          <Typography sx={{ fontSize: '8px'}}>
-            THIS CARD IS NON-TRANSFERRABLE
-          </Typography>
-          <Typography sx={{ fontSize: '8px'}}>
-            AND VALID UNTIL {formData?.validUntil}
-          </Typography>
-        </Box>
-        
-        <Box sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center", }}>
-          <Box sx={{ width: '80px', height: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box sx={{ display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center" }}>
+          <Box sx={{ width: '80px', height: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {formData?.scMedia.signature ? (
               <img 
                 src={formData.scMedia.signature} 
@@ -141,6 +138,15 @@ const IDFront = () => {
             Signature or Thumbmark
           </Typography>
         </Box>
+
+      <Box sx={{ textAlign: 'center' }}>
+        <Box>
+          <Typography sx={{ fontSize: '7px', textDecoration: 'underline', mt: '4px' }}>
+            THIS CARD IS NON-TRANSFERRABLE AND VALID ANYWHERE IN THE COUNTRY 
+          </Typography>
+        </Box>
+        
+        
       </Box>
     </Card>
   );

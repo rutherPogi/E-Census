@@ -4,7 +4,7 @@ import { useNotification } from "./useNotification";
 import { get } from '../../../../utils/api/apiService';
 
 
-export const useTransformData = (pwdApplicationID, populationID, renewal = false) => {
+export const useTransformData = (pwdIDNumber, populationID, renewal = false) => {
   
   const { setEntireFormData } = useFormContext();
   const { showNotification } = useNotification();
@@ -27,7 +27,7 @@ export const useTransformData = (pwdApplicationID, populationID, renewal = false
             otherInfo: {},
             pwdMedia: {}
           };
-          console.log('TRANSFORMED DATA:', transformedData);
+          console.log('TRANSFORMED DATA:', transformedData); 
           setEntireFormData(transformedData);
           
         } else {
@@ -37,11 +37,11 @@ export const useTransformData = (pwdApplicationID, populationID, renewal = false
         console.error('Error fetching data', err);
         showNotification('Failed to load data. Please try again later.', 'error');
       }
-    } else if (pwdApplicationID && renewal) {
+    } else if (pwdIDNumber && renewal) {
       console.log('RENEWAL');
       try {
-        const response = await get(`/pwdID/view/${pwdApplicationID}`, {
-          params: { pwdApplicationID },
+        const response = await get(`/pwdID/view/${pwdIDNumber}`, {
+          params: { pwdIDNumber },
         });
     
         if (response) {

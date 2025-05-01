@@ -4,6 +4,7 @@ import * as updateSoloParentIDModel from '../models/updateSoloParentIDModel.js';
 
 
 export const getNewSoloParentId = async (req, res) => {
+
   const connection = await pool.getConnection();
   
   try {
@@ -31,11 +32,11 @@ export const submitSoloParentID = async (req, res) => {
   
   try {
     await connection.beginTransaction();
+
+    const { spApplicationID } = await soloParentIDModel.generateSoloParentId(connection);
     
     const applicationData = JSON.parse(req.body.applicationData);
-    console.log('APPLICATION:', applicationData);
     const populationID = applicationData.personalInfo.populationID;
-    const spApplicationID = applicationData.personalInfo.spApplicationID;
 
     console.log('Application ID:', spApplicationID);
     console.log('Population ID:', populationID);
@@ -57,7 +58,7 @@ export const submitSoloParentID = async (req, res) => {
       await soloParentIDModel.updatePopulation(applicantID, populationID, applicationData.personalInfo, connection);
     } else {
       console.log("Inserting Personal Info...");
-      await soloParentIDModel.addPersonalInfo(applicantID, applicationData.personalInfo, connection);
+      await soloParentIDModel.addPersonalInfo(applicantID, spApplicationID, applicationData.personalInfo, connection);
     }
     
     console.log("Inserting Other Info...");
@@ -106,7 +107,7 @@ export const updateSoloParentID = async (req, res) => {
     await connection.beginTransaction();
     
     const applicationData = JSON.parse(req.body.applicationData);
-    const spApplicationID = applicationData.personalInfo.spApplicationID;
+    const spApplicationID = applicationData.personalInfo.soloParentIDNumber;
     console.log('Application ID', spApplicationID);
 
     let photoID = null;
@@ -185,7 +186,7 @@ export const manageSoloParentId = async (req, res) => {
           pi.middleName,
           pi.lastName,
           pi.suffix
-        FROM soloParentApplication sp
+        FROM SoloParentApplication sp
         LEFT JOIN PersonalInformation pi ON sp.applicantID = pi.applicantID
         ORDER BY dateApplied ASC;`);
 
@@ -205,7 +206,7 @@ export const findID = async (req, res) => {
   const connection = await pool.getConnection();
   
   try {
-    console.log('Finding Person ...');
+    console.log('Finding Person (Solo Parent) ...');
     console.log('Search params:', req.body);
     
     // Get search parameters from request body
@@ -219,22 +220,20 @@ export const findID = async (req, res) => {
       });
     }
 
-    // First query for PersonalInformation records
-    // Use IFNULL or COALESCE to handle null values for optional fields
     const [results] = await connection.query(`
       SELECT 
         pi.personalInfoID,
         pi.populationID,
-        pi.sPApplicationID,
-        pi.pwdIDNumber,
+        pi.applicantID,
+        pi.soloParentIDNumber,
         pi.firstName,
         pi.middleName,
         pi.lastName,
         pi.suffix,
         pi.birthdate,
         pi.sex,
-        CASE WHEN p.populationID IS NOT NULL THEN TRUE ELSE FALSE END AS existsInPopulation,
-        COALESCE(p.isPWD, FALSE) AS isPWD
+        pi.isSoloParent,
+        CASE WHEN p.populationID IS NOT NULL THEN TRUE ELSE FALSE END AS existsInPopulation
       FROM PersonalInformation pi
       LEFT JOIN Population p ON pi.populationID = p.populationID
       WHERE pi.firstName LIKE ?
@@ -243,6 +242,7 @@ export const findID = async (req, res) => {
         AND (pi.suffix LIKE ? OR ? = '' OR pi.suffix IS NULL)
         ${birthdate ? 'AND pi.birthdate = ?' : ''}
         AND pi.sex = ?
+        AND pi.isSoloParent = TRUE
       ORDER BY 
         CASE WHEN pi.middleName = ? THEN 1 ELSE 2 END,
         CASE WHEN pi.birthdate = ? THEN 1 ELSE 2 END
@@ -263,7 +263,7 @@ export const findID = async (req, res) => {
     const population = results.map(person => ({
       personalInfoID: person.personalInfoID,
       populationID: person.populationID,
-      scApplicationID: person.scApplicationID,
+      applicantID: person.applicantID,
       pwdIDNumber: person.pwdIDNumber,
       firstName: person.firstName,
       middleName: person.middleName || 'N/A',
@@ -271,7 +271,7 @@ export const findID = async (req, res) => {
       suffix: person.suffix || 'N/A',
       birthdate: person.birthdate,
       sex: person.sex,
-      isPWD: person.isPWD
+      isSoloParent: person.isSoloParent
     }));
 
     res.status(200).json({ 
@@ -353,10 +353,10 @@ export const deleteApplication = async (req, res) => {
     await connection.beginTransaction();
 
     const [rows] = await connection.query(
-      'SELECT applicantID FROM soloParentApplication WHERE spApplicationID = ?',
+      'SELECT applicantID FROM SoloParentApplication WHERE spApplicationID = ?',
       [spApplicationID]
     );
-    
+
     if (rows.length === 0) {
       throw new Error('No application found with the given ID.');
     }
@@ -373,7 +373,7 @@ export const deleteApplication = async (req, res) => {
     await connection.query('DELETE FROM ProfessionalInformation WHERE applicantID = ?', [applicantID]);
     await connection.query('DELETE FROM ContactInformation WHERE applicantID = ?', [applicantID]);
 
-    await connection.query('DELETE FROM soloParentApplication WHERE spApplicationID = ?', [spApplicationID]);
+    await connection.query('DELETE FROM SoloParentApplication WHERE spApplicationID = ?', [spApplicationID]);
     
     
     await connection.commit();
@@ -406,7 +406,7 @@ export const viewApplication = async (req, res) => {
   try {
 
     const [applicantRows] = await connection.query(`
-      SELECT applicantID FROM soloParentApplication WHERE spApplicationID = ?
+      SELECT applicantID FROM SoloParentApplication WHERE spApplicationID = ?
     `, [spApplicationID]);
     
     const applicantID = applicantRows[0]?.applicantID;
@@ -425,7 +425,7 @@ export const viewApplication = async (req, res) => {
         proi.*,
         ci.*,
         oi.*
-      FROM soloParentApplication sp
+      FROM SoloParentApplication sp
       LEFT JOIN GovernmentIDs gov 
         ON sp.applicantID = gov.applicantID
       LEFT JOIN PersonalInformation pi 
@@ -463,7 +463,7 @@ export const viewApplication = async (req, res) => {
 
     console.log('Retrieving Photo ID and Signature');
     const [rows] = await connection.query(`
-      SELECT photoID, signature FROM soloParentApplication
+      SELECT photoID, signature FROM SoloParentApplication
       WHERE spApplicationID = ?
     `, [spApplicationID]);
 

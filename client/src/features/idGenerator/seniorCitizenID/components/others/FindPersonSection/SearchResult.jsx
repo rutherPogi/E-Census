@@ -9,7 +9,7 @@ import {
   TableHead, 
   TableRow, 
   Radio, 
-  Box, useTheme, useMediaQuery
+  Box, useTheme, useMediaQuery, Chip
 } from '@mui/material';
 
 const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson }) => {
@@ -46,7 +46,7 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
               <TableCell>Resident?</TableCell>
               <TableCell>Birthdate</TableCell>
               <TableCell>Sex</TableCell>
-              {!isMobile && <TableCell>PWD</TableCell>}
+              <TableCell>Senior Citizen?</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -81,13 +81,25 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
                       person.suffix !== 'N/A' ? person.suffix : ''
                     ].filter(Boolean).join(' ')}
                   </TableCell>
-                  <TableCell>{person.pwdApplicationID ? 'YES' : 'NO'}</TableCell>
-                  <TableCell>{person.populationID ? 'YES' : 'NO'}</TableCell>
+                  <TableCell>
+                    {person.seniorCitizenIDNumber 
+                      ? ( person.seniorCitizenIDNumber ) 
+                      : (<Chip label="Not Yet Applied" color="error" size="small" />)
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {person.populationID 
+                      ? ( person.populationID )  
+                      : (<Chip label="Not a Resident" color="error" size="small" />)
+                    }
+                  </TableCell>
                   <TableCell>
                     {person.birthdate ? new Date(person.birthdate).toLocaleDateString() : 'N/A'}
                   </TableCell>
                   <TableCell>{person.sex}</TableCell> 
-                  {!isMobile && <TableCell>{person.isPWD ? 'Yes' : 'No'}</TableCell>}
+                  <TableCell>
+                    {person.age >= 60 ? `YES (${person.age})` : 'NO'}
+                  </TableCell> 
                 </TableRow>
               );
             })}

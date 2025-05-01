@@ -3,7 +3,13 @@ import { Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, Tabl
 
 export const CropsPlantedSection = (cropsPlanted) => {
 
-  if (!cropsPlanted) return null;
+  if (!cropsPlanted) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Crops added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

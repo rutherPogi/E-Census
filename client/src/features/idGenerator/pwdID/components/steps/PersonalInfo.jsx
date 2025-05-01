@@ -27,10 +27,10 @@ import {
 
 export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
 
-  const { pwdApplicationID, populationID } = useParams();
+  const { pwdIDNumber, populationID } = useParams();
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData(pwdApplicationID, populationID);
+  const { fetchPersonData } = useTransformData(pwdIDNumber, populationID);
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
@@ -43,7 +43,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     handleDateChange,
     handleContactChange
   } = useFormValidation(
-    PI_INITIAL_VALUES(pwdApplicationID, userData.barangay),
+    PI_INITIAL_VALUES(pwdIDNumber, populationID, userData.barangay),
     true, 
     PI_REQUIRED_FIELDS
   );
@@ -76,10 +76,10 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
       setValues(prev => ({
         ...prev,
         ...formData.personalInfo,
-        pwdApplicationID: pwdApplicationID,
+        pwdIDNumber: pwdIDNumber,
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdIDNumber]);
 
   useEffect(() => {
     // Once data is fetched and available, set the form values only once
@@ -87,10 +87,10 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
       setValues(prev => ({
         ...prev,
         ...formData.personalInfo,
-        pwdApplicationID: pwdApplicationID,
+        pwdIDNumber: pwdIDNumber,
       }));
     }
-  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdApplicationID]);
+  }, [isRegistered, initialFetchDone, formData.personalInfo, pwdIDNumber]);
   
 
   const handleSubmit = async (e) => {

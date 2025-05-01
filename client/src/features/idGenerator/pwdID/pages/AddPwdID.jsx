@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 
 import AddID from '../../components/AddID';
-import pwdID from '../../../../assets/pwdID-image.svg'
+import pwdID from '../../../../assets/pwdID.svg'
 import '../../../../styles/components/style';
 
 

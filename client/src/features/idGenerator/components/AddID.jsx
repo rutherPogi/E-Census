@@ -105,7 +105,7 @@ export default function AddID({ idType, onClick, id, idImage, title }) {
                 py: { xs: 1, sm: 1.25, md: 1.5 }
               }}
             >
-              LIST {idType} ID's
+              MANAGE ID's
             </Button>
             <Button
               variant="contained"

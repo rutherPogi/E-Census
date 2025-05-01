@@ -3,7 +3,13 @@ import { Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, Tabl
 
 export const AppliancesSection = (appliancesOwn) => {
 
-  if (!appliancesOwn) return null;
+  if (!appliancesOwn) {
+      return (
+        <Box sx={{ textAlign: 'center', py: 3 }}>
+          <Typography color="text.secondary">No Appliances added.</Typography>
+        </Box>
+      );
+    }
   
   return (
     <Box sx={{ mb: 4 }}>

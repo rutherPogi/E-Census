@@ -48,17 +48,6 @@ export default function PWDFindPerson() {
     setSnackbarOpen 
   } = useNotification();
 
-  const generateNewSurveyId = async () => {
-    try {
-      const response = await get('/pwdID/generate');
-      return response.pwdID;
-    } catch (err) {
-      console.error('Error fetching PWD ID:', err);
-      showNotification('Failed to generate PWD ID. Please try again.', 'error');
-    } 
-  };
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
         
@@ -69,18 +58,13 @@ export default function PWDFindPerson() {
     
     setLoading(true);
     try {
-      const formattedDate = values.birthdate
-        ? new Date(new Date(values.birthdate).getTime() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .split('T')[0]
-        : null;
 
       const response = await post('/pwdID/find', {
         firstName: values.firstName,
         middleName: values.middleName || '',
         lastName: values.lastName,
         suffix: values.suffix || '',
-        birthdate: formattedDate,
+        birthdate: values.birthdate,
         sex: values.sex
       });
       
@@ -102,20 +86,13 @@ export default function PWDFindPerson() {
   };
 
   const handleSelectPerson = (person, uniqueKey) => {
-    // Store the relevant IDs
-    const id = person.populationID || person.pwdApplicationID || null;
-    
-    console.log('Selected ID:', id);
-    console.log('PWD ID NUMBER:', person.pwdApplicationID || 'None');
 
-    // Set the IDs to state variables
     setPopulationID(person.populationID || null);
-    setpwdApplicationID(person.pwdApplicationID || null);
+    setpwdApplicationID(person.pwdIDNumber || null);
 
-    console.log('Population ID:', populationID);
-    console.log('PWD Application ID:', pwdApplicationID);
-    
-    // Toggle selection logic
+    console.log('Population ID:', person.populationID);
+    console.log('PWD Application ID:', person.pwdIDNumber);
+
     setSelectedPerson(uniqueKey === selectedPerson ? null : uniqueKey);
   };
 
@@ -127,17 +104,11 @@ export default function PWDFindPerson() {
       return;
     } else if (populationID) {
       console.log('REGISTERED RESIDENT');
-      const newApplicantID = await generateNewSurveyId();
-      console.log('NEW APPLICANT ID:', newApplicantID);
       console.log('POPULATION ID:', populationID);
-      navigate(`/main/generate-id/pwd/resident/${newApplicantID}/${populationID}`);
+      navigate(`/main/generate-id/pwd/resident/${populationID}`);
     } else {
       console.log('NEW APPLICANT');
-      const newApplicantID = await generateNewSurveyId();
-      console.log('NEW APPLICANT ID:', newApplicantID);
-      navigate(`/main/generate-id/pwd/new/${newApplicantID}`, { 
-        state: { pwdApplicationNumber: newApplicantID } 
-      });
+      navigate(`/main/generate-id/pwd/new`);
     }
     
   };

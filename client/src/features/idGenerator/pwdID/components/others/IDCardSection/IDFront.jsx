@@ -79,9 +79,10 @@ const IDFront = () => {
           <Box sx={{width: '100%'}}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
               <Typography sx={{ fontSize: '12px', fontWeight: "bold" }}>
-                { (formData.personalInfo.firstName || '...') + 
-                  (formData.personalInfo.middleName === 'N/A' ? ' ' : ' ' + (formData.personalInfo.middleName || '') + ' ') + 
-                  (formData.personalInfo.lastName || '') }
+                {`${formData.personalInfo.firstName}
+                  ${formData.personalInfo.middleName || ''}
+                  ${formData.personalInfo.lastName}
+                  ${formData.personalInfo.suffix || ''}`}
               </Typography>
               <Typography 
                 sx={{ width: '100%', borderTop: '1px solid black', fontSize: '8px', textAlign: 'center' }}
@@ -145,7 +146,7 @@ const IDFront = () => {
             {/* ID NUMBER */}
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.5 }}>
               <Typography sx={{ fontSize: '9px', fontWeight: "bold" }}>
-                {formData.personalInfo.pwdID || '...'}
+                {formData.personalInfo.pwdIDNumber || '...'}
               </Typography>
               <Typography sx={{ width: '100%', borderTop: '1px solid black', fontSize: '8px', textAlign: 'center' }}>
                   ID No.

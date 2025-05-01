@@ -2,7 +2,13 @@ import { Box, Typography, Paper, TableContainer, Table, TableHead, TableRow, Tab
 
 export const renderLivestockTable = (livestock) => {
 
-  if (!livestock) return null;
+  if (!livestock) {
+    return (
+      <Box sx={{ textAlign: 'center', py: 3 }}>
+        <Typography color="text.secondary">No Animals/Livestock added.</Typography>
+      </Box>
+    );
+  }
   
   return (
     <Box sx={{ mb: 4 }}>

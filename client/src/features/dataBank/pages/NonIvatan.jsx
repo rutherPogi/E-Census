@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Hail } from "@mui/icons-material";
 
 import NonIvatanTable from "../components/tables/NonIvatanTable";
-import DatabankHeader from "../components/DataBankHeader";
+import DatabankHeader from "../components/DatabankHeader";
 
 import { exportMasterlistData } from '../utils/exportData';
 import { get } from '../../../utils/api/apiService'; 
@@ -50,7 +50,6 @@ export default function NonIvatan() {
       }}
     >
       <DatabankHeader title={'Masterlist of Non-Ivatan'} Icon={Hail} onExport={handleExport}/>
-      
       
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="manage tabs">
         <Tab label="Sta. Rosa" />

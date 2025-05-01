@@ -23,6 +23,11 @@ export const getSurveyFromDB = async (surveyID) => {
   return await db.get(STORE_NAME, surveyID);
 };
 
+export const getAllSurveysFromDB = async () => {
+  const db = await initDB();
+  return await db.getAll(STORE_NAME);
+};
+
 export const deleteSurveyFromDB = async (surveyID) => {
   const db = await initDB();
   await db.delete(STORE_NAME, surveyID);

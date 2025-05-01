@@ -4,13 +4,12 @@ import { useNotification } from "./useNotification";
 import { get } from '../../../../utils/api/apiService';
 
 
-export const useTransformData = (spApplicationID, populationID, renewal = false) => {
+export const useTransformData = (soloParentIDNumber, populationID, renewal = false) => {
   
   const { setEntireFormData } = useFormContext();
   const { showNotification } = useNotification();
 
   const fetchPersonData = useCallback(async () => {
-
     if (populationID) {
       console.log('REGISTER');
       try {
@@ -37,11 +36,11 @@ export const useTransformData = (spApplicationID, populationID, renewal = false)
         console.error('Error fetching data', err);
         showNotification('Failed to load data. Please try again later.', 'error');
       }
-    } else if (spApplicationID && renewal) {
+    } else if (soloParentIDNumber && renewal) {
       console.log('RENEWAL');
       try {
-        const response = await get(`/soloParentID/view/${spApplicationID}`, {
-          params: { spApplicationID },
+        const response = await get(`/soloParentID/view/${soloParentIDNumber}`, {
+          params: { soloParentIDNumber },
         });
     
         if (response) {

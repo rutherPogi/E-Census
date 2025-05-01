@@ -12,14 +12,14 @@ import { useNotification } from '../../hooks/useNotification';
 import { useTransformData } from "../../hooks/useTransformData";
 
 
-
 export default function DisplayPWDInfo ({ 
   handleBack, 
   handleNext, 
   handleEdit, 
   isEditing = false, 
   isUpdating = false,
-  firstMount = false
+  firstMount = false,
+  isViewing = false
 }) {
 
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ export default function DisplayPWDInfo ({
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const { formData, clearFormData } = useFormContext();
+  const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(pwdApplicationID, null, true);
 
   const { 
@@ -66,23 +66,33 @@ export default function DisplayPWDInfo ({
 
       //delete formData.pwdMedia.photoIDPreview;
 
-      if(isUpdating) {
+      let res;
+
+      if(isUpdating && !firstMount) {
         console.log('UPDATING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await put('/pwdID/update', formDataToSend, true);
+        res = await put('/pwdID/update', formDataToSend, true);
         showNotification('Application UPDATED successfully!', 'success');
       } else {
         console.log('SUBMITING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await post('/pwdID/submit', formDataToSend, true);
+        res = await post('/pwdID/submit', formDataToSend, true);
         showNotification('Application SUBMITTED successfully!', 'success');
       }
 
-      handleNext();
-      //clearFormData();
-      //setTimeout(() => navigate('/main/generate-id/pwd'), 1000);
+      console.log('Response:', res);
+
+      updateFormData('personalInfo', {
+        ...formData.personalInfo,
+        pwdIDNumber: res.pwdApplicationID
+      });
+
+      console.log('FormData:', formData.personalInfo.pwdIDNumber );
+      console.log('FormData:', formData.personalInfo );
+
+      setTimeout(() => handleNext(), 1000);
     } catch (error) {
       console.error('Error submitting application:', error);
         
@@ -107,16 +117,16 @@ export default function DisplayPWDInfo ({
           padding: '1em'
       }}>
         
-        <DisplayInfoSections formData={formData} handleEdit={handleEdit}/>
+        <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
         
       </Box>
-      <FormButtons
+      {!isViewing && (<FormButtons
         onBack = {handleBack} 
         onNext = {handleSubmit} 
         backLabel = 'Back' 
-        nextLabel = {isUpdating ? 'Update' : 'Submit'}
+        nextLabel = {isUpdating && !firstMount  ? 'Update' : 'Submit'}
         nextDisabled = { firstMount }
-      />
+      />)}
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 

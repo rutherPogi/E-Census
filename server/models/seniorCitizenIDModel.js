@@ -11,7 +11,7 @@ export const generateSeniorCitizenId = async (connection) => {
   try {
     // Get the current sequence for today
     const [rows] = await connection.query(
-      `SELECT MAX(scApplicationID) as maxId FROM seniorCitizenApplication 
+      `SELECT MAX(scApplicationID) as maxId FROM SeniorCitizenApplication 
        WHERE scApplicationID LIKE ?`,
       [`SC${datePrefix}%`]
     );
@@ -29,7 +29,7 @@ export const generateSeniorCitizenId = async (connection) => {
     
     // Verify this ID doesn't already exist (double-check)
     const [existingCheck] = await connection.query(
-      `SELECT COUNT(*) as count FROM seniorCitizenApplication WHERE scApplicationID = ?`,
+      `SELECT COUNT(*) as count FROM SeniorCitizenApplication WHERE scApplicationID = ?`,
       [seniorCitizenID]
     );
     
@@ -38,7 +38,7 @@ export const generateSeniorCitizenId = async (connection) => {
       return generateSeniorCitizenId(connection);
     }
 
-    return seniorCitizenID;
+    return { scApplicationID: seniorCitizenID };
   } catch (error) {
     console.error('Error generating Senior Citizen ID:', error);
     throw error;
@@ -57,7 +57,7 @@ export const createSeniorCitizenApplicant = async (scApplicationID, photoID, sig
     const applicantID = applicantResult.insertId;
     
     await connection.query(
-      `INSERT INTO seniorCitizenApplication (
+      `INSERT INTO SeniorCitizenApplication (
         scApplicationID, 
         applicantID,
         dateApplied, 
@@ -73,7 +73,7 @@ export const createSeniorCitizenApplicant = async (scApplicationID, photoID, sig
       ]
     );
 
-    console.log('[ INSERTED SUCCESSFULLY seniorCitizenApplication ]')
+    console.log('[ INSERTED SUCCESSFULLY SeniorCitizenApplication ]')
     return { applicantID };
   } catch (error) {
     await connection.rollback();
@@ -82,7 +82,7 @@ export const createSeniorCitizenApplicant = async (scApplicationID, photoID, sig
   }
 };
 
-export const addPersonalInfo = async (applicantID, personalInfo, connection) => {
+export const addPersonalInfo = async (applicantID, scApplicationID, personalInfo, connection) => {
 
   await connection.beginTransaction();
 
@@ -112,7 +112,7 @@ export const addPersonalInfo = async (applicantID, personalInfo, connection) => 
         personalInfo.sex,
         personalInfo.civilStatus,
         personalInfo.birthplace,
-        personalInfo.seniorCitizenIDNumber || 123 ]
+        scApplicationID ]
     );
 
     await connection.query(

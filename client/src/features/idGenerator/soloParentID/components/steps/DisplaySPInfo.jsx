@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button } from '@mui/material';
+import { Box, Button, IconButton, Typography, Tabs, Tab } from '@mui/material';
 
 import { post, put } from '../../../../../utils/api/apiService';
 
@@ -10,6 +10,7 @@ import { DisplayInfoSections } from '../others/DisplaySection/DisplaySection';
 import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useTransformData } from "../../hooks/useTransformData";
+import { ArrowBack } from "@mui/icons-material";
 
 
 
@@ -19,7 +20,8 @@ export default function DisplaySPInfo ({
   handleEdit, 
   isEditing = false, 
   isUpdating = false,
-  firstMount = false
+  firstMount = false,
+  isViewing = false
 }) {
 
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function DisplaySPInfo ({
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const { formData, clearFormData } = useFormContext();
+  const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(spApplicationID, null, true);
 
   const { 
@@ -66,23 +68,32 @@ export default function DisplaySPInfo ({
 
       //delete formData.pwdMedia.photoIDPreview;
 
-      if(isUpdating) {
+      let res;
+
+      if(isUpdating && !firstMount) {
         console.log('UPDATING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await put('/soloParentID/update', formDataToSend, true);
+        res = await put('/soloParentID/update', formDataToSend, true);
         showNotification('Application UPDATED successfully!', 'success');
       } else {
         console.log('SUBMITING...');
         console.log('APPLICATION DATA:', processedFormData);
         formDataToSend.append('applicationData', JSON.stringify(processedFormData));
-        await post('/soloParentID/submit', formDataToSend, true);
+        res = await post('/soloParentID/submit', formDataToSend, true);
         showNotification('Application SUBMITTED successfully!', 'success');
       }
+      console.log('Response:', res);
 
-      //clearFormData();
-      handleNext();
-      //setTimeout(() => navigate('/main/generate-id/solo-parent'), 1000);
+      updateFormData('personalInfo', {
+        ...formData.personalInfo,
+        soloParentIDNumber: res.spApplicationID
+      });
+
+      console.log('FormData:', formData.personalInfo.soloParentIDNumber );
+      console.log('FormData:', formData.personalInfo );
+
+      setTimeout(() => handleNext(), 1000);
     } catch (error) {
       console.error('Error submitting application:', error);
         
@@ -96,34 +107,52 @@ export default function DisplaySPInfo ({
     }
   };
 
+  
+
   return (
-    <div className='responsive-container'>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3}}>
       <Box
-        sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '2em',
-          backgroundColor: '#fff',
-          padding: '1em'
-      }}>
-        
-        <DisplayInfoSections formData={formData} handleEdit={handleEdit}/>
-        
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          padding: '1em',
+          borderRadius: 2
+        }}
+      >
+        <IconButton 
+          onClick={() => navigate(-1)} 
+          size="medium"
+          sx={{ mr: 1 }}
+        >
+          <ArrowBack/>
+        </IconButton>
+        <Typography>
+          Solo Parent Application #{formData.personalInfo.spApplicationID}
+        </Typography>
       </Box>
-      <FormButtons
+
+      <Box>
+        <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
+        
+        {!isViewing && (<FormButtons
         onBack = {handleBack} 
         onNext = {handleSubmit} 
         backLabel = 'Back' 
-        nextLabel = {isUpdating ? 'Update' : 'Submit'}
+        nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
         nextDisabled = { firstMount } 
-      />
+      />)}
+
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 
         setSnackbarOpen={setSnackbarOpen} 
         severity={severity}
       />
-    </div>
+      </Box>
+      
+      
+    </Box>
     
   );
 }

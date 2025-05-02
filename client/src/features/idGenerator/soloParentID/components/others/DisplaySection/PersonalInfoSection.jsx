@@ -16,11 +16,7 @@ export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => 
     <Box 
       sx={{ 
         backgroundColor: 'white',
-        padding: '2em',
-        borderTopLeftRadius: '1rem',
-        borderTopRightRadius: '1rem',
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
+        padding: '2em'
         }}>
       <Box sx={{
         display: 'flex', 
@@ -88,7 +84,7 @@ export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => 
 
             <Grid item xs={12} sm={6} md={3}>
               <Typography variant="subtitle2" color="text.secondary">Birthplace</Typography>
-              <Typography variant="body2">{member.birthplace}</Typography>
+              <Typography variant="body2">{member.birthplace || 'N/A'}</Typography>
             </Grid>
             
             <Grid item xs={12} sm={6} md={3}>
@@ -170,7 +166,7 @@ export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => 
 
             <Grid item xs={12} sm={6} md={3}>
               <Typography variant="subtitle2" color="text.secondary">Monthly Income</Typography>
-              <Typography variant="body2">{member.monthlyIncome || 'N/A'}</Typography>
+              <Typography variant="body2">{`₱${formatters.currency(member.monthlyIncome)}` || 'N/A'}</Typography>
             </Grid>
           </Grid>
         </Box>

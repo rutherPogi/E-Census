@@ -35,62 +35,6 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
     setTabValue(newValue);
   };
   
-  // Determine responsive variant based on screen size
-  const getTitleVariant = () => {
-    if (isMobile) return "h6";
-    if (isTablet) return "h5";
-    return "h4";
-  };
-  
-  const titleVariant = getTitleVariant();
-  
-  // Enhanced section header style
-  const titleStyle = { 
-    fontWeight: 'bold', 
-    color: theme.palette.primary.main,
-    fontFamily: "'Roboto', sans-serif",
-    letterSpacing: '0.5px'
-  };
-
-  const renderSectionHeader = (title, sectionIndex) => (
-    <Box sx={{
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      mb: 2,
-      pb: 1
-    }}>
-      <Typography variant={titleVariant} sx={titleStyle}>
-        {title}
-      </Typography>
-      {!isViewing && (
-        <Tooltip title="Edit section">
-          <Button
-            onClick={() => handleEdit(sectionIndex)}
-            variant="outlined"
-            color="primary"
-            startIcon={<Edit/>}
-          >
-            EDIT
-          </Button>
-        </Tooltip>
-      )}
-    </Box>
-  );
-
-  // Section container shared style
-  const sectionStyle = {
-    mb: 5,
-    p: 3,
-    borderRadius: 2,
-    boxShadow: theme.shadows[3],
-    backgroundColor: theme.palette.background.paper,
-    '&:hover': {
-      boxShadow: theme.shadows[6],
-      transition: 'box-shadow 0.3s ease-in-out'
-    }
-  };
-
 
   return (
     <Box>
@@ -106,9 +50,9 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
             label="Personal Info"
             sx={{
               borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 0 ? "#ddd" : "#f5f5f5",
+              backgroundColor: tabValue === 0 ? "#fff" : "#f5f5f5",
               padding: "10px 20px",
-              border: "1px solid #ccc",
+              marginRight: 1,
               boxShadow: tabValue === 0 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
             }}
           />
@@ -116,9 +60,9 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
             label="Household"
             sx={{
               borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 1 ? "#ddd" : "#f5f5f5",
+              backgroundColor: tabValue === 1 ? "#fff" : "#f5f5f5",
               padding: "10px 20px",
-              border: "1px solid #ccc",
+              marginRight: 1,
               boxShadow: tabValue === 1 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
             }}
           />
@@ -126,9 +70,9 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
             label="Problems/Needs"
             sx={{
               borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 2 ? "#ddd" : "#f5f5f5",
+              backgroundColor: tabValue === 2 ? "#fff" : "#f5f5f5",
               padding: "10px 20px",
-              border: "1px solid #ccc",
+              marginRight: 1,
               boxShadow: tabValue === 2 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
             }}
           />
@@ -136,9 +80,9 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
             label="Emergency Contact"
             sx={{
               borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 3 ? "#ddd" : "#f5f5f5",
+              backgroundColor: tabValue === 3 ? "#fff" : "#f5f5f5",
               padding: "10px 20px",
-              border: "1px solid #ccc",
+              marginRight: 1,
               boxShadow: tabValue === 3 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
             }}
           />
@@ -146,9 +90,8 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
             label="ID & SIGNATURE"
             sx={{
               borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 4 ? "#ddd" : "#f5f5f5",
+              backgroundColor: tabValue === 4 ? "#fff" : "#f5f5f5",
               padding: "10px 20px",
-              border: "1px solid #ccc",
               boxShadow: tabValue === 4 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
             }}
           />
@@ -162,34 +105,22 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
 
       {/* HOUSEHOLD COMPOSITION SECTION */}
       {tabValue === 1 && 
-        <Paper elevation={3} sx={sectionStyle}>
-          {renderSectionHeader('Household Composition', 3)}
-          {HouseholdCompositionSection(formData?.householdComposition)}
-        </Paper>
+        <HouseholdCompositionSection members={formData?.householdComposition} handleEdit={handleEdit} isViewing={isViewing}/>
       }
 
       {/* PROBLEMS AND NEEDS SECTION */}
       {tabValue === 2 &&
-        <Paper elevation={3} sx={sectionStyle}>
-          {renderSectionHeader('Solo Parent Circumstances, Problems, and Needs', 4)}
-          {ProblemNeedsSection(formData?.problemNeeds)}
-        </Paper>
+        <ProblemNeedsSection member={formData?.householdComposition} handleEdit={handleEdit} isViewing={isViewing}/>
       }
 
       {/* EMERGENCY CONTACT SECTION */}
       {tabValue === 3 &&
-        <Paper elevation={3} sx={sectionStyle}>
-          {renderSectionHeader('Emergency Contact', 5)}
-          {EmergencyContactSection(formData?.emergencyContact)}
-        </Paper>
+        <EmergencyContactSection member={formData?.emergencyContact} handleEdit={handleEdit} isViewing={isViewing}/>
       }
 
       {/* PHOTO ID AND SIGNATURE SECTION */}
       {tabValue === 4 &&
-        <Paper elevation={3} sx={sectionStyle}>
-          {renderSectionHeader('Photo ID and Signature', 6)}
-          {SPMediaSection(formData?.spMedia)}
-        </Paper>
+        <SPMediaSection media={formData?.spMedia} handleEdit={handleEdit} isViewing={isViewing}/>
       }
     </Box>
   );

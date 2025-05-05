@@ -55,12 +55,7 @@ const Sidebar = ({
 
   const position = userData.position;
 
-  const showHome = position === 'Admin' || position === 'MSWDO';
-  const showNews = position === 'Admin' || position === 'MSWDO';
-  const showAccounts = position === 'Admin';
-  const showDataBank = position === 'Admin' || position === 'MSWDO';
-  const showIdGenerator = position === 'Admin' || position === 'MSWDO';
-  const showHazardMap = position === 'Admin' || position === 'MSWDO';
+  const show = position != 'Barangay Official';
 
   // Track the current selected path
   const [selectedPath, setSelectedPath] = useState(location.pathname);
@@ -128,7 +123,7 @@ const Sidebar = ({
 
       <List sx={{ width: '100%', p: 0 }}>
         {/* Home */}
-        {showHome && (
+        {show && (
           <Tooltip title={!open ? "Home" : ""} placement="right">
             <ListItem 
               onClick={() => handleItemClick('/main/dashboard')}
@@ -143,7 +138,7 @@ const Sidebar = ({
         )}
 
         {/* News and Updates */}
-        {showNews && (
+        {show && (
           <Tooltip title={!open ? "News and Updates" : ""} placement="right">
             <ListItem 
               onClick={() => handleItemClick('/main/updates')}
@@ -158,7 +153,7 @@ const Sidebar = ({
         )}
         
         {/* Accounts - Only visible if not a Barangay Official */}
-        {showAccounts && (
+        {show && (
           <Tooltip title={!open ? "Accounts" : ""} placement="right">
             <ListItem 
               onClick={() => handleItemClick('/main/accounts')}
@@ -242,7 +237,7 @@ const Sidebar = ({
         </>
 
         {/* Data Bank */}
-        {showDataBank && (
+        {show && (
           <>
             <Tooltip title={!open ? "Data Bank" : ""} placement="right">
               <ListItem 
@@ -383,7 +378,7 @@ const Sidebar = ({
         )}
         
         {/* ID Generator with submenu - Only visible if not a Barangay Official */}
-        {showIdGenerator && (
+        {show && (
           <>
             <Tooltip title={!open ? "ID Generator" : ""} placement="right">
               <ListItem 
@@ -454,7 +449,7 @@ const Sidebar = ({
         )}
 
         {/* Hazard Map - Only visible if not a Barangay Official */}
-        {showHazardMap && (
+        {show && (
           <Tooltip title={!open ? "Hazard Map" : ""} placement="right">
             <ListItem 
               onClick={() => handleItemClick('/main/hazard-map')}

@@ -14,6 +14,7 @@ import { useAuth } from '../../../../utils/auth/authContext'
 import LocationMap from "../others/HouseInfoSections/HouseMap/LocationMap";
 import CoordinatesDisplay from "../others/HouseInfoSections/HouseMap/CoordinatesDisplay";
 import HouseAddress from "../others/HouseInfoSections/HouseAddress";
+import OfflineLocationMap from "../others/HouseInfoSections/HouseMap/OfflineLocationMap";
 
 
 
@@ -92,7 +93,7 @@ export default function HouseLocation({ handleBack, handleNext }) {
           Please mark your house location in Itbayat Municipality by clicking on the map.
         </Typography>
         
-        <LocationMap 
+        <OfflineLocationMap 
           position={position} 
           setPosition={setPosition}
           showNotification={showNotification}

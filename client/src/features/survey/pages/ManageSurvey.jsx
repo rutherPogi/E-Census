@@ -11,11 +11,13 @@ import { get, del } from '../../../utils/api/apiService';
 import { Notification } from '../../../components/common/Notification'
 
 import { useNotification } from '../hooks/useNotification';
-
+import { useAuth } from '../../../utils/auth/authContext';
 
 
 
 const ManageSurvey = () => {
+
+  const { userData } = useAuth();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -46,7 +48,7 @@ const ManageSurvey = () => {
   const fetchSurveyData = async () => {
     setLoading(true);
     try {
-      const response = await get('/surveys/list');
+      const response = await get(`/surveys/list/${userData.username}/${userData.position}`);
       setSurveyData(response);
       setFilteredData(response);
     } catch (err) {

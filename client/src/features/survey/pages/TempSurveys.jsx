@@ -90,7 +90,7 @@ const TempSurvey = () => {
   const handleSelectAllSurveys = () => {
     const displayedSurveys = filteredData
       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      .map(survey => survey.surveyID);
+      .map(survey => survey.id);
       
     const allSelected = displayedSurveys.every(id => selectedSurveys.includes(id));
     

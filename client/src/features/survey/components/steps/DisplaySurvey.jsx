@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
+import { ArrowBack } from "@mui/icons-material";
 
 import { useFormContext } from "../../pages/FormContext";
 import { useSurveyData } from "../../hooks/useSurveyData";
@@ -12,7 +13,17 @@ import { Notification, FormButtons } from '../../../../components/common';
 
 import DisplaySurveySections from "../others/DisplaySurveySections/DisplaySurveySections";
 
-export default function DisplaySurvey({ handleBack, handleEdit, isEditing = false, isUpdating = false }) {
+
+
+
+export default function DisplaySurvey({ 
+  handleBack, 
+  handleEdit, 
+  isEditing = false, 
+  isUpdating = false,
+  firstMount = false,
+  isViewing = false 
+}) {
 
   const navigate = useNavigate();
   const params = useParams();
@@ -102,30 +113,46 @@ export default function DisplaySurvey({ handleBack, handleEdit, isEditing = fals
   };
 
   return (
-    <div className='responsive-container'>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3}}>
       <Box
         sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '2em',
-          backgroundColor: '#fff',
-          padding: '1em'
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          padding: '1em',
+          borderRadius: 2
       }}>
-        <DisplaySurveySections formData={formData} handleEdit={handleEdit} />
+        <IconButton 
+          onClick={() => navigate(-1)} 
+          size="medium"
+          sx={{ mr: 1 }}
+        >
+          <ArrowBack/>
+        </IconButton>
+        <Typography>
+          Survey #{formData.surveyData.surveyID}
+        </Typography>
       </Box> 
 
-      <FormButtons 
-        onBack={handleBack}
-        onNext={handleSubmit}
-        backLabel="Back"
-        nextLabel={isUpdating ? 'Update' : 'Submit'}
-      />
-      <Notification
-        snackbarMessage={snackbarMessage} 
-        snackbarOpen={snackbarOpen} 
-        setSnackbarOpen={setSnackbarOpen} 
-        severity={severity}
-      />   
-    </div>
+      <Box>
+        <DisplaySurveySections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
+
+        {!isViewing && (<FormButtons
+          onBack = {handleBack} 
+          onNext = {handleSubmit} 
+          backLabel = 'Back' 
+          nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
+          nextDisabled = { firstMount } 
+        />)}
+
+        <Notification
+          snackbarMessage={snackbarMessage} 
+          snackbarOpen={snackbarOpen} 
+          setSnackbarOpen={setSnackbarOpen} 
+          severity={severity}
+        /> 
+      </Box>  
+
+    </Box>
   );
 }

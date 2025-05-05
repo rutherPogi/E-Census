@@ -1,25 +1,5 @@
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Chip, 
-  Grid, 
-  Divider, 
-  Card, 
-  CardContent,
-  Avatar,
-  useTheme,
-  Tooltip,
-  Button
-} from "@mui/material";
-import { 
-  Edit,
-  Person,
-  School,
-  Work,
-  AttachMoney,
-  People
-} from "@mui/icons-material";
+import { Box, Typography, Chip, Grid, Divider, Card, CardContent, Tooltip, Button } from "@mui/material";
+import { Edit, Person, Work, People } from "@mui/icons-material";
 import { formatters } from "../../../../utils/formatter";
 
 
@@ -37,39 +17,39 @@ export const HouseholdCompositionSection = ({ members, handleEdit, isViewing = f
   
   return (
     <Box
-    sx={{ 
-      backgroundColor: 'white',
-      padding: '2em'
-      }}
-    >
-      <Box sx={{
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
-        mb: 2,
-        pb: 1
-      }}>
-        <Box sx={{ alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
-            <People/>
-            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-              Household Composition
-            </Typography> 
+      sx={{ 
+        backgroundColor: 'white',
+        padding: '2em'
+        }}
+      >
+        <Box sx={{
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 2,
+          pb: 1
+        }}>
+          <Box sx={{ alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+              <People/>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                Household Composition
+              </Typography> 
+            </Box>
           </Box>
+          {!isViewing && (
+            <Tooltip title="Edit section">
+              <Button
+                onClick={() => handleEdit(3)}
+                variant="outlined"
+                color="primary"
+                startIcon={<Edit/>}
+              >
+                EDIT
+              </Button>
+            </Tooltip>
+          )}
         </Box>
-        {!isViewing && (
-          <Tooltip title="Edit section">
-            <Button
-              onClick={() => handleEdit(3)}
-              variant="outlined"
-              color="primary"
-              startIcon={<Edit/>}
-            >
-              EDIT
-            </Button>
-          </Tooltip>
-        )}
-      </Box>
 
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -114,6 +94,7 @@ export const HouseholdCompositionSection = ({ members, handleEdit, isViewing = f
                     </Box>
                     
                     <Divider sx={{ mb: 2 }} />
+                    
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="subtitle2" color="text.secondary">Age</Typography>

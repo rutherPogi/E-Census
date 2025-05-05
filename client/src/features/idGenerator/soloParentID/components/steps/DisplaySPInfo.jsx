@@ -136,19 +136,19 @@ export default function DisplaySPInfo ({
         <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
         
         {!isViewing && (<FormButtons
-        onBack = {handleBack} 
-        onNext = {handleSubmit} 
-        backLabel = 'Back' 
-        nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
-        nextDisabled = { firstMount } 
-      />)}
+          onBack = {handleBack} 
+          onNext = {handleSubmit} 
+          backLabel = 'Back' 
+          nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
+          nextDisabled = { firstMount } 
+        />)}
 
-      <Notification
-        snackbarMessage={snackbarMessage} 
-        snackbarOpen={snackbarOpen} 
-        setSnackbarOpen={setSnackbarOpen} 
-        severity={severity}
-      />
+        <Notification
+          snackbarMessage={snackbarMessage} 
+          snackbarOpen={snackbarOpen} 
+          setSnackbarOpen={setSnackbarOpen} 
+          severity={severity}
+        />
       </Box>
       
       

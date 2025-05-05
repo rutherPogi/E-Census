@@ -97,7 +97,7 @@ export default function PrintID({ handleBack }) {
           sx={{ border: '1px solid #ccc', padding: 2, borderRadius: 1 }}
         >
           <div ref={contentRef}>
-            <Box sx={{display: 'flex', flexDirection: 'column', gap: '2em', alignItems: 'center'}}>
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: '2em', alignItems: 'center', padding: 2}}>
               <IDFront />
               <IDBack mayor={mayor} mayorSignature={mayorSignature} />
             </Box>

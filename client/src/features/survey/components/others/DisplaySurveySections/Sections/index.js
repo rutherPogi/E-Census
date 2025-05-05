@@ -9,7 +9,8 @@ export { FamilyResourcesSection } from './FamilyResources';
 export { AppliancesSection } from './Appliances';
 export { AmenitiesSection } from './Amenities';
 
-export { renderExpensesTable } from './ExpensesTable';
+export { RenderExpensesTable } from './ExpensesTable';
 export { FamilyProfileSection } from './FamilyProfile';
-export { renderLivestockTable } from './LivestockTable';
-export { renderServiceAvailed } from './ServiceAvailed';
+export { RenderLivestockTable } from './LivestockTable';
+export { RenderServiceAvailed } from './ServiceAvailed';
+export { Issues } from './Issues';

@@ -65,7 +65,7 @@ export const ProblemNeedsSection = ({member, handleEdit, isViewing = false}) => 
         {!isViewing && (
           <Tooltip title="Edit section">
             <Button
-              onClick={() => handleEdit(1)}
+              onClick={() => handleEdit(4)}
               variant="outlined"
               color="primary"
               startIcon={<Edit/>}

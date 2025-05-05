@@ -88,8 +88,16 @@ const AddAccount = () => {
       setFormData(INITIAL_FORM_DATA);
     } catch (err) {
       console.error(err);
-      showNotification(err.response?.data?.error || "Error registering account", 'error');
-    }
+    
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || "Error registering account";
+    
+      // Check for specific error message
+      if (errorMessage === "Username already exists") {
+        showNotification("Username already exists", 'error');
+      } else {
+        showNotification(errorMessage, 'error');
+      }
+    }    
   };
 
   const goBack = () => navigate(-1);

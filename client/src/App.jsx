@@ -1,7 +1,7 @@
 // App.jsx
 import { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { AuthProvider } from './utils/auth/authContext.jsx';
+import { AuthProvider, useAuth } from './utils/auth/authContext.jsx';
 import ProtectedRoutes from './routes/ProtectedRoutes.jsx';
 
 import Main from './components/layout/Main.jsx';
@@ -38,6 +38,7 @@ import NonIvatan from './features/dataBank/pages/NonIvatan.jsx';
 import TempSurvey from './features/survey/pages/tEMPsURVEYS.JSX';
 
 export default function App() {
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -59,12 +60,17 @@ export default function App() {
     }
   }, [location, navigate]);
 
+  const HomeRoute = () => {
+    const { userData } = useAuth();
+    return userData?.position === 'Barangay Official' ? <SurveyForm /> : <Dashboard />;
+  }
+
   return (
     <AuthProvider>
       <Routes>
         <Route element={<ProtectedRoutes />}>
           <Route path='/main' element={<Main />}>
-            <Route index element={<Dashboard />} />
+            <Route index element={<HomeRoute />} />
             <Route path='dashboard' element={<Dashboard />} />
             <Route path='updates' element={<PostLists />} />
             <Route path='post/add' element={<AddPost />} />

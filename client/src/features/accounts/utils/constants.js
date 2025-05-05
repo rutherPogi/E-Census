@@ -18,17 +18,17 @@ export const BARANGAY_OPTIONS = [
 
 export const POSITION_MAP = {
   'admin': '#d32f2f',
-  'manager': '#7b1fa2',
-  'supervisor': '#1976d2',
-  'level 1': '#388e3c',
-  'level 2': '#f57c00',
+  'mswdo head': '#7b1fa2',
+  'mswdo staff': '#1976d2',
+  'barangay official': '#388e3c',
+  'mswdo': '#f57c00',
   'level 3': '#0097a7'
 };
 
 
 export const POSITION_OPTIONS = [
-  { value: 'Admin', label: 'Admin' },
-  { value: 'MSWDO', label: 'MSWDO' },
+  { value: 'MSWDO Head', label: 'MSWDO Head' },
+  { value: 'MSWDO Staff', label: 'MSWDO Staff' },
   { value: 'Barangay Official', label: 'Barangay Official' },
 ];
 

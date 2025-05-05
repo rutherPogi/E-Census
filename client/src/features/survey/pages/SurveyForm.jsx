@@ -14,14 +14,16 @@ export default function Form({ isViewing = false, isEditing = false }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);
 
-  const [viewing, setViewing] = useState(false);
+  const [view, setView] = useState(false);
   const [editing, setEditing] = useState(false);
   const [update, setUpdate] = useState(false);
+  const [mount, setMount] = useState(false);
 
   useEffect(() => {
     if (isViewing) {
-      setCurrentPage(22);
-      setViewing(true);
+      setCurrentPage(21);
+      setEditing(true);
+      setView(true);
     } else if (isEditing) {
       setCurrentPage(21);
       setEditing(true);
@@ -80,9 +82,10 @@ export default function Form({ isViewing = false, isEditing = false }) {
           handleBack={handleBack} 
           handleEdit={handleEdit} 
           isEditing={editing}
-          isUpdating={update}/>
+          isUpdating={update}
+          firstMount={mount}
+          isViewing={view}/>
         }
-        {currentPage === 22 && <ViewSurvey handleEdit={handleEdit} isViewing={viewing}/>}
 
 
         <div className='form-pagination'>

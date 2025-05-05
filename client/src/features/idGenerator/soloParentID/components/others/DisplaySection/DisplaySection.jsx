@@ -1,21 +1,5 @@
 import { useState } from "react";
-import { 
-  useTheme, 
-  useMediaQuery, 
-  Box, 
-  Typography, 
-  Button, 
-  Card, 
-  CardContent,
-  Container,
-  Tabs,
-  Tab,
-  Paper,
-  IconButton,
-  Tooltip,
-  Divider
-} from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { Box, Tabs, Tab } from "@mui/material";
 
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { EmergencyContactSection } from "./EmergencyContactSection";
@@ -23,17 +7,24 @@ import { ProblemNeedsSection } from "./ProblemNeedsSection";
 import { HouseholdCompositionSection } from "./HouseholdCompositionSection";
 import { SPMediaSection } from "./SPMediaSection";
 
-export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+
+
+export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
 
   const [tabValue, setTabValue] = useState(0);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
+
+  const tabLabels = [
+    "Personal Info",
+    "Household",
+    "Problems/Needs",
+    "Emergency Contact",
+    "ID & SIGNATURE",
+  ];
   
 
   return (
@@ -46,55 +37,19 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
           scrollButtons="auto"
           indicatorColor="none"
         >
-          <Tab
-            label="Personal Info"
-            sx={{
-              borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 0 ? "#fff" : "#f5f5f5",
-              padding: "10px 20px",
-              marginRight: 1,
-              boxShadow: tabValue === 0 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
-            }}
-          />
-          <Tab
-            label="Household"
-            sx={{
-              borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 1 ? "#fff" : "#f5f5f5",
-              padding: "10px 20px",
-              marginRight: 1,
-              boxShadow: tabValue === 1 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
-            }}
-          />
-          <Tab
-            label="Problems/Needs"
-            sx={{
-              borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 2 ? "#fff" : "#f5f5f5",
-              padding: "10px 20px",
-              marginRight: 1,
-              boxShadow: tabValue === 2 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
-            }}
-          />
-          <Tab
-            label="Emergency Contact"
-            sx={{
-              borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 3 ? "#fff" : "#f5f5f5",
-              padding: "10px 20px",
-              marginRight: 1,
-              boxShadow: tabValue === 3 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
-            }}
-          />
-          <Tab
-            label="ID & SIGNATURE"
-            sx={{
-              borderRadius: "8px 8px 0 0",
-              backgroundColor: tabValue === 4 ? "#fff" : "#f5f5f5",
-              padding: "10px 20px",
-              boxShadow: tabValue === 4 ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
-            }}
-          />
+          {tabLabels.map((label, index) => (
+            <Tab
+              key={label}
+              label={label}
+              sx={{
+                borderRadius: "8px 8px 0 0",
+                backgroundColor: tabValue === index ? "#fff" : "#f5f5f5",
+                padding: "10px 20px",
+                marginRight: index < tabLabels.length - 1 ? 1 : 0,
+                boxShadow: tabValue === index ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
+              }}
+            />
+          ))}
         </Tabs>
       </Box>
 

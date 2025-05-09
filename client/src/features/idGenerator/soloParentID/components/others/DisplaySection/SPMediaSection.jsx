@@ -1,24 +1,5 @@
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  CardMedia, 
-  Divider,
-  useTheme,
-  Paper,
-  Button,
-  Tooltip
-} from "@mui/material";
-import {
-  PhotoCamera,
-  Create,
-  ZoomIn,
-  People,
-  Edit
-} from "@mui/icons-material";
-import { formatters } from "../../../../utils/formatter";
+import { Box, Typography, Grid, Card, CardContent, useTheme, Paper, Button, Tooltip } from "@mui/material";
+import { PhotoCamera, Create, Edit } from "@mui/icons-material";
 
 
 export const SPMediaSection = ({ media, handleEdit, isViewing = false }) => {
@@ -114,31 +95,6 @@ export const SPMediaSection = ({ media, handleEdit, isViewing = false }) => {
                         borderRadius: '4px'
                       }} 
                     />
-                    <Box 
-                      className="zoom-overlay"
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        opacity: 0,
-                        transition: 'opacity 0.3s',
-                        borderRadius: '4px'
-                      }}
-                    >
-                      <Button 
-                        variant="contained" 
-                        startIcon={<ZoomIn />}
-                        size="small"
-                      >
-                        View Full Size
-                      </Button>
-                    </Box>
                   </Paper>
                   <Typography variant="caption" color="text.secondary">
                     Government-issued ID
@@ -209,32 +165,6 @@ export const SPMediaSection = ({ media, handleEdit, isViewing = false }) => {
                         objectFit: 'contain',
                       }} 
                     />
-                    <Box 
-                      className="zoom-overlay"
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: 'rgba(0,0,0,0.3)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        opacity: 0,
-                        transition: 'opacity 0.3s',
-                        borderRadius: '4px'
-                      }}
-                    >
-                      <Button 
-                        variant="contained" 
-                        startIcon={<ZoomIn />}
-                        size="small"
-                        color="secondary"
-                      >
-                        View Full Size
-                      </Button>
-                    </Box>
                   </Paper>
                   <Typography variant="caption" color="text.secondary">
                     Applicant's signature

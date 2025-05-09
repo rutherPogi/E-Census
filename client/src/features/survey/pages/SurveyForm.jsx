@@ -4,8 +4,7 @@ import { SurveyDetails, FamilyProfile, FamilyProfile2,
          FoodExpenses, EducationExpenses, FamilyExpenses, MonthlyExpenses,
          HouseInfo, HouseInfo2, WaterInfo, Livestock, Farmlots, CropsPlanted, 
          FruitBearingTree, FamilyResources, AppliancesOwn, Amenities, 
-         CommunityIssue, ServiceAvailed, ServiceAvailed2, DisplaySurvey,
-         ViewSurvey } from "../components/steps";
+         CommunityIssue, ServiceAvailed, ServiceAvailed2, DisplaySurvey } from "../components/steps";
 
 
          
@@ -49,6 +48,10 @@ export default function Form({ isViewing = false, isEditing = false }) {
     if (currentPage > 1) setCurrentPage((prev) => prev - 1);
   };
 
+  const handleRestart = () => {
+    setCurrentPage(1);
+  };
+
   const handleEdit = (pageNumber) => {
     setPreviousPage(21); // Store that we came from display page
     setCurrentPage(pageNumber);
@@ -79,6 +82,7 @@ export default function Form({ isViewing = false, isEditing = false }) {
         {currentPage === 20 && <ServiceAvailed2 handleNext={handleNext} handleBack={handleBack}/>}
         {currentPage === 21 && 
           <DisplaySurvey 
+          handleRestart={handleRestart}
           handleBack={handleBack} 
           handleEdit={handleEdit} 
           isEditing={editing}

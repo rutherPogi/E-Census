@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
+import { ArrowBack } from "@mui/icons-material";
 
 import { post, put } from '../../../../../utils/api/apiService';
 
@@ -10,6 +11,8 @@ import { DisplayInfoSections } from '../others/DisplaySection/DisplaySection';
 import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useTransformData } from "../../hooks/useTransformData";
+
+
 
 
 export default function DisplayPWDInfo ({ 
@@ -27,6 +30,8 @@ export default function DisplayPWDInfo ({
   const { pwdApplicationID } = useParams();
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing || isViewing);
 
   const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(pwdApplicationID, null, true);
@@ -42,20 +47,26 @@ export default function DisplayPWDInfo ({
   useEffect(() => {
     if (isEditing && !initialFetchDone) {
       console.log('Fetching application data for editing');
+      setIsLoading(true);
       fetchPersonData()
         .then(() => {
           setInitialFetchDone(true);
+          setIsLoading(false);
         })
         .catch(err => {
           console.error('Error fetching application data:', err);
           setInitialFetchDone(true);
+          setIsLoading(false);
         });
     }
   }, [isEditing, initialFetchDone, fetchPersonData]);
 
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     try {
       const formDataToSend = new FormData();
@@ -107,33 +118,63 @@ export default function DisplayPWDInfo ({
   };
 
   return (
-    <div className='responsive-container'>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3}}>
       <Box
-        sx={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          gap: '2em',
-          backgroundColor: '#fff',
-          padding: '1em'
-      }}>
-        
-        <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
-        
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          backgroundColor: 'white',
+          padding: '1em',
+          borderRadius: 2
+        }}
+      >
+        <IconButton 
+          onClick={() => navigate(-1)} 
+          size="medium"
+          sx={{ mr: 1 }}
+        >
+          <ArrowBack/>
+        </IconButton>
+        <Typography>
+          {isLoading ? 'Loading Application...' : `PWD Application #${formData.personalInfo.pwdApplicationID}`}
+        </Typography>
+        {isLoading && (
+          <CircularProgress 
+            size={24} 
+            sx={{ ml: 2 }}
+          />
+        )}
       </Box>
-      {!isViewing && (<FormButtons
-        onBack = {handleBack} 
-        onNext = {handleSubmit} 
-        backLabel = 'Back' 
-        nextLabel = {isUpdating && !firstMount  ? 'Update' : 'Submit'}
-        nextDisabled = { firstMount }
-      />)}
+
+      <Box>
+
+        <DisplayInfoSections 
+          formData={formData} 
+          handleEdit={handleEdit} 
+          isViewing={isViewing}
+          isLoading={isLoading}
+        />
+
+        {!isViewing && (!isLoading && (
+          <FormButtons
+            onBack = {handleBack} 
+            onNext = {handleSubmit} 
+            backLabel = 'Back' 
+            nextLabel = {isUpdating && !firstMount ? 'Update' : isSubmitting ? 'Submitting' : 'Submit'}
+            nextDisabled={firstMount || isSubmitting}
+            isLoading={isSubmitting}
+          />
+        ))}
+
+      </Box>
+        
       <Notification
         snackbarMessage={snackbarMessage} 
         snackbarOpen={snackbarOpen} 
         setSnackbarOpen={setSnackbarOpen} 
         severity={severity}
       />
-    </div>
+    </Box>
     
   );
 }

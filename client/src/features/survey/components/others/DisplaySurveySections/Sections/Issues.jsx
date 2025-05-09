@@ -1,23 +1,5 @@
-import { 
-  Box, 
-  Typography, 
-  Grid, 
-  Card, 
-  CardContent, 
-  Divider,
-  useTheme,
-  Paper,
-  Button,
-  Tooltip,
-  useMediaQuery
-} from "@mui/material";
-import {
-  Help,
-  Info,
-  Edit,
-  EscalatorWarning
-} from "@mui/icons-material";
-import { formatters } from "../../../../utils/formatter";
+import { Box, Typography, Divider, useTheme, Button, Tooltip, useMediaQuery } from "@mui/material";
+import { Help, Edit } from "@mui/icons-material";
 
 
 
@@ -26,7 +8,9 @@ export const Issues = ({ formData, handleEdit, isViewing = false }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const issues = formData.issues;
+  const issues = formData.communityIssues;
+
+  console.log(issues);
   
   return (
     <Box
@@ -47,7 +31,7 @@ export const Issues = ({ formData, handleEdit, isViewing = false }) => {
         {!isViewing && (
           <Tooltip title="Edit section">
             <Button
-              onClick={() => handleEdit(1)}
+              onClick={() => handleEdit(18)}
               variant="outlined"
               color="primary"
               startIcon={<Edit/>}
@@ -72,7 +56,7 @@ export const Issues = ({ formData, handleEdit, isViewing = false }) => {
           
           <Divider sx={{ mb: 2 }} />
 
-          <Typography variant="body2">{issues || 'N/A'}</Typography>
+          <Typography variant="body2">{issues.issues || 'N/A'}</Typography>
         </Box>
       </Box>  
     </Box>

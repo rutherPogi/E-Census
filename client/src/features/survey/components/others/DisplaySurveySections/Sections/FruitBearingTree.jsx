@@ -43,12 +43,12 @@ export const FruitBearingTreeSection = ({ formData, handleEdit, isViewing = fals
           {!isViewing && (
             <Tooltip title="Edit section">
               {isSmallScreen ? (
-                <IconButton onClick={() => handleEdit(10)} color="primary">
+                <IconButton onClick={() => handleEdit(14)} color="primary">
                   <Edit />
                 </IconButton>
               ) : (
                 <Button
-                  onClick={() => handleEdit(10)}
+                  onClick={() => handleEdit(14)}
                   variant="outlined"
                   color="primary"
                   startIcon={<Edit />}

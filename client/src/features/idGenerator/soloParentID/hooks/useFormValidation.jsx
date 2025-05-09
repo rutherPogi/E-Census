@@ -55,7 +55,7 @@ export const useFormValidation = (
   const handleChange = (field) => (e, newValue) => {
     let value;
     
-    if (e === '' && newValue === null) {
+    if (newValue === null) {
       value = '';
     } else if (newValue?.value !== undefined) {
       // For dropdown/autocomplete

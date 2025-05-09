@@ -1,5 +1,5 @@
-import { useTheme, useMediaQuery, Box, Typography, Divider} from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { useState } from "react";
+import { Box, Tabs, Tab, Skeleton } from "@mui/material";
 
 import { PersonalInfoSection } from "./PersonalInfoSection";
 import { SCMediaSection } from "./SCMediaSection";
@@ -8,64 +8,77 @@ import { FamilyProfileSection } from "./FamilyCompositionSection";
 
 
 
-export const DisplayInfoSections = ({ formData, handleEdit, isViewing }) => {
+export const DisplayInfoSections = ({ formData, handleEdit, isViewing, isLoading }) => {
 
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
-  
-  // Determine responsive variant based on screen size
-  const getTitleVariant = () => {
-    if (isMobile) return "h7";
-    if (isTablet) return "h6";
-    return "h5";
-  };
-  
-  const titleVariant = getTitleVariant();
-  
-  // Common style for all section headers
-  const titleStyle = { 
-    fontWeight: 'bold', 
-    color: '#1976d2' 
+  const [tabValue, setTabValue] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
   };
 
-  const renderSectionHeader = (title, sectionIndex) => (
-    <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1}}>
-      <Typography variant={titleVariant} sx={titleStyle}>
-        {title}
-      </Typography>
-      {!isViewing && (
-        <Edit 
-          onClick={() => handleEdit(sectionIndex)}
-          sx={{ fontSize: 18, color: 'primary.main', cursor: 'pointer' }} 
-        />
-      )}
+  const tabLabels = [
+    "Personal Info",
+    "Family Composition",
+    "ID & SIGNATURE",
+  ];
+
+  const SectionSkeleton = () => (
+    <Box sx={{ 
+      backgroundColor: 'white',
+      padding: { xs: '1em', md: '2em' }
+    }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+        <Skeleton variant="rectangular" width="40%" height={32} />
+        <Skeleton variant="rectangular" width="10%" height={32} />
+      </Box>
+      <Box sx={{ mt: 2 }}>
+        <Skeleton variant="rectangular" width="100%" height={200} />
+      </Box>
     </Box>
   );
 
   return (
-
-    
-    <>
-      {/* PERSONAL INFORMATION SECTION */}
+    <Box>
       <Box>
-        {renderSectionHeader('Personal Information', 1)}
-        <Divider sx={{ mb: 2 }} />
-        {PersonalInfoSection(formData?.personalInfo)}
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange}
+          variant="scrollable" 
+          scrollButtons="auto"
+          indicatorColor="none"
+        >
+          {tabLabels.map((label, index) => (
+            <Tab
+              key={label}
+              label={label}
+              sx={{
+                borderRadius: "8px 8px 0 0",
+                backgroundColor: tabValue === index ? "#fff" : "#f5f5f5",
+                padding: "10px 20px",
+                marginRight: index < tabLabels.length - 1 ? 1 : 0,
+                boxShadow: tabValue === index ? "2px 2px 5px rgba(0,0,0,0.2)" : "none",
+              }}
+            />
+          ))}
+        </Tabs>
       </Box>
 
-      <Box>
-        {renderSectionHeader('Family Composition', 3)}
-        <Divider sx={{ mb: 2 }} />
-        {FamilyProfileSection(formData?.familyComposition)}
-      </Box>
+      {isLoading && (<SectionSkeleton />)}
 
-      <Box>
-        {renderSectionHeader('PhotoID and Signature', 4)}
-        <Divider sx={{ mb: 2 }} />
-        {SCMediaSection(formData?.scMedia)}
-      </Box>
-    </>
+      {!isLoading && (
+        <>
+          {/* PERSONAL INFORMATION SECTION */}
+          {tabValue === 0 && <PersonalInfoSection member={formData?.personalInfo} handleEdit={handleEdit} isViewing={isViewing}/> }
+
+          {/* FAMILY PROFILE SECTION */}
+          {tabValue === 1 && <FamilyProfileSection members={formData?.familyComposition} handleEdit={handleEdit} isViewing={isViewing}/> }
+
+          {/* SC MEDIA SECTION */}
+          {tabValue === 2 && <SCMediaSection media={formData?.scMedia} handleEdit={handleEdit} isViewing={isViewing}/> }
+        </>
+      )}
+
+    </Box>
   );
 };
 

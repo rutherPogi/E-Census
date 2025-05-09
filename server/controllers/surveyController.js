@@ -27,17 +27,19 @@ export const newSurveyID = async (req, res) => {
 };
 
 export const submitSurvey = async (req, res) => {
+
   const connection = await pool.getConnection();
   
   try {
 
     await connection.beginTransaction();
 
+    const surveyData = JSON.parse(req.body.surveyData);   
     const surveyID = await surveyModel.generateSurveyId(connection);
-    console.log('SURVEY ID:', surveyID);
-
-    const surveyData = JSON.parse(req.body.surveyData);
     const populationID = `P${surveyID}`;
+
+    console.log('SUBMITTING SURVEY APPLICATION');
+    console.log('SURVEY ID:', surveyID);
     
     console.log("Inserting Survey Details");
     await surveyModel.createSurvey(surveyID, surveyData.surveyData, connection);
@@ -177,7 +179,7 @@ export const updateSurvey = async (req, res) => {
     await connection.beginTransaction();
 
     const surveyData = JSON.parse(req.body.surveyData);
-    console.log('SURVEY DATA:', surveyData);
+
     const surveyID = surveyData.surveyData.surveyID;
     const householdID = surveyData.surveyData.householdID;
     const populationID = `P${surveyID}`;

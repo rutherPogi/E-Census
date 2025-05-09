@@ -56,8 +56,8 @@ export default function OtherInfo({ handleBack, handleNext}) {
     
     Object.keys(processedValues).forEach((key) => {
       const value = processedValues[key];
-      if (value === '' || value === null) {
-        processedValues[key] = 'N/A';
+      if (value === '' || value === undefined) {
+        processedValues[key] = null;
       }
     });
 

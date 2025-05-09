@@ -8,8 +8,8 @@ export const FormButtons = ({
   backLabel = 'Cancel', 
   nextLabel = 'Next', 
   backDisabled = false,
-  nextDisabled = false
-
+  nextDisabled = false,
+  isLoading = false
 }) => {
   return (
     <div className='form-buttons'>
@@ -27,6 +27,7 @@ export const FormButtons = ({
           onClick={onNext} 
           sx={{ width: '100%' }}
           disabled={nextDisabled}
+          loading={isLoading}
         >
           {nextLabel}
         </Button>

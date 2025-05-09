@@ -18,6 +18,5 @@ export { default as ServiceAvailed } from './ServiceAvailed';
 export { default as ServiceAvailed2 } from './ServiceAvailed2';
 export { default as WaterInfo } from './WaterInfo';
 
-export { default as ViewSurvey } from './ViewSurvey';
 export { default as DisplaySurvey } from './DisplaySurvey';
 export { default as SurveyDetails } from './SurveyDetails';

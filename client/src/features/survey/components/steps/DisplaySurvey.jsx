@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
 import { ArrowBack } from "@mui/icons-material";
 
 import { useFormContext } from "../../pages/FormContext";
@@ -13,10 +13,8 @@ import { Notification, FormButtons } from '../../../../components/common';
 
 import DisplaySurveySections from "../others/DisplaySurveySections/DisplaySurveySections";
 
-
-
-
 export default function DisplaySurvey({ 
+  handleRestart,
   handleBack, 
   handleEdit, 
   isEditing = false, 
@@ -30,8 +28,11 @@ export default function DisplaySurvey({
   const surveyID = params.id;
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing || isViewing); // Initialize as true if we're editing
+  const [fetchError, setFetchError] = useState(null);
 
-  const { formData, setEntireFormData, clearFormData } = useFormContext();
+  const { formData, clearFormData } = useFormContext();
   const { fetchSurveyData } = useSurveyData(surveyID);
 
   const { 
@@ -45,29 +46,35 @@ export default function DisplaySurvey({
   useEffect(() => {
     if (isEditing && !initialFetchDone) {
       console.log('Fetching survey data for editing');
+      setIsLoading(true);
       fetchSurveyData()
         .then(() => {
           setInitialFetchDone(true);
+          setIsLoading(false);
         })
         .catch(err => {
           console.error('Error fetching survey data:', err);
           setInitialFetchDone(true);
+          setIsLoading(false);
+          setFetchError(err.message || 'Failed to load survey data');
+          showNotification('Error loading survey data', 'error');
         });
     }
-  }, [isEditing, initialFetchDone, fetchSurveyData]);
+  }, [isEditing, initialFetchDone, fetchSurveyData, showNotification]);
 
   
   const handleSubmit = async (e) => {
+    
     e.preventDefault();
     
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+        
+  
     try {
       const formDataToSend = new FormData();
-      
       const processedFormData = { ...formData };
 
-     
-      await saveSurveyToDB(`local-${Date.now()}`, processedFormData);
-      
       if (formData.houseInfo?.houseImages && formData.houseInfo.houseImages.length > 0) {
 
         formData.houseInfo.houseImages.forEach((imageObj) => {
@@ -83,35 +90,44 @@ export default function DisplaySurvey({
       }
 
       formDataToSend.append('surveyData', JSON.stringify(processedFormData));
-
-      if(isUpdating) {
-        console.log('SURVEY DATA:', processedFormData);
+  
+      if (isUpdating) {
+        console.log('UPDATING...', processedFormData);
         await put('/surveys/update', formDataToSend, true);
         showNotification('Survey updated successfully!', 'success');
       } else {
-        console.log('SURVEY DATA:', processedFormData);
+        console.log('SUBMITTING...', processedFormData);
         await post('/surveys/submit', formDataToSend, true);
         showNotification('Survey submitted successfully!', 'success');
       }
-
-      // Delete local data only if server confirms
-      await deleteSurveyFromDB(`local-${Date.now()}`);
-
+  
+      setTimeout(() => handleRestart(), 1000);
       clearFormData();
-      setTimeout(() => navigate('/main/survey/add'), 1000);
     } catch (error) {
       console.error('Error submitting survey:', error);
-      showNotification('Survey submission failed. Data saved for retry.', 'error');
+      showNotification('Survey submission failed. Saving data locally...', 'error');
+  
+      try {
+        await saveSurveyToDB(`local-${Date.now()}`, processedFormData);
+        showNotification('Survey saved locally. Please resubmit when online.', 'info');
+      } catch (localErr) {
+        console.error('Local save failed:', localErr);
+        showNotification('Local save failed. Please do not close this page.', 'error');
+      }
+  
       if (error.response) {
         showNotification(`Server error: ${error.response.data.message || 'Unknown error'}`, 'error');
       } else if (error.request) {
-        showNotification('Your answers have been saved locally. Please check your connection and resubmit later.', 'info');
+        showNotification('Connection issue. Your data has been saved locally.', 'info');
       } else {
-        showNotification(`Error preparing request: ${error.message}`, 'error');
+        showNotification(`Unexpected error: ${error.message}`, 'error');
       }
+    } finally {
+      // Reset submission state regardless of success or failure
+      setIsSubmitting(false);
     }
   };
-
+  
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3}}>
       <Box
@@ -130,20 +146,35 @@ export default function DisplaySurvey({
           <ArrowBack/>
         </IconButton>
         <Typography>
-          Survey #{formData.surveyData.surveyID}
+          {isLoading ? 'Loading survey...' : `Survey #${formData?.surveyData?.surveyID || ''}`}
         </Typography>
+        {isLoading && (
+          <CircularProgress 
+            size={24} 
+            sx={{ ml: 2 }}
+          />
+        )}
       </Box> 
 
       <Box>
-        <DisplaySurveySections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
+        <DisplaySurveySections 
+          formData={formData} 
+          handleEdit={handleEdit} 
+          isViewing={isViewing}
+          isLoading={isLoading}
+          error={fetchError}
+        />
 
-        {!isViewing && (<FormButtons
-          onBack = {handleBack} 
-          onNext = {handleSubmit} 
-          backLabel = 'Back' 
-          nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
-          nextDisabled = { firstMount } 
-        />)}
+        {!isViewing && (!isLoading && (
+          <FormButtons
+            onBack={handleBack} 
+            onNext={handleSubmit} 
+            backLabel='Back' 
+            nextLabel={isUpdating && !firstMount ? 'Update' : isSubmitting ? 'Submitting' : 'Submit'}
+            nextDisabled={firstMount || isSubmitting}
+            isLoading={isSubmitting}
+          />
+        ))}
 
         <Notification
           snackbarMessage={snackbarMessage} 

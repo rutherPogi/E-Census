@@ -2,15 +2,10 @@ import { Box, Typography, Paper, Chip, Grid, Divider, Tooltip, Button, Container
 import { Call, Edit, Person, Work } from "@mui/icons-material";
 import { formatters } from "../../../../utils/formatter";
 
-export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => {
 
-  if (!member) {
-    return (
-      <Box sx={{ textAlign: 'center', py: 3 }}>
-        <Typography color="text.secondary">No Personal Information added.</Typography>
-      </Box>
-    );
-  }
+
+
+export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => {
   
   return (
     <Box 

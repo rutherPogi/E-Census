@@ -87,6 +87,12 @@ export const RenderExpensesTable = ({ formData, expenseType, handleEdit, isViewi
                   </TableCell>
                 </TableRow>
               )}
+              <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableCell sx={{ fontWeight: 'bold' }}>TOTAL</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 'bold' }}>
+                  {`₱${total ? total.toFixed(2) : '0.00'}`}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

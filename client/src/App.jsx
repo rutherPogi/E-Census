@@ -27,7 +27,7 @@ import SPFindPerson from './features/idGenerator/soloParentID/pages/FindPerson.j
 import EditPost from './features/post/pages/EditPost.jsx';
 import AddPost from './features/post/pages/AddPost.jsx';
 import PostLists from './features/post/pages/PostLists.jsx';
-import ViewPost from './features/post/pages/ViewPost.jsx';
+import ViewPost from './features/Home/pages/ViewPost.jsx';
 import Segregation from './features/dataBank/pages/Segregation.jsx';
 import YouthMasterlist from './features/dataBank/pages/YouthMasterlist.jsx';
 import OSY from './features/dataBank/pages/OSY.jsx';
@@ -47,7 +47,7 @@ export default function App() {
       window.matchMedia('(display-mode: standalone)').matches ||
       window.navigator.standalone === true;
 
-    const isLoggedIn = Boolean(localStorage.getItem('auth_token'));
+    const isLoggedIn = Boolean(localStorage.getItem('authToken'));
     const alreadyRedirected = sessionStorage.getItem('alreadyRedirected');
 
     if (isInStandaloneMode && location.pathname === '/' && !alreadyRedirected) {

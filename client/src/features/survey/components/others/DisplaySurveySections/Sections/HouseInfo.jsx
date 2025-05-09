@@ -48,7 +48,7 @@ export const HouseInfoSection = ({ formData, handleEdit, isViewing = false }) =>
         {!isViewing && (
           <Tooltip title="Edit section">
             <Button
-              onClick={() => handleEdit(3)}
+              onClick={() => handleEdit(8)}
               variant="outlined"
               color="primary"
               startIcon={<Edit/>}

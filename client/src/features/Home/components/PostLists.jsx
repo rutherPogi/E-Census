@@ -4,7 +4,7 @@ import { Box, Grid, Container, Typography, IconButton } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos, BusinessCenterOutlined, InfoOutlined } from "@mui/icons-material";
 
 import { get } from "../../../utils/api/apiService";
-import Posts from "../components/Posts";
+import Posts from "./Posts";
 
 const PostLists = () => {
   const navigate = useNavigate();
@@ -105,12 +105,14 @@ const PostLists = () => {
   if (error) return <Box>Error loading posts: {error}</Box>;
 
   return (
-    <Container>    
+    <Container >    
       {/* NEWS and UPDATES */}
       <Box>
         <Box 
           sx={{
             display: 'flex', 
+            flexDirection: {xs: 'column', sm: 'row'},
+            gap: 2,
             justifyContent: 'space-between', 
             alignItems: 'center',
             borderBottom: '5px solid #FF5733',
@@ -128,7 +130,7 @@ const PostLists = () => {
             NEWS AND UPDATES
           </Typography>
 
-          <Box sx={{ textAlign: 'right' }}>
+          <Box sx={{ textAlign: {xs: 'center', sm:'right'} }}>
             <Typography 
               variant="subtitle1"
               sx={{ 
@@ -235,7 +237,7 @@ const PostLists = () => {
         <Box 
           sx={{
             display: 'flex', 
-            justifyContent: 'space-between', 
+            justifyContent: {xs: 'center', sm: 'left'},
             alignItems: 'center',
             borderBottom: '5px solid #FF5733',
             pb: 2,

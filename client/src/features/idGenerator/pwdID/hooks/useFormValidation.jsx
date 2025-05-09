@@ -60,8 +60,9 @@ export const useFormValidation = (
   // Handle changes for text inputs and dropdowns
   const handleChange = (field) => (e, newValue) => {
     let value;
-    
-    if (e === '' && newValue === null) {
+
+    if (newValue === null) {
+      // When clearing dropdown
       value = '';
     } else if (newValue?.value !== undefined) {
       // For dropdown/autocomplete

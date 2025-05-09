@@ -35,12 +35,12 @@ export const AppliancesSection = ({ formData, handleEdit, isViewing = false }) =
           {!isViewing && (
             <Tooltip title="Edit section">
               {isSmallScreen ? (
-                <IconButton onClick={() => handleEdit(10)} color="primary">
+                <IconButton onClick={() => handleEdit(16)} color="primary">
                   <Edit />
                 </IconButton>
               ) : (
                 <Button
-                  onClick={() => handleEdit(10)}
+                  onClick={() => handleEdit(16)}
                   variant="outlined"
                   color="primary"
                   startIcon={<Edit />}

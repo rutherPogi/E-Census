@@ -30,7 +30,7 @@ export const FarmlotsSection = ({ formData, handleEdit, isViewing = false }) => 
         {!isViewing && (
           <Tooltip title="Edit section">
             <Button
-              onClick={() => handleEdit(10)}
+              onClick={() => handleEdit(12)}
               variant="outlined"
               color="primary"
               startIcon={<Edit />}

@@ -36,12 +36,12 @@ export const FamilyResourcesSection = ({ formData, handleEdit, isViewing = false
           {!isViewing && (
             <Tooltip title="Edit section">
               {isSmallScreen ? (
-                <IconButton onClick={() => handleEdit(10)} color="primary">
+                <IconButton onClick={() => handleEdit(15)} color="primary">
                   <Edit />
                 </IconButton>
               ) : (
                 <Button
-                  onClick={() => handleEdit(10)}
+                  onClick={() => handleEdit(15)}
                   variant="outlined"
                   color="primary"
                   startIcon={<Edit />}

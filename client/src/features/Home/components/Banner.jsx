@@ -43,63 +43,11 @@ const Banner = ({ onLogin }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(42, 42, 58, 0.9)',
+          backgroundColor: 'rgba(42, 42, 58, 0.8)',
         }}
       />
 
-      {/* Header with Logo and Login */}
-      <Box sx={{ width: '100%', position: "absolute", top: 0, zIndex: 2 }}>
-        <Toolbar sx={{ 
-          display: "flex", 
-          justifyContent: "space-between",
-          px: { xs: 1, sm: 2, md: 3 }
-        }}>
-          {/* App Logo and Name */}
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Box
-              component="img"
-              src={mswdoLogo}
-              alt="eCensus Logo"
-              sx={{
-                height: { xs: '20px', sm: '30px' },
-                marginRight: { xs: '5px', sm: '10px' },
-              }}
-            />
-            {!isMobile && (<Typography 
-              variant={isMobile ? "body1" : "h6"}
-              sx={{
-                color: '#fff',
-                fontFamily: 'Prosto One',
-                fontSize: { xs: '1rem', sm: '1.25rem' }
-              }}
-            >
-              <span style={{ color: '#FF5733' }}>e</span>-tbayat MSWDO
-            </Typography>)}
-          </Box>
-          
-          {/* Login Button */}
-          <Tooltip title="Login">
-            <Button
-              startIcon={!isMobile ? <PersonIcon /> : null}
-              variant="outlined"
-              onClick={onLogin}
-              sx={{
-                color: '#fff',
-                borderColor: '#FF5733',
-                '&:hover': {
-                  borderColor: '#fff',
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                },
-                fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.8rem' },
-                py: { xs: 0.5, sm: 0.75 },
-                px: { xs: 1, sm: 1.5 }
-              }}
-            >
-              Login
-            </Button>
-          </Tooltip>
-        </Toolbar>
-      </Box>
+
 
       {/* Banner Content */}
       <Container
@@ -123,25 +71,23 @@ const Banner = ({ onLogin }) => {
             marginBottom: { xs: 2, md: 4 },
           }}
         >
-          {/* Municipality Logo */}
-          
-          
+
           {/* Municipality Name */}
           <Box>
-          <Box
-            component="img"
-            src={itbayatLogo}
-            alt="Itbayat Logo"
-            sx={{
-              height: { xs: '70px', sm: '80px', md: '150px' },
-              marginRight: { xs: 0, md: 2 },
-              marginBottom: { xs: 1, md: 0 },
-            }}
-          />
+            <Box
+              component="img"
+              src={itbayatLogo}
+              alt="Itbayat Logo"
+              sx={{
+                height: { xs: '70px', sm: '100px', md: '200px' },
+                marginRight: { xs: 0, md: 2 },
+                marginBottom: { xs: 1, md: 0 },
+              }}
+            />
             <Typography
               variant={isMobile ? "h4" : isTablet ? "h3" : "h2"}
               sx={{
-                color: '#FF5733',
+                color: '#FF7448',
                 fontWeight: 'bold',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
                 fontSize: { xs: '1.5rem', sm: '2.5rem', md: '3rem' }

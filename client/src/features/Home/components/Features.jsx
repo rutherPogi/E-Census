@@ -1,47 +1,68 @@
-import { Typography, Box, useMediaQuery, useTheme } from "@mui/material";
+import { Typography, Box, useTheme } from "@mui/material";
+
 import digitalSurvey from '../../../assets/digitalSurvey.png';
 import idGenerator from '../../../assets/idGenerator.png';
 import hazzardMap from '../../../assets/hazzardMap.png';
 
 
 
-const FeatureBox = ({ image, title, description }) => (
-  <Box 
-    sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      textAlign: 'center',
-      p: 2,
-      maxWidth: 300,
-      width: '100%',
-      transition: 'transform 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-5px)'
-      }
-    }}
-  >
+const FeatureBox = ({ image, title, description }) => {
+
+  const theme = useTheme();
+  
+  return (
     <Box 
-      component="img"
-      src={image} 
-      alt={title}
       sx={{
-        width: {xs:70, sm: 100, md: 150},
-        height: {xs:70, sm: 100, md: 150},
-        mb: 2
-      }}
-    />
-    <Typography 
-      sx={{ 
-        fontSize: { xs: 16, sm: 24 }, 
-        fontWeight: 'bold',
-        mb: 1
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        p: { xs: 1, sm: 2 },
+        maxWidth: { xs: 250, sm: 300 },
+        width: '100%',
+        borderRadius: 2
       }}
     >
-      {title}
-    </Typography>
-  </Box>
-);
+      <Box 
+        className="image-container"
+        sx={{
+          border: {xs: '3px solid #DC623C', sm: '5px solid #DC623C'},
+          borderRadius: '50%',
+          width: { xs: 40, sm: 100 },
+          height: { xs: 40, sm: 100 },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
+          mb: 2,
+          padding: { xs: 2, sm: 3 }
+        }}
+      >
+        <Box 
+          component="img"
+          src={image} 
+          alt={title}
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      </Box>
+      
+      <Typography 
+        className="feature-title"
+        sx={{
+          color: '#DC623C',
+          fontSize: { xs: 16, sm: 20, md: 24 }, 
+          fontWeight: 'bold'
+        }}
+      >
+        {title}
+      </Typography>
+    </Box>
+  );
+};
 
 
 const Features = () => {
@@ -68,7 +89,7 @@ const Features = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: { xs: 3, md: 5 },
+        gap: { xs: .5, md: 5 },
         width: '100%'
       }}
     >

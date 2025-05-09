@@ -16,6 +16,5 @@ export const MANAGE_TABLE_HEADERS = [
   'Remarks',
   'PWD ID',
   'Solo Parent ID',
-  'Senior Citizen ID',
-  'Actions'
+  'Senior Citizen ID'
 ];

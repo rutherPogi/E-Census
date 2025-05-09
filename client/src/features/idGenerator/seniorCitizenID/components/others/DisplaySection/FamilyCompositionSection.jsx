@@ -1,78 +1,138 @@
-import { Box, Typography, Paper, Chip, Grid, Divider } from "@mui/material";
+import { Box, Typography, Chip, Grid, Divider, Card, CardContent, Tooltip, Button, Paper } from "@mui/material";
+import { Edit, Person, Work, People } from "@mui/icons-material";
 import { formatters } from "../../../../utils/formatter";
 
-export const FamilyProfileSection = (members) => {
 
-  if (!members || members.length === 0) return null;
+
+export const FamilyProfileSection = ({ members, handleEdit, isViewing = false }) => {
   
   return (
-    <Box sx={{ mb: 4 }}>
-      {members.map((member, index) => (
-        <Paper key={index} elevation={1} sx={{ p: 3, mb: 3, borderRadius: '12px' }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: { xs: 'flex-start', sm: 'center' },
-            flexDirection: { xs: 'column', sm: 'row' }, 
-            mb: 2 
-          }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {`${member.firstName} 
-                ${member.middleName === 'N/A' ? '' : member.middleName} 
-                ${member.lastName} 
-                ${member.suffix === 'N/A' ? '' : member.suffix}`.trim()}
-            </Typography>
-            <Chip 
-              size="small" 
-              label= {member.relationship} 
-              color="primary" 
-              sx={{ 
-                ml: { xs: 0, sm: 1 },
-                mt: { xs: 0.5, sm: 0 }
-              }} 
-            />
+    <Box
+      sx={{ 
+        backgroundColor: 'white',
+        padding: '2em'
+        }}
+      >
+        <Box sx={{
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          mb: 2,
+          pb: 1
+        }}>
+          <Box sx={{ alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center'}}>
+              <People/>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                FAMILY COMPOSITION
+              </Typography> 
+            </Box>
           </Box>
+          {!isViewing && (
+            <Tooltip title="Edit section">
+              <Button
+                onClick={() => handleEdit(3)}
+                variant="outlined"
+                color="primary"
+                startIcon={<Edit/>}
+              >
+                EDIT
+              </Button>
+            </Tooltip>
+          )}
+        </Box>
 
-          {/* PERSONAL INFORMATION SECTION */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Personal Information
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Age</Typography>
-                <Typography variant="body2">{member.age}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Civil Status</Typography>
-                <Typography variant="body2">{member.civilStatus || 'N/A'}</Typography>
-              </Grid>
-            </Grid>
-          </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {members.map((member, index) => (
+          <Grid item xs={12} key={index}>
+            <Card sx={{ border: '1px solid #ccc', borderRadius: 2 }}>
+              <CardContent>
+                {/* HEADER WITH NAME AND RELATIONSHIP */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: { xs: 'flex-start', sm: 'center' },
+                  flexDirection: { xs: 'column', sm: 'row' }, 
+                  mb: 2 
+                }}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      {`${member.firstName || ''} 
+                        ${member.middleName === 'N/A' ? '' : member.middleName || ''} 
+                        ${member.lastName || ''} 
+                        ${member.suffix === 'N/A' ? '' : member.suffix || ''}`.trim()}
+                    </Typography>
+                    {member.relationship && (
+                      <Chip 
+                        size="small" 
+                        label={member.relationship} 
+                        color="primary" 
+                        sx={{ mt: 0.5 }} 
+                      />
+                    )}
+                  </Box>
+                </Box>
+                
+                <Divider sx={{ mb: 3 }} />
 
-          {/* PROFESSIONAL INFORMATION SECTION */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
-              Professional Information
-            </Typography>
-            <Divider sx={{ mb: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Occupation</Typography>
-                <Typography variant="body2">{member.occupation || 'N/A'}</Typography>
-              </Grid>
-              
-              <Grid item xs={12} sm={6} md={3}>
-                <Typography variant="subtitle2" color="text.secondary">Annual Income</Typography>
-                <Typography variant="body2">{
-                  member.annualIncome ? formatters.currency ? formatters.currency(member.annualIncome) : member.annualIncome : 'N/A'
-                }</Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        </Paper>
-      ))}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Box sx={{ border: '1px solid #ccc', borderRadius: 2, padding: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2}}>
+                      <Person color="primary"/>
+                      <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
+                        PERSONAL INFORMATION
+                      </Typography>
+                    </Box>
+                    
+                    <Divider sx={{ mb: 2 }} />
+                    
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="subtitle2" color="text.secondary">Age</Typography>
+                        <Typography variant="body2">{member.age}</Typography>
+                      </Grid>
+                      
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="subtitle2" color="text.secondary">Birthdate</Typography>
+                        <Typography variant="body2">{formatters.date(member.birthdate)}</Typography>
+                      </Grid>
+                      
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="subtitle2" color="text.secondary">Civil Status</Typography>
+                        <Typography variant="body2">{member.civilStatus || 'N/A'}</Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+
+                  <Box sx={{ border: '1px solid #ccc', borderRadius: 2, padding: 2 }}>
+                    <Box sx={{ display: 'flex', gap: 2}}>
+                      <Work color="primary"/>
+                      <Typography variant="subtitle1" color="primary" sx={{ mb: 1, fontWeight: 'medium' }}>
+                        PROFESSIONAL INFORMATION
+                      </Typography>
+                    </Box>
+                    
+                    <Divider sx={{ mb: 2 }} />
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="subtitle2" color="text.secondary">Occupation</Typography>
+                        <Typography variant="body2">{member.occupation || 'N/A'}</Typography>
+                      </Grid>
+                      
+                      <Grid item xs={12} sm={6} md={3}>
+                        <Typography variant="subtitle2" color="text.secondary">Annua Income</Typography>
+                        <Typography variant="body2">{`₱${formatters.currency(member.annualIncome)}`}</Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </Box>
+
+                
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Box>
+
     </Box>
   );
 };

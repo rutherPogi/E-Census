@@ -2,19 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Box, Typography, Container, Button } from "@mui/material";
 import Banner from "../components/Banner";
-import PostLists from "./PostLists";
+import PostLists from "../components/PostLists";
 import Features from "../components/Features";
+import Topbar from "../components/Topbar";
 
 export default function LandingPage() {
+
   const navigate = useNavigate();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
-
-  const today = new Date(2025, 2, 25).toLocaleDateString('en-US', {
-    month: 'long',
-    day: '2-digit',
-    year: 'numeric',
-  });
 
   const handleLogin = () => {
     navigate('/login');
@@ -31,6 +27,7 @@ export default function LandingPage() {
 
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
+
 
   const handleInstallClick = () => {
     if (deferredPrompt) {
@@ -49,21 +46,15 @@ export default function LandingPage() {
 
   return (
     <Box sx={{ width: '100%', overflow: 'hidden', bgcolor: '#fff' }}>
-      {/* Hero Banner Section */}
-      <Banner onLogin={handleLogin} />
 
-      <Container>
-        {/* Features Section */}
-        <Box sx={{ 
-          py: { xs: 4, md: 6 },
-          px: { xs: 2, md: 4 },
-          mb: { xs: 4, md: 6 },
-        }}>
-          <Features />
-        </Box>
-
+      <Topbar onLogin={handleLogin}/>      
+      
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: {xs: 5, sm: 10}}}>
+        <Banner />
+        <Features/>
         <PostLists />
-      </Container>
+      </Box>
+      
 
       {/* Install Button at Bottom */}
       {showInstallButton && (

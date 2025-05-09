@@ -44,12 +44,12 @@ export const RenderLivestockTable = ({ formData, handleEdit, isViewing = false }
             {!isViewing && (
               <Tooltip title="Edit section">
                 {isSmallScreen ? (
-                  <IconButton onClick={() => handleEdit(10)} color="primary">
+                  <IconButton onClick={() => handleEdit(11)} color="primary">
                     <Edit />
                   </IconButton>
                 ) : (
                   <Button
-                    onClick={() => handleEdit(10)}
+                    onClick={() => handleEdit(11)}
                     variant="outlined"
                     color="primary"
                     startIcon={<Edit />}

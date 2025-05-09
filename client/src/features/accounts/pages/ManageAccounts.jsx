@@ -20,7 +20,7 @@ const ManageAccounts = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(5);
+  const [rowsPerPage] = useState(10);
   const [selectedAccounts, setSelectedAccounts] = useState([]);
   
   const [deleteDialog, setDeleteDialog] = useState({

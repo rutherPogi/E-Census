@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Box, Button, IconButton, Typography, Tabs, Tab } from '@mui/material';
+import { Box, IconButton, Typography, CircularProgress } from '@mui/material';
+import { ArrowBack } from "@mui/icons-material";
 
 import { post, put } from '../../../../../utils/api/apiService';
 
@@ -10,7 +11,7 @@ import { DisplayInfoSections } from '../others/DisplaySection/DisplaySection';
 import { useFormContext } from "../others/FormContext";
 import { useNotification } from '../../hooks/useNotification';
 import { useTransformData } from "../../hooks/useTransformData";
-import { ArrowBack } from "@mui/icons-material";
+
 
 
 
@@ -29,6 +30,8 @@ export default function DisplaySPInfo ({
   const { spApplicationID } = useParams();
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(isEditing || isViewing);
 
   const { formData, updateFormData } = useFormContext();
   const { fetchPersonData } = useTransformData(spApplicationID, null, true);
@@ -44,20 +47,26 @@ export default function DisplaySPInfo ({
   useEffect(() => {
     if (isEditing && !initialFetchDone) {
       console.log('Fetching application data for editing');
+      setIsLoading(true);
       fetchPersonData()
         .then(() => {
           setInitialFetchDone(true);
+          setIsLoading(false);
         })
         .catch(err => {
           console.error('Error fetching application data:', err);
           setInitialFetchDone(true);
+          setIsLoading(false);
         });
     }
   }, [isEditing, initialFetchDone, fetchPersonData]);
 
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     try {
       const formDataToSend = new FormData();
@@ -128,20 +137,34 @@ export default function DisplaySPInfo ({
           <ArrowBack/>
         </IconButton>
         <Typography>
-          Solo Parent Application #{formData.personalInfo.spApplicationID}
+          {isLoading ? 'Loading Application...' : `Solo Parent Application #${formData.personalInfo.spApplicationID}`}
         </Typography>
+        {isLoading && (
+          <CircularProgress 
+            size={24} 
+            sx={{ ml: 2 }}
+          />
+        )}
       </Box>
 
       <Box>
-        <DisplayInfoSections formData={formData} handleEdit={handleEdit} isViewing={isViewing}/>
+        <DisplayInfoSections 
+          formData={formData} 
+          handleEdit={handleEdit} 
+          isViewing={isViewing}
+          isLoading={isLoading}
+        />
         
-        {!isViewing && (<FormButtons
-          onBack = {handleBack} 
-          onNext = {handleSubmit} 
-          backLabel = 'Back' 
-          nextLabel = {isUpdating && !firstMount ? 'Update' : 'Submit'}
-          nextDisabled = { firstMount } 
-        />)}
+        {!isViewing && (!isLoading && (
+          <FormButtons
+            onBack = {handleBack} 
+            onNext = {handleSubmit} 
+            backLabel = 'Back' 
+            nextLabel = {isUpdating && !firstMount ? 'Update' : isSubmitting ? 'Submitting' : 'Submit'}
+            nextDisabled={firstMount || isSubmitting}
+            isLoading={isSubmitting}
+          />
+        ))}
 
         <Notification
           snackbarMessage={snackbarMessage} 

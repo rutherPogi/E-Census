@@ -12,7 +12,7 @@ import PrintID from "../components/steps/PrintID";
 
 
 
-export default function SoloParentForm({ hasSPID = false, isRegistered = false, isViewing = false}) {
+export default function SoloParentForm({ hasSPID = false, isRegistered = false, isViewing = false }) {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [previousPage, setPreviousPage] = useState(null);

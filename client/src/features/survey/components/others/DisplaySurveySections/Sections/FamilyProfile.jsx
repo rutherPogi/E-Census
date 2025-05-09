@@ -169,7 +169,7 @@ export const FamilyProfileSection = ({ members, handleEdit, isViewing = false })
                         <Grid item xs={12} sm={6} md={3}>
                           <Typography variant="subtitle2" color="text.secondary">Contact Number</Typography>
                           <Typography variant="body2">
-                            {member.mobileNumber ? `+63 ${member.mobileNumber}` : 'N/A'}
+                            {member.contactNumber ? `+63 ${member.contactNumber}` : 'N/A'}
                           </Typography>
 
                         </Grid>
@@ -230,7 +230,7 @@ export const FamilyProfileSection = ({ members, handleEdit, isViewing = false })
   
                         <Grid item xs={12} sm={6} md={3}>
                           <Typography variant="subtitle2" color="text.secondary">Health Status</Typography>
-                          <Typography variant="body2">{member.occupation || 'N/A'}</Typography>
+                          <Typography variant="body2">{member.healthStatus || 'N/A'}</Typography>
                         </Grid>
                       </Grid>
 
@@ -248,7 +248,7 @@ export const FamilyProfileSection = ({ members, handleEdit, isViewing = false })
                       </Grid>
                     </Box>
 
-                    {Boolean(member.isTransient) && (
+                    {Boolean(member.isIpula) && (
                       <Box sx={{ border: '1px solid #ccc', borderRadius: 2, padding: 2 }}>
                         <Box sx={{ display: 'flex', gap: 2}}>
                           <Person color="primary"/>
@@ -270,11 +270,6 @@ export const FamilyProfileSection = ({ members, handleEdit, isViewing = false })
                           </Grid>
 
                           <Grid item xs={12} sm={6} md={3}>
-                            <Typography variant="subtitle2" color="text.secondary">Skills</Typography>
-                            <Typography variant="body2">{member.skills || 'N/A'}</Typography>
-                          </Grid>
-
-                          <Grid item xs={12} sm={6} md={3}>
                             <Typography variant="subtitle2" color="text.secondary">Place of Origin</Typography>
                             <Typography variant="body2">{member.placeOfOrigin || 'N/A'}</Typography>
                           </Grid>
@@ -289,7 +284,7 @@ export const FamilyProfileSection = ({ members, handleEdit, isViewing = false })
                               {member.isRegistered && (
                                 <Grid item xs={12} sm={6} md={3}>
                                   <Typography variant="subtitle2" color="text.secondary">Date Registered</Typography>
-                                  <Typography variant="body2">{formatters.date(member.dateRegistered) || 'N/A'}</Typography>
+                                  <Typography variant="body2">{formatters.date(member.transientDateRegistered) || 'N/A'}</Typography>
                                 </Grid>
                               )}
                               

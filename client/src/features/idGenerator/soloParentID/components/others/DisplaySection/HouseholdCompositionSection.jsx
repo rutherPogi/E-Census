@@ -98,7 +98,7 @@ export const HouseholdCompositionSection = ({ members, handleEdit, isViewing = f
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6} md={3}>
                         <Typography variant="subtitle2" color="text.secondary">Age</Typography>
-                        <Typography variant="body2">{member.age}</Typography>
+                        <Typography variant="body2">{member.age || member.formattedAge}</Typography>
                       </Grid>
 
                       <Grid item xs={12} sm={6} md={3}>

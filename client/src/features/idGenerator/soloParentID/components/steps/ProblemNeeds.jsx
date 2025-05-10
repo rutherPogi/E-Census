@@ -69,7 +69,7 @@ export default function ProblemNeeds({ handleBack, handleNext}) {
           value={values.causeSoloParent}
           onChange={handleChange('causeSoloParent')}
           error={errors.causeSoloParent}
-          helperText = {errors.causeSoloParent || 'e.g. ---'}
+          helperText = {errors.causeSoloParent || 'Dahilan bakit naging solo parent'}
           placeholder={'Classification/Circumtances of being a solo parent (Dahilan bakit naging solo parent)'}
           multiline
           required
@@ -78,7 +78,7 @@ export default function ProblemNeeds({ handleBack, handleNext}) {
           value={values.needsSoloParent}
           onChange={handleChange('needsSoloParent')}
           error={errors.needsSoloParent}
-          helperText = {errors.needsSoloParent || 'e.g. Santos'}
+          helperText = {errors.needsSoloParent || 'Kinakailangan/Problema ng isa ng solo parent'}
           placeholder={'Needs/Problem of being a solo parent (Kinakailangan/Problema ng isa ng solo parent)'}
           multiline
           required

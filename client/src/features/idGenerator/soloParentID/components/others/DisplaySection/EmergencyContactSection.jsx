@@ -25,18 +25,6 @@ import { formatters } from "../../../../utils/formatter";
 export const EmergencyContactSection = ({ member, handleEdit, isViewing = false }) => {
 
 
-  if (!member) {
-    return (
-      <Box sx={{ 
-        textAlign: 'center', 
-        py: 5,
-        borderRadius: 2,
-      }}>
-        <Typography color="text.secondary" variant="h6">No emergency contact added</Typography>
-      </Box>
-    );
-  }
-  
   
   return (
     <Box
@@ -88,7 +76,7 @@ export const EmergencyContactSection = ({ member, handleEdit, isViewing = false 
                 }}>
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      {member.contactName}
+                      {member.contactName || 'N/A'}
                     </Typography>
                     {member.relationship && (
                       <Chip 

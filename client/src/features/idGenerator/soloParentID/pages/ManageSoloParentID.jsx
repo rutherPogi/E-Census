@@ -162,7 +162,7 @@ const ManageSoloParentID = () => {
       // Process each deletion one by one to better handle errors
       for (const application of applicationsToDelete) {
         try {
-          const result = await del(`/soloParentID/delete/${application.spApplicationID}`);
+          const result = await del(`/soloParentID/delete/${application.populationID}/${application.spApplicationID}`);
           // Check if response has the expected structure
           if (result && result.success) {
             successCount++;

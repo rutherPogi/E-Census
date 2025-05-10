@@ -162,7 +162,7 @@ const ManagePWDID = () => {
       // Process each deletion one by one to better handle errors
       for (const application of applicationsToDelete) {
         try {
-          const result = await del(`/pwdID/delete/${application.pwdApplicationID}`);
+          const result = await del(`/pwdID/delete/${application.populationID}/${application.pwdApplicationID}`);
           // Check if response has the expected structure
           if (result && result.success) {
             successCount++;

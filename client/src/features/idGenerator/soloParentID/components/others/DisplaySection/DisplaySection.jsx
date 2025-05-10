@@ -79,12 +79,12 @@ export const DisplayInfoSections = ({ formData, handleEdit, isViewing, isLoading
 
           {/* HOUSEHOLD COMPOSITION SECTION */}
           {tabValue === 1 && 
-            <HouseholdCompositionSection members={formData?.householdComposition} handleEdit={handleEdit} isViewing={isViewing}/>
+            <HouseholdCompositionSection members={formData?.householdComposition || formData?.familyBackground } handleEdit={handleEdit} isViewing={isViewing}/>
           }
 
           {/* PROBLEMS AND NEEDS SECTION */}
           {tabValue === 2 &&
-            <ProblemNeedsSection member={formData?.householdComposition} handleEdit={handleEdit} isViewing={isViewing}/>
+            <ProblemNeedsSection member={formData?.problemNeeds} handleEdit={handleEdit} isViewing={isViewing}/>
           }
 
           {/* EMERGENCY CONTACT SECTION */}

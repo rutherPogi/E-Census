@@ -349,28 +349,24 @@ const HouseDetailsDialog = ({ open, onClose, selectedHouse }) => {
                 <CircularProgress />
               </Box>
             ) : household.length > 0 ? (
-              <Box>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2}}>
                 {household.map((member, index) => (
                   <Card sx={{ height: '100%' }}>
-                    <CardContent sx={{ p: 2 }}>
+                    <CardContent>
                       <Box sx={{ 
                         display: 'flex', 
                         alignItems: 'center',
                       }}>
-                        <Avatar sx={{ 
-                          bgcolor: 'primary.main', 
-                          width: 36, 
-                          height: 36, 
-                          mr: 1.5 
-                        }}>
-                          {member.firstName ? member.firstName.charAt(0) : <PersonIcon />}
-                        </Avatar>
-                        <Typography variant="subtitle1" fontWeight="medium" noWrap>
-                          {`${member.firstName}
-                            ${member.middleName ? member.middleName : ''}
-                            ${member.lastName}
-                            ${member.suffix ? member.suffix : ''}`}
-                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2}}>
+                          <Typography variant="subtitle1" fontWeight="medium" noWrap>
+                            {`${member.firstName}
+                              ${member.middleName ? member.middleName : ''}
+                              ${member.lastName}
+                              ${member.suffix ? member.suffix : ''}`}
+                          </Typography>
+                          <Chip size="small" label={member.relationToFamilyHead} 
+                            color={member.relationToFamilyHead === 'Family Head' ? 'secondary' : 'info'}  />
+                        </Box>
                       </Box>
                     </CardContent>
                   </Card>

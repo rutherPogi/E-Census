@@ -94,10 +94,16 @@ export const useFormValidation = (
     } else {
       // For regular text inputs
       value = e.target.value;
-      if (value.length > 50) {
-        value = value.slice(0, 50); // ✂️ Limit to 50 characters
-      }
 
+      if (field === 'issues') {
+        if (value.length > 200) {
+          value = value.slice(0, 200); // Only for 'issues'
+        }
+      } else {
+        if (value.length > 50) {
+          value = value.slice(0, 50); // All other fields
+        }
+      }
     }
     
     setValues(prev => ({ ...prev, [field]: value }));

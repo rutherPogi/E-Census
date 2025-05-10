@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { Notification, FormButtons } from "../../../../../components/common";
 import { PI_INITIAL_VALUES } from "../../utils/initialValues";
@@ -26,11 +26,13 @@ import {
 
 export default function PersonalInfo({ handleBack, handleNext, isRegistered = false}) {
 
-  const { soloParentIDNumber, populationID } = useParams();
+  const { spApplicationID, populationID } = useParams();
 
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData(soloParentIDNumber, populationID, soloParentIDNumber);
+  const { fetchPersonData } = useTransformData(spApplicationID, populationID, spApplicationID);
+
+  const navigate = useNavigate();
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
@@ -44,7 +46,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
     handleContactChange,
     handleIncomeChange
   } = useFormValidation(
-    PI_INITIAL_VALUES(soloParentIDNumber, populationID, userData.barangay),
+    PI_INITIAL_VALUES(spApplicationID, populationID, userData.barangay),
     true, 
     PI_REQUIRED_FIELDS
   );
@@ -166,7 +168,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
         
       </div>
       <FormButtons
-        onBack = {handleBack} 
+        onBack={() => navigate(-1)}
         onNext = {handleSubmit} 
         backLabel = 'Cancel' 
         nextLabel = 'Next' 

@@ -66,9 +66,16 @@ export const useFormValidation = (
     } else {
       // For regular text inputs
       value = e.target.value;
-      if (value.length > 50) {
-        value = value.slice(0, 50); // ✂️ Limit to 50 characters
+      if (field === 'causeSoloParent' || field === 'needsSoloParent'  ) {
+        if (value.length > 200) {
+          value = value.slice(0, 200); // ✂️ Limit to 50 characters
+        }
+      } else {
+        if (value.length > 50) {
+          value = value.slice(0, 50); // ✂️ Limit to 50 characters
+        }
       }
+      
     }
     
     setValues(prev => ({ ...prev, [field]: value }));

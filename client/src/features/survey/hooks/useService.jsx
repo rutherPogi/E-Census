@@ -106,10 +106,18 @@ export const useServiceForm = () => {
     } 
     // Handle text input case where e.target.value exists
     else if (e && e.target) {
-      const value = e.target.value;
-      if (value.length > 50) {
-        value = value.slice(0, 100); // ✂️ Limit to 50 characters
+      let value = e.target.value;
+
+      if(field === 'howServiceHelp') {
+        if (value.length > 200) {
+          value = value.slice(0, 200); // Only for 'issues'
+        }
+      } else {
+        if (value.length > 50) {
+          value = value.slice(0, 50); // ✂️ Limit to 50 characters
+        }
       }
+      
       setValues(prev => ({ ...prev, [field]: value }));
     }
     

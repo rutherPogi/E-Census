@@ -12,7 +12,6 @@ export function useHousehold() {
       try {
         setIsLoading(true);
         const response = await get('/hazzardMap/household');
-        console.log('HOUSEHOLD RESPONSE:', response);
         setHousehold(response);
       } catch (err) {
         setError('Failed to fetch household');

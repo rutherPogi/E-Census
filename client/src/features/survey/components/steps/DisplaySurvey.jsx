@@ -69,12 +69,13 @@ export default function DisplaySurvey({
     
     if (isSubmitting) return;
     setIsSubmitting(true);
+
+    const processedFormData = { ...formData };
         
   
     try {
       const formDataToSend = new FormData();
-      const processedFormData = { ...formData };
-
+      
       if (formData.houseInfo?.houseImages && formData.houseInfo.houseImages.length > 0) {
 
         formData.houseInfo.houseImages.forEach((imageObj) => {
@@ -108,11 +109,16 @@ export default function DisplaySurvey({
       showNotification('Survey submission failed. Saving data locally...', 'error');
   
       try {
-        await saveSurveyToDB(`local-${Date.now()}`, processedFormData);
-        showNotification('Survey saved locally. Please resubmit when online.', 'info');
-      } catch (localErr) {
-        console.error('Local save failed:', localErr);
-        showNotification('Local save failed. Please do not close this page.', 'error');
+        const id = `local-${Date.now()}`;
+        console.log('Saving locally with ID:', id);
+        await saveSurveyToDB(id, processedFormData);
+        console.log('Successfully saved to IndexedDB');
+        showNotification('Survey saved locally', 'info');
+        setTimeout(() => handleRestart(), 1000);
+        clearFormData();
+      } catch (err) {
+        console.error('Failed to save locally:', err);
+        showNotification('Failed to save locally', 'error');
       }
   
       if (error.response) {

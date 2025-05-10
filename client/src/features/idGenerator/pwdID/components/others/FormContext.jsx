@@ -25,10 +25,10 @@ export function FormProvider({ children }) {
   };
 
   const addItem = (section, item) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: [...prev[section], item]
-    }));
+    setFormData(prev => {
+      const existing = Array.isArray(prev[section]) ? prev[section] : [];
+      return { ...prev, [section]: [...existing, item] };
+    });
   };
 
   const updateItem = (section, index, updatedItem) => {

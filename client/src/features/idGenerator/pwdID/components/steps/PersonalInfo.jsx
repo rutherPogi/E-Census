@@ -30,7 +30,7 @@ export default function PersonalInfo({ handleBack, handleNext, isRegistered = fa
   const { pwdIDNumber, populationID } = useParams();
   const { userData } = useAuth();
   const { formData, updateFormData } = useFormContext();
-  const { fetchPersonData } = useTransformData(pwdIDNumber, populationID);
+  const { fetchPersonData } = useTransformData(pwdIDNumber, populationID, pwdIDNumber);
 
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 

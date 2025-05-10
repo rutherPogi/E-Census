@@ -81,8 +81,8 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
                     ].filter(Boolean).join(' ')}
                   </TableCell>
                   <TableCell>
-                    {person.soloParentIDNumber 
-                      ? ( person.soloParentIDNumber ) 
+                    {person.soloParentIDNumber || person.spApplicationID 
+                      ? ( person.soloParentIDNumber || person.spApplicationID ) 
                       : (<Chip label="Not Yet Applied" color="error" size="small" />)
                     }
                   </TableCell>

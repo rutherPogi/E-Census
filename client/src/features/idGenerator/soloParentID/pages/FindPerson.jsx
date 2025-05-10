@@ -148,6 +148,7 @@ export default function SPFindPerson() {
       
       <FormButtons 
         onNext={handleSubmit}
+        onBack={() => navigate(-1)}
         backLabel="Back"
         nextLabel={loading ? 'Searching...' : 'Find Person'}
         nextDisabled={loading || !values.firstName || !values.lastName}

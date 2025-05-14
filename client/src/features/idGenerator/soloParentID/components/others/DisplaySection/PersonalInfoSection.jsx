@@ -118,7 +118,7 @@ export const PersonalInfoSection = ({member, handleEdit, isViewing = false}) => 
               <Typography variant="body2">{member.emailAddress || 'N/A'}</Typography>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Typography variant="subtitle2" color="text.secondary">House Number & Street</Typography>
+              <Typography variant="subtitle2" color="text.secondary">Address</Typography>
               <Typography variant="body2">
                 {`${member.street}
                   ${member.barangay}

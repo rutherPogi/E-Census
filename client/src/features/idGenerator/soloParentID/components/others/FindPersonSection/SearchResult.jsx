@@ -52,6 +52,8 @@ const SearchResultsTable = ({ searchResults, selectedPerson, handleSelectPerson 
             {searchResults.map((person, index) => {
 
               const uniqueKey = person.personalInfoID || `person-${index}`;
+
+              console.log('PERSON', person);
               
               return (
                 <TableRow 

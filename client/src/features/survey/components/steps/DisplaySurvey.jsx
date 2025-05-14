@@ -86,7 +86,8 @@ export default function DisplaySurvey({
         
         processedFormData.houseInfo.houseImages = formData.houseInfo.houseImages.map(img => ({
           houseImageID: img.houseImageID,
-          title: img.title
+          title: img.title,
+          file: img.file 
         }));
       }
 

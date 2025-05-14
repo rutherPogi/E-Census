@@ -130,10 +130,10 @@ export const FAMILY_COMPOSITION_HEADERS = [
 ];
 
 export const MANAGE_TABLE_HEADERS = [
-  "Survey ID", 
-  "Respondent", 
-  "Interviewer", 
-  "Date of Survey", 
+  "Applicantion ID", 
+  "Name", 
+  "Resident", 
+  "Date of Applied", 
   "Actions"
 ];
 

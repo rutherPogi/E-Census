@@ -245,11 +245,7 @@ const ManagePWDID = () => {
                 icon={<Edit />}
                 label="Edit"
                 color="#ff9800"
-                to={
-                  application.populationID 
-                    ? `/main/generate-id/pwd/resident/${application.pwdApplicationID}/${application.populationID}` 
-                    : `/main/generate-id/pwd/renewal/${application.pwdApplicationID}`
-                }
+                to={`/main/generate-id/pwd/renewal/${application.pwdApplicationID}`}
               />
             </Box>
           </Tooltip>

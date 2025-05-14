@@ -245,11 +245,7 @@ const ManageSoloParentID = () => {
                 icon={<Edit />}
                 label="Edit"
                 color="#ff9800"
-                to={
-                  application.populationID 
-                    ? `/main/generate-id/solo-parent/resident/${application.spApplicationID}/${application.populationID}` 
-                    : `/main/generate-id/solo-parent/renewal/${application.spApplicationID}`
-                }
+                to={`/main/generate-id/solo-parent/renewal/${application.spApplicationID}`}
               />
             </Box>
           </Tooltip>

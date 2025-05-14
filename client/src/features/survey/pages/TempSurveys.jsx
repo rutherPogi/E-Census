@@ -145,29 +145,45 @@ const TempSurvey = () => {
   };
 
   const handleSubmitSurveys = async () => {
-
     const localSurveys = await getAllSurveysFromDB();
-
+  
     for (const survey of localSurveys) {
       try {
-
         const formDataToSend = new FormData();
-        
-        // Reconstruct images if needed
+  
         if (survey.data?.houseInfo?.houseImages) {
-          survey.data.houseInfo.houseImages.forEach(img => {
-            if (img.file) {
-              formDataToSend.append('houseImages', img.file);
+          survey.data.houseInfo.houseImages.forEach((img, index) => {
+            console.log("Raw image object from IndexedDB:", img);
+  
+            let blob;
+  
+            // Handle actual Blob
+            if (img.file instanceof Blob) {
+              blob = img.file;
+  
+            // Handle deserialized object (likely format from IndexedDB)
+            } else if (img.file?.data && img.file?.type) {
+              blob = new Blob([new Uint8Array(img.file.data)], { type: img.file.type });
+  
+            } else {
+              console.warn("Skipping invalid image file:", img.file);
+              return;
             }
+  
+            console.log(`Appending image #${index}:`, blob);
+            formDataToSend.append('houseImages', blob, `image-${index}.jpg`);
           });
         }
   
         formDataToSend.append('surveyData', JSON.stringify(survey.data));
   
-        // Send to server
+        // Optional: log all formData contents
+        for (let [key, value] of formDataToSend.entries()) {
+          console.log(`${key}:`, value);
+        }
+  
         await post('/surveys/submit', formDataToSend, true);
   
-        // On success, delete local copy
         await deleteSurveyFromDB(survey.id);
         showNotification(`Synced survey ${survey.id}`, 'success');
         loadLocalSurveys();
@@ -176,9 +192,9 @@ const TempSurvey = () => {
         showNotification(`Failed to sync ${survey.id}`, 'error');
       }
     }
-
-  }
-
+  };
+  
+  
   const renderSurveyRow = (survey, index) => (
     <TableRow key={survey.id || index}>
       <TableCell padding="checkbox">

@@ -243,11 +243,7 @@ const ManageSeniorCitizenID = () => {
                 icon={<Edit />}
                 label="Edit"
                 color="#ff9800"
-                to={
-                  application.populationID 
-                    ? `/main/generate-id/senior-citizen/resident/${application.scApplicationID}/${application.populationID}` 
-                    : `/main/generate-id/senior-citizen/renewal/${application.scApplicationID}`
-                }
+                to={`/main/generate-id/senior-citizen/renewal/${application.scApplicationID}`}
               />
             </Box>
           </Tooltip>
